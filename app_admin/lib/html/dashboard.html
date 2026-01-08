@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau De Bord</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style/style_main.css">
+</head>
+
+<body>
+    <main id="scenario-view" class="container animate-page">
+        
+        <div class="page-header" style="align-items: flex-start; flex-direction: column;">
+            
+            <button class="btn btn-outline"
+                style="border:none; padding-left:0; margin-bottom: 1rem;">← Retour</button>
+            <div style="display:flex; justify-content: space-between; width:100%; align-items: flex-end;">
+                <h2 id="current-scenario-title" class="page-title uppercase rapprochement-letter">Titre</h2>
+                <button class="btn btn-black">+ Nouveau dialogue</button>
+            </div>
+        </div>
+        <table class="dialogue-table">
+            <thead>
+                <tr class="uppercase">
+                    <th>ID</th>
+                    <th>Locuteur</th>
+                    <th>Contenu du message</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody class="dialogue-list-body">
+
+            </tbody>
+        </table>
+    </main>
+
+    <script src="../../js/manage_scenario.js"></script>
+</body>
+
+</html>
