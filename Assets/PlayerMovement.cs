@@ -1,21 +1,23 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
 
-
 public class PlayerMovement : MonoBehaviour
 {
-    private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Animator animator;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    // Propriétés pour que le PlayerController puisse lire la direction du regard
+    public Vector2 MoveInput => moveInput;
+    public Vector2 LastInput => new Vector2(animator.GetFloat("LastinputX"), animator.GetFloat("LastinputY"));
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         rb.linearVelocity = moveInput * moveSpeed;

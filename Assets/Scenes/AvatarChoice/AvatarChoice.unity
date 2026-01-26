@@ -1106,6 +1106,9 @@ PrefabInstance:
       addedObject: {fileID: 1726201129}
     - targetCorrespondingSourceObject: {fileID: 6089344898181113419, guid: a8b819ae0d3969944b37778a9698bf10, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1726201131}
+    - targetCorrespondingSourceObject: {fileID: 6089344898181113419, guid: a8b819ae0d3969944b37778a9698bf10, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1726201130}
   m_SourcePrefab: {fileID: 100100000, guid: a8b819ae0d3969944b37778a9698bf10, type: 3}
 --- !u!1 &1704356227 stripped
@@ -1118,6 +1121,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5322888952951781929, guid: 7e551bef5a6b36c4494b0a8e61e46970, type: 3}
   m_PrefabInstance: {fileID: 1743998089}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1704356229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704356227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 139b09caa5cf4e24ab3d4ac7fe191f44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &1714528405
 GameObject:
   m_ObjectHideFlags: 0
@@ -1273,6 +1291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f993988baa71cb4789b9b89a60ba233, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  moveSpeed: 5
 --- !u!50 &1726201130
 Rigidbody2D:
   serializedVersion: 5
@@ -1300,6 +1319,21 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1726201131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726201123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 139b09caa5cf4e24ab3d4ac7fe191f44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &1732586615
 GameObject:
   m_ObjectHideFlags: 0
@@ -1437,16 +1471,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8413601419548947446, guid: 7e551bef5a6b36c4494b0a8e61e46970, type: 3}
       propertyPath: m_ActionEvents.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8413601419548947446, guid: 7e551bef5a6b36c4494b0a8e61e46970, type: 3}
       propertyPath: m_ActionEvents.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: 
+      value: Move
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1189374526741456616, guid: 7e551bef5a6b36c4494b0a8e61e46970, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1704356229}
   m_SourcePrefab: {fileID: 100100000, guid: 7e551bef5a6b36c4494b0a8e61e46970, type: 3}
 --- !u!1 &1899891178
 GameObject:
