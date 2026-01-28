@@ -15,25 +15,42 @@ public class SaveController : MonoBehaviour
 
     public void SaveGame()
     {
-        SaveData saveData = new SaveData
-        {
-            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position,
-            mapBoundary = FindObjectOfType<CinemachineConfiner>().m_BoundingShape2D.gameObject.name
-        };
-        File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
+    GameObject player = GameObject.FindGameObjectWithTag("Player");
+    if (player == null) return; // Sécurité : on arrête si le joueur n'est pas là
+
+    SaveData saveData = new SaveData();
+    saveData.playerPosition = player.transform.position;
+
+    // On vérifie si la Cinemachine existe avant de sauvegarder les limites
+    CinemachineConfiner confiner = FindObjectOfType<CinemachineConfiner>();
+    if (confiner != null && confiner.m_BoundingShape2D != null)
+    {
+        saveData.mapBoundary = confiner.m_BoundingShape2D.gameObject.name;
+    }
+
+    File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
     }
 
     public void LoadGame()
     {
-        if(File.Exists(saveLocation))
+        if (!File.Exists(saveLocation)) return;
+
+        SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
+        
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
         {
-            SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
-            GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
-            FindObjectOfType<CinemachineConfiner>().m_BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
+            player.transform.position = saveData.playerPosition;
         }
-        else
+
+        CinemachineConfiner confiner = FindObjectOfType<CinemachineConfiner>();
+        if (confiner != null && !string.IsNullOrEmpty(saveData.mapBoundary))
         {
-            SaveGame();
+            GameObject boundaryObj = GameObject.Find(saveData.mapBoundary);
+            if (boundaryObj != null)
+            {
+                confiner.m_BoundingShape2D = boundaryObj.GetComponent<PolygonCollider2D>();
+            }
         }
     }
 }
