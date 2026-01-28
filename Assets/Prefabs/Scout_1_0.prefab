@@ -342,18 +342,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-<<<<<<< HEAD
   m_Offset: {x: 0, y: 0}
-=======
-  m_Offset: {x: 0, y: -0.18165031}
-  m_Offset: {x: 0, y: 0}
-    newSize: {x: 1, y: 1.875}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-<<<<<<< HEAD
-  m_Size: {x: 1, y: 1.875}
-=======
-  m_Size: {x: 1, y: 1.5116994}
   m_Size: {x: 1, y: 1.875}
