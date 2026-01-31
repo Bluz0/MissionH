@@ -32627,8 +32627,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
   tousLesAvatars:
-  - {fileID: 1189374526741456616, guid: 7e551bef5a6b36c4494b0a8e61e46970, type: 3}
-  - {fileID: 6089344898181113419, guid: a8b819ae0d3969944b37778a9698bf10, type: 3}
+  - {fileID: 4527684438011268191, guid: 5d1baa3c95978e6459dea357668dce49, type: 3}
   vcam: {fileID: 596937104}
 --- !u!4 &572442096
 Transform:
