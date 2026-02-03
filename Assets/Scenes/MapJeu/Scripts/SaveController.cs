@@ -7,50 +7,37 @@ using UnityEngine;
 public class SaveController : MonoBehaviour
 {
     private string saveLocation;
+    private InventoryController inventoryController;
     void Start()
     {
         saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");
+        inventoryController = FindAnyObjectByType<InventoryController>();
         LoadGame();
     }
 
     public void SaveGame()
     {
-    GameObject player = GameObject.FindGameObjectWithTag("Player");
-    if (player == null) return; // Sécurité : on arrête si le joueur n'est pas là
-
-    SaveData saveData = new SaveData();
-    saveData.playerPosition = player.transform.position;
-
-    // On vérifie si la Cinemachine existe avant de sauvegarder les limites
-    CinemachineConfiner confiner = FindObjectOfType<CinemachineConfiner>();
-    if (confiner != null && confiner.m_BoundingShape2D != null)
-    {
-        saveData.mapBoundary = confiner.m_BoundingShape2D.gameObject.name;
-    }
-
-    File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
+        SaveData saveData = new SaveData
+        {
+            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position,
+            mapBoundary = FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D.gameObject.name,
+            inventorySaveData = inventoryController.GetInventoryItems()
+        };
+        File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
     }
 
     public void LoadGame()
     {
-        if (!File.Exists(saveLocation)) return;
-
-        SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
-        
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        if (File.Exists(saveLocation))
         {
-            player.transform.position = saveData.playerPosition;
+            SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
+            GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
+            FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
+            inventoryController.SetInventoryItems(saveData.inventorySaveData);
         }
-
-        CinemachineConfiner confiner = FindObjectOfType<CinemachineConfiner>();
-        if (confiner != null && !string.IsNullOrEmpty(saveData.mapBoundary))
+        else
         {
-            GameObject boundaryObj = GameObject.Find(saveData.mapBoundary);
-            if (boundaryObj != null)
-            {
-                confiner.m_BoundingShape2D = boundaryObj.GetComponent<PolygonCollider2D>();
-            }
+            SaveGame();
         }
     }
 }

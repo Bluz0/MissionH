@@ -13,7 +13,7 @@ public class MapTransitions : MonoBehaviour
 
     private void Awake()
     {
-        confiner = FindObjectOfType<CinemachineConfiner>();
+        confiner = FindAnyObjectByType<CinemachineConfiner>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

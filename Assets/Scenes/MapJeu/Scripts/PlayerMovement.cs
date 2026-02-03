@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
     void StopMovementAnimations()
     {
         animator.SetBool("isWalking", false);
-        animator.SetFloat("LastinputX", moveInput.x);
-        animator.SetFloat("LastinputY", moveInput.y);
+        animator.SetFloat("LastInputX", moveInput.x);
+        animator.SetFloat("LastInputY", moveInput.y);
     }
 }
