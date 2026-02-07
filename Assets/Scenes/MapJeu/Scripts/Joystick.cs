@@ -26,10 +26,9 @@ public class Joystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointer
             eventData.pressEventCamera,
             out localPos))
         {
-            // Position relative AU CENTRE du background
             Vector2 offset = localPos - backgroundCenter;
-
             Vector2 radius = background.sizeDelta / 2f;
+            
             Vector2 normalized = new Vector2(
                 offset.x / radius.x,
                 offset.y / radius.y
@@ -44,10 +43,7 @@ public class Joystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointer
         }
     }
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        OnDrag(eventData);
-    }
+    public void OnPointerDown(PointerEventData eventData) => OnDrag(eventData);
 
     public void OnPointerUp(PointerEventData eventData)
     {
