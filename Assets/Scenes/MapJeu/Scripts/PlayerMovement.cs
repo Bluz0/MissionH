@@ -9,6 +9,10 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator animator;
+    
+    // --- AJOUT POUR LA LIAISON AVEC PLAYERCONTROLLER ---
+    public Vector2 MoveInput => Joystick.valeurInput;
+    public Vector2 LastInput => new Vector2(animator.GetFloat("LastInputX"), animator.GetFloat("LastInputY"));
 
     void Start()
     {
@@ -52,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void StopMovementAnimations()
+    public void StopMovementAnimations()
     {
         animator.SetBool("isWalking", false);
         // On garde la dernière direction pour l'Idle
