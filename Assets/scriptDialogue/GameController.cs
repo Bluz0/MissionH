@@ -9,14 +9,12 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        // Si non assigné dans l'inspecteur, on le cherche
         if (playerController == null)
             playerController = Object.FindFirstObjectByType<PlayerController>();
 
         DialogManager.Instance.OnshowDialog += () =>
         {
             state = GameState.Dialog;
-            // On force l'arrêt visuel du joueur quand il commence à parler
             playerController?.GetComponent<PlayerMovement>()?.StopMovementAnimations();
         };
 
@@ -27,17 +25,29 @@ public class GameController : MonoBehaviour
         };
     }
 
+    // CETTE FONCTION EST LE NOUVEL AIGUILLAGE POUR LE BOUTON
+    public void OnActionButtonPressed()
+    {
+        if (state == GameState.FreeRoam)
+        {
+            // Si on se promène, on demande au joueur d'interagir
+            playerController.OnInteractButtonPressed();
+        }
+        else if (state == GameState.Dialog)
+        {
+            // Si on est en dialogue, on demande au DialogManager de passer à la suite
+            DialogManager.Instance.OnNextLinePressed();
+        }
+    }
+
     private void Update()
     {
         if (playerController == null) return;
 
+        // On garde HandleUpdate pour la touche F (PC)
         if (state == GameState.FreeRoam)
-        {
             playerController.HandleUpdate();
-        } 
         else if (state == GameState.Dialog)
-        {
             DialogManager.Instance.HandleUpdate();
-        }
     }
 }

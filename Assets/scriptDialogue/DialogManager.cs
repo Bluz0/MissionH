@@ -1,26 +1,26 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro; // Nécessaire pour TextMeshPro
 using UnityEngine.UI;
 using System;
-using UnityEngine.InputSystem;
 
 public class DialogManager : MonoBehaviour
 {
     [SerializeField] GameObject dialogBox;
-    [SerializeField] Text dialogText;
+    [SerializeField] Text dialogText; 
     [SerializeField] int lettersPerSecond;
+
+    // AJOUT : Référence au texte du bouton
+    [SerializeField] TMP_Text interactButtonText; 
 
     public event Action OnshowDialog;
     public event Action OnHideDialog;
     public static DialogManager Instance { get; private set; }
 
-    private InputAction interactAction;
-
     private void Awake()
     {
         Instance = this;
-        interactAction = new InputAction("Interact", InputActionType.Button, "<Keyboard>/f");
-        interactAction.Enable();
     }
 
     Dialog dialog;
@@ -30,6 +30,10 @@ public class DialogManager : MonoBehaviour
     public IEnumerator ShowDialog(Dialog dialog)
     {
         yield return new WaitForEndOfFrame();
+        
+        // On change le texte du bouton au début du dialogue
+        if (interactButtonText != null) interactButtonText.text = "Suivant";
+
         OnshowDialog?.Invoke();
 
         this.dialog = dialog;
@@ -37,9 +41,9 @@ public class DialogManager : MonoBehaviour
         StartCoroutine(TypeDialog(dialog.Lines[0]));
     }
 
-    public void HandleUpdate()
+    public void OnNextLinePressed()
     {
-        if (interactAction.triggered && !isTyping)
+        if (!isTyping)
         {
             ++currentLine;
             if (currentLine < dialog.Lines.Count)
@@ -48,10 +52,23 @@ public class DialogManager : MonoBehaviour
             }
             else
             {
+                // Fin du dialogue : on ferme et on remet le texte initial
                 dialogBox.SetActive(false);
                 currentLine = 0;
+
+                if (interactButtonText != null) interactButtonText.text = "Interagir";
+
                 OnHideDialog?.Invoke();
             }
+        }
+    }
+
+    public void HandleUpdate()
+    {
+        // On garde la touche F pour le debug PC
+        if (UnityEngine.InputSystem.Keyboard.current.fKey.wasPressedThisFrame && !isTyping)
+        {
+            OnNextLinePressed();
         }
     }
 
@@ -66,6 +83,4 @@ public class DialogManager : MonoBehaviour
         }
         isTyping = false;
     }
-
-    private void OnDestroy() => interactAction.Disable();
 }

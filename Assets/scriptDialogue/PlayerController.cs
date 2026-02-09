@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,18 +12,19 @@ public class PlayerController : MonoBehaviour
 
     public void HandleUpdate()
     {
-        if (Keyboard.current.fKey.wasPressedThisFrame)
+        // On laisse la touche F pour les tests sur PC, mais le bouton mobile utilisera la fonction ci-dessous
+        if (UnityEngine.InputSystem.Keyboard.current.fKey.wasPressedThisFrame)
         {
-            Interact();
+            OnInteractButtonPressed();
         }
     }
 
-    void Interact()
+    // CETTE FONCTION SERA APPELÉE PAR LE BOUTON UI
+    public void OnInteractButtonPressed()
     {
         // On récupère la direction depuis le mouvement
         Vector2 direction = (playerMovement.MoveInput != Vector2.zero) ? playerMovement.MoveInput : playerMovement.LastInput;
         
-        // On normalise pour éviter des rayons trop longs en diagonale
         Vector3 interactPos = transform.position + new Vector3(direction.x, direction.y, 0).normalized;
 
         Collider2D collider = Physics2D.OverlapCircle(interactPos, 0.3f, interactableLayer);
