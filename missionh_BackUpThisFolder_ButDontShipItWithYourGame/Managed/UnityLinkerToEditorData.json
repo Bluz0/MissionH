@@ -1682,6 +1682,7 @@
           {
             "name": "Font",
             "scenes": [
+              "Assets/Scenes/MapJeu/map_jeu.unity",
               "Assets/Scenes/TitleScreen/TitleScreen.unity"
             ],
             "dependencyType": 0,
