@@ -7,5 +7,8 @@ public class SaveData
 {
     public Vector3 playerPosition;
     public string mapBoundary;
+
     public List<InventorySaveData> inventorySaveData = new List<InventorySaveData>();
+    public List<InventorySaveData> hotbarSaveData = new List<InventorySaveData>();
 }
+

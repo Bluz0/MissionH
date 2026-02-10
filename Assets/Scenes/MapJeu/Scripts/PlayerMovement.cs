@@ -1,52 +1,66 @@
-using UnityEngine.InputSystem;
 using UnityEngine;
-
 
 public class PlayerMovement : MonoBehaviour
 {
-    private float moveSpeed = 5f;
+    [Header("Paramètres de vitesse")]
+    public float walkSpeed = 5f;    // Vitesse normale
+    public float runSpeed = 8f;     // Vitesse accélérée
+    public float sprintThreshold = 0.85f; // Seuil du joystick pour courir (0 à 1)
+
     private Rigidbody2D rb;
-    private Vector2 moveInput;
     private Animator animator;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
+    // --- AJOUT POUR LA LIAISON AVEC PLAYERCONTROLLER ---
+    public Vector2 MoveInput => Joystick.valeurInput;
+    public Vector2 LastInput => new Vector2(animator.GetFloat("LastInputX"), animator.GetFloat("LastInputY"));
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (PauseController.IsGamePaused)
         {
-            if(rb.linearVelocity != Vector2.zero)
-            {
-                rb.linearVelocity = Vector2.zero;
-                StopMovementAnimations();
-            }
+            rb.linearVelocity = Vector2.zero;
+            StopMovementAnimations();
             return;
         }
-        rb.linearVelocity = moveInput * moveSpeed;
-        animator.SetBool("isWalking", rb.linearVelocity.magnitude > 0);
-    }
 
-    public void Move(InputAction.CallbackContext context)
-    {
-        animator.SetBool("isWalking", true);
-        if (context.canceled)
+        Vector2 moveInput = Joystick.valeurInput;
+        float inputMagnitude = moveInput.magnitude;
+
+        if (inputMagnitude > 0)
         {
+            // --- LOGIQUE D'ACCÉLÉRATION ---
+            // Si on pousse le stick à plus de 85%, on utilise runSpeed, sinon walkSpeed
+            float currentSpeed = (inputMagnitude > sprintThreshold) ? runSpeed : walkSpeed;
+            
+            rb.linearVelocity = moveInput * currentSpeed;
+
+            // --- ANIMATIONS ---
+            animator.SetBool("isWalking", true);
+            
+            // Si tu as une animation de course, tu peux utiliser ce paramètre :
+            // animator.SetBool("isRunning", inputMagnitude > sprintThreshold);
+
+            animator.SetFloat("InputX", moveInput.x);
+            animator.SetFloat("InputY", moveInput.y);
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
             StopMovementAnimations();
         }
-        moveInput = context.ReadValue<Vector2>();
-        animator.SetFloat("InputX", moveInput.x);
-        animator.SetFloat("InputY", moveInput.y);
     }
 
-    void StopMovementAnimations()
+    public void StopMovementAnimations()
     {
         animator.SetBool("isWalking", false);
-        animator.SetFloat("LastInputX", moveInput.x);
-        animator.SetFloat("LastInputY", moveInput.y);
+        // On garde la dernière direction pour l'Idle
+        animator.SetFloat("LastInputX", animator.GetFloat("InputX"));
+        animator.SetFloat("LastInputY", animator.GetFloat("InputY"));
     }
 }

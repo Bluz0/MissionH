@@ -1,21 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MenuController : MonoBehaviour
 {
     public GameObject menuCanvas;
+    public GameObject menuButton;
+    public GameObject joystick;
+    public GameObject interactButton;
 
     void Start()
     {
         menuCanvas.SetActive(false);
     }
 
-    void Update()
+    public void ToggleMenu()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            menuCanvas.SetActive(!menuCanvas.activeSelf);
-        }
+        bool isOpen = !menuCanvas.activeSelf;
+
+        menuCanvas.SetActive(isOpen);
+        joystick.SetActive(!isOpen);
+        interactButton.SetActive(!isOpen);
+        PauseController.SetPause(isOpen);
     }
 }
