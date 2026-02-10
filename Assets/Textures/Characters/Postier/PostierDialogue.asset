@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a9838ce5f0b3884ea4824bcd232a85f, type: 3}
+  m_Name: PostierDialogue
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
+  npcName: Postier
+  npcPortrait: {fileID: -1272629535, guid: 6fa2e1c373ed7f34f8174d58ea3ec48a, type: 3}
+  dialogueLines:
+  - Bonjour, chere eleve !
+  - "Tu as l'air d'\xEAtre pr\xE9sser"
+  autoProgressLines: 0100
+  autoProgressDelay: 1.5
+  typingSpeed: 0.05
+  voiceSound: {fileID: 8300000, guid: 983c08dbf3aaf684d96f8fc1ba412d09, type: 3}
+  voicePitch: 1

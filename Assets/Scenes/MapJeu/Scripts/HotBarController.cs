@@ -23,6 +23,7 @@ public class HotBarController : MonoBehaviour
             else
                 hotbarKeys[i] = Key.Digit0;
         }
+        highlight.gameObject.SetActive(false);
         GenerateSlots();
     }
 
@@ -38,23 +39,6 @@ public class HotBarController : MonoBehaviour
             Instantiate(slotPrefab, hotbarPanel.transform);
     }
 
-    void Update()
-    {
-#if UNITY_STANDALONE || UNITY_EDITOR
-        if (Keyboard.current == null)
-            return;
-
-        for (int i = 0; i < slotCount; i++)
-        {
-            if (Keyboard.current[hotbarKeys[i]].wasPressedThisFrame)
-            {
-                UseItemInSlot(i);
-            }
-        }
-#endif
-    }
-
-
     void UseItemInSlot(int index)
     {
         Slot slot = hotbarPanel.transform.GetChild(index).GetComponent<Slot>();
@@ -69,11 +53,16 @@ public class HotBarController : MonoBehaviour
     public void SelectSlot(int index)
     {
         selectedIndex = index;
+
         Transform slot = hotbarPanel.transform.GetChild(index);
+        if (!highlight.gameObject.activeSelf)
+            highlight.gameObject.SetActive(true);
         highlight.SetParent(slot, false);
+
         highlight.anchoredPosition = Vector2.zero;
         highlight.SetAsLastSibling();
     }
+
 
 
     public List<InventorySaveData> GetHotBarItems()

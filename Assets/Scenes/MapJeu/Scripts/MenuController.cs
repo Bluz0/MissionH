@@ -3,9 +3,9 @@ using UnityEngine;
 public class MenuController : MonoBehaviour
 {
     public GameObject menuCanvas;
-    public GameObject menuButton;      // Bouton pour ouvrir le menu
-    public GameObject joystick;        // Joystick de déplacement
-    public GameObject interactButton;  // Bouton d'interaction
+    public GameObject menuButton;
+    public GameObject joystick;
+    public GameObject interactButton;
 
     void Start()
     {
@@ -19,5 +19,6 @@ public class MenuController : MonoBehaviour
         menuCanvas.SetActive(isOpen);
         joystick.SetActive(!isOpen);
         interactButton.SetActive(!isOpen);
+        PauseController.SetPause(isOpen);
     }
 }
