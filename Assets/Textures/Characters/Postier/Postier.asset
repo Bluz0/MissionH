@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a9838ce5f0b3884ea4824bcd232a85f, type: 3}
-  m_Name: PostierDialogue
+  m_Name: Postier
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
-  npcName: Postier
-  npcPortrait: {fileID: -1272629535, guid: 6fa2e1c373ed7f34f8174d58ea3ec48a, type: 3}
+  npcName: Ayoub
+  npcPortrait: {fileID: 6567824428080183441, guid: c4922f4768d6be846b28d421cb87e00b, type: 3}
   dialogueLines:
   - Bonjour, chere eleve !
-  - "Tu as l'air d'\xEAtre pr\xE9sser"
+  - Comment vas-tu, Aujourd'hui ?
   autoProgressLines: 0100
   autoProgressDelay: 1.5
   typingSpeed: 0.05
