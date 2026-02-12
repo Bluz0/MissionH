@@ -839,7 +839,6 @@ UnityEngine.HDROutputSettings::GetDisplayColorGamut
 UnityEngine.HDROutputSettings::GetGraphicsFormat
 UnityEngine.ImageConversion::EncodeToPNG_Injected
 UnityEngine.Input::CheckDisabled
-UnityEngine.Input::GetKeyDownInt
 UnityEngine.Input::GetKeyInt
 UnityEngine.Input::GetMouseButton
 UnityEngine.Input::GetMouseButtonDown
@@ -1148,7 +1147,6 @@ UnityEngine.PhysicsScene::OverlapSphereNonAlloc_Internal_Injected
 UnityEngine.PhysicsScene2D::GetRayIntersectionArray_Internal_Injected
 UnityEngine.PhysicsScene2D::RaycastArray_Internal_Injected
 UnityEngine.PhysicsScene2D::RaycastList_Internal_Injected
-UnityEngine.PhysicsScene2D::OverlapCircle_Internal_Injected
 UnityEngine.PhysicsScene2D::GetRayIntersection_Internal_Injected
 UnityEngine.PhysicsScene2D::Raycast_Internal_Injected
 UnityEngine.Playables.PlayableDirector::get_duration_Injected
@@ -1641,6 +1639,7 @@ UnityEngine.ScalableBufferManager::get_heightScaleFactor
 UnityEngine.ScalableBufferManager::get_widthScaleFactor
 UnityEngine.ScalableBufferManager::ResizeBuffers
 UnityEngine.SceneManagement.Scene::GetGUIDInternal_Injected
+UnityEngine.SceneManagement.Scene::GetNameInternal_Injected
 UnityEngine.SceneManagement.SceneManager::get_sceneCount
 UnityEngine.SceneManagement.SceneManager::GetActiveScene_Injected
 UnityEngine.SceneManagement.SceneManager::GetSceneAt_Injected
@@ -1944,6 +1943,7 @@ UnityEngine.Transform::GetRoot_Injected
 UnityEngine.Transform::GetPositionAndRotation_Injected
 UnityEngine.Transform::InverseTransformPoint_Injected
 UnityEngine.Transform::SetAsFirstSibling_Injected
+UnityEngine.Transform::SetAsLastSibling_Injected
 UnityEngine.Transform::SetLocalPositionAndRotation_Injected
 UnityEngine.Transform::SetParent_Injected
 UnityEngine.Transform::SetPositionAndRotation_Injected

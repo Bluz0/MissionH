@@ -106,7 +106,9 @@
           },
           {
             "name": "AudioClip",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/MapJeu/map_jeu.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -129,8 +131,10 @@
           },
           {
             "name": "AudioResource",
-            "scenes": [],
-            "dependencyType": 1,
+            "scenes": [
+              "Assets/Scenes/MapJeu/map_jeu.unity"
+            ],
+            "dependencyType": 0,
             "icon": null
           },
           {
@@ -1204,6 +1208,14 @@
             "icon": null
           },
           {
+            "name": "CircleCollider2D",
+            "scenes": [
+              "Assets/Scenes/MapJeu/map_jeu.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
             "name": "Collider2D",
             "scenes": [],
             "dependencyType": 1,
@@ -1682,7 +1694,6 @@
           {
             "name": "Font",
             "scenes": [
-              "Assets/Scenes/MapJeu/map_jeu.unity",
               "Assets/Scenes/TitleScreen/TitleScreen.unity"
             ],
             "dependencyType": 0,
