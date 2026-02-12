@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style/style_main.css">
+</head>
+
+<body>
+
+
+    <div id="app">
+
+        <nav>
+            <div class="logo espace-letter uppercase"><a class="remove-blue-link" href="index.html">Espace Admin</a>
+            </div>
+            <div class="nav-info uppercase espace-letter">Session active : dev_mission_h</div>
+        </nav>
+
+
+        <main id="dashboard" class="container">
+
+            <div class="page-header">
+                <h2 class="page-title uppercase">Scénarios</h2>
+                <div class="nav-info uppercase espace-letter">3 Chapitres</div>
+            </div>
+
+            <div class="grid-scenarios">
+
+                <div class="scenario-card rapprochement-letter" onclick="openScenario('Mission-1')">
+                    <span class="card-number">01</span>
+                    <h3 class="font-black uppercase rapprochement-letter" style="font-size: 1.5rem;">Mission 1</h3>
+                </div>
+
+                <div class="scenario-card rapprochement-letter" onclick="openScenario('Mission-2')">
+                    <span class="card-number">02</span>
+                    <h3 class="font-black uppercase rapprochement-letter" style="font-size: 1.5rem;">Mission 2</h3>
+                </div>
+
+                <div class="scenario-card rapprochement-letter" onclick="openScenario('Mission-3')">
+                    <span class="card-number">03</span>
+                    <h3 class="font-black uppercase rapprochement-letter" style="font-size: 1.5rem;">Mission 3</h3>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+
+
+
+    <script>
+
+        // pour mongodb
+        const dialogues = [
+            { id: 'd01', name: 'Eleve', text: 'Salut' },
+            { id: 'd02', name: 'Prof', text: 'Pourquoi vous etes en retard ????' },
+            { id: 'd03', name: 'Eleve', text: 'Ecoutez monsieur...' }
+        ];
+
+        const app = document.getElementById('app');
+        const notification = document.getElementById('notification');
+
+
+        function openScenario(title) {
+            window.location.href = "dashboard.html" + "?title=" + encodeURIComponent(title);
+        }
+
+        // dialogues.forEach(d => {
+        //         const row = document.createElement('tr');
+        //         row.className = 'dialogue-row';
+        //         row.innerHTML = `
+        //             <td style="font-family:monospace; color:#888;">${d.id}</td>
+        //             <td class="font-black">${d.name}</td>
+        //             <td>${d.text}</td>
+        //             <td style="text-align: right;">
+        //                 <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="openEditor('${d.id}')">Éditer</button>
+        //             </td>
+        //         `;
+        //         listBody.appendChild(row);
+        //     });
+
+
+        function openEditor(id) {
+            const dialogue = dialogues.find(d => d.id === id);
+            document.getElementById('edit-name').value = dialogue.name;
+            document.getElementById('edit-text').value = dialogue.text;
+            updatePreview();
+            showView('editor');
+        }
+
+        // aperçu Unity
+        function updatePreview() {
+            document.getElementById('preview-name').innerText = document.getElementById('edit-name').value;
+            document.getElementById('preview-text').innerText = document.getElementById('edit-text').value;
+        }
+
+        function saveDialogue() {
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+                showView('scenario');
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>

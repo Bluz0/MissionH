@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style/style_main.css">
+</head>
+<body>
+    <main id="editor-view" class="container">
+            <div class="page-header" style="align-items: flex-start; flex-direction: column;">
+                <button onclick="showView('scenario')" class="btn btn-outline"
+                    style="border:none; padding-left:0; margin-bottom: 1rem;">← Annuler l'édition</button>
+                <h2 class="page-title uppercase espace-letter">Édition</h2>
+            </div>
+
+            <div class="editor-split">
+
+                <div class="editor-form">
+                    <div class="input-group">
+                        <label class="uppercase espace-letter">Nom du personnage</label>
+                        <input type="text" id="edit-name" value="Eleve" oninput="updatePreview()">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="uppercase espace-letter">Texte du dialogue</label>
+                        <textarea id="edit-text" rows="6"
+                            oninput="updatePreview()">Halte-là ! On ne passe pas.</textarea>
+                    </div>
+                    <button class="btn btn-black" onclick="saveDialogue()"
+                        style="width:100%; justify-content:center; padding: 1.5rem;">Enregistrer en base de
+                        données</button>
+                </div>
+
+                <!-- Aperçu Unity -->
+                <div class="unity-preview">
+                    <div class="uppercase espace-letter font-black" style="font-size: 10px; margin-bottom: 1rem;">
+                        Simulateur Jeu</div>
+                    <div class="unity-screen">
+                        <!-- Image de fond fictive (placeholder) -->
+                        <div
+                            style="width:100%; height:100%; background: linear-gradient(45deg, #222, #444); display:flex; align-items:center; justify-content:center;">
+                            <span style="color:rgba(255,255,255,0.1); font-weight:900; font-size:4rem;">JEU</span>
+                        </div>
+                        <div class="unity-dialogue-box">
+                            <span class="unity-name" id="preview-name">Eleve</span>
+                            <p class="unity-text" id="preview-text">Salut</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+</body>
+</html>
