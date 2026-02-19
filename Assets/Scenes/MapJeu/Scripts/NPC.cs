@@ -156,18 +156,6 @@ public class NPC : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// Affiche les boutons de choix pour une ligne donnée.
-    /// </summary>
-    void DisplayChoices(DialogueChoice choice)
-    {
-        for (int i = 0; i < choice.choices.Length; i++)
-        {
-            int nextIndex = choice.nextDialogueIndexes[i];
-            dialogueUI.CreateChoiceButton(choice.choices[i], () => ChooseOption(nextIndex));
-        }
-    }
-
-    /// <summary>
     /// Applique le choix sélectionné et passe /// </summary>
     void DisplayChoices(DialogueChoice choice)
     {

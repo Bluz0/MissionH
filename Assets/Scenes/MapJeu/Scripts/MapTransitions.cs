@@ -49,7 +49,7 @@ public class MapTransitions : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             FadeTransition(collision.gameObject);
         }
@@ -72,7 +72,7 @@ public class MapTransitions : MonoBehaviour
     /// </summary>
     private void UpdatePlayerPosition(GameObject player)
     {
-        if(direction == Direction.Teleport)
+        if (direction == Direction.Teleport)
         {
             player.transform.position = teleportTargetPosition.position;
             return;
@@ -80,7 +80,7 @@ public class MapTransitions : MonoBehaviour
 
         Vector3 newPos = player.transform.position;
 
-        switch(direction)
+        switch (direction)
         {
             case Direction.Up:
                 newPos.y += 1.5f;
