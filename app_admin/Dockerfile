@@ -2,14 +2,12 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copier package.json
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci --only=production
 
-# Copier tout le contenu de app_admin
 COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "src/server.js"]
