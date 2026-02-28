@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 1. ON DÉFINIT D'ABORD LES OPTIONS (Ordre crucial !)
+// 1. ON DÉFINIT D'ABORD LES OPTIONS
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -213,6 +213,7 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *           description: ID du scénario
  *         ordre:
  *           type: integer
+ *           autoIncrement: true
  *           description: Ordre du dialogue dans le scénario
  *         contenu:
  *           type: string
