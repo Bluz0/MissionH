@@ -205,7 +205,8 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *       required:
  *         - scenarioId
  *         - ordre
- *         - texte
+ *         - contenu
+ *         - locuteur
  *       properties:
  *         scenarioId:
  *           type: string
@@ -213,10 +214,10 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *         ordre:
  *           type: integer
  *           description: Ordre du dialogue dans le scénario
- *         texte:
+ *         contenu:
  *           type: string
  *           description: Contenu du dialogue
- *         personnage:
+ *         locuteur:
  *           type: string
  *           description: Personnage qui parle
  */
