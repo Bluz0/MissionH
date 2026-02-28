@@ -14,9 +14,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -29,6 +26,11 @@ const swaggerOptions = {
   },
   apis: ['./src/server.js'],
 };
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-dialogue', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
 
 
 // --- CONFIGURATION MONGODB ---
@@ -47,10 +49,28 @@ mongoose.connect(uri)
 
 // NOS CRUD POUR LES DIALOGUES (crud_dialogue.js)
 
+
+
+
 app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
 });
 
+/**
+ * @openapi
+ * /api/scenarios/{scenarioId}/dialogues:
+ * get:
+ * summary: Récupérer tous les dialogues d'un scénario
+ * parameters:
+ * - in: path
+ * name: scenarioId
+ * required: true
+ * schema:
+ * type: string
+ * responses:
+ * 200:
+ * description: Liste des dialogues
+ */
 app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
   try {
     const dialogues = await Dialogue.find({ scenarioId: req.params.scenarioId }).sort('ordre');
