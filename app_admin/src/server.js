@@ -14,6 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// 1. ON DÉFINIT D'ABORD LES OPTIONS (Ordre crucial !)
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -27,14 +28,12 @@ const swaggerOptions = {
   apis: ['./src/server.js'],
 };
 
+// 2. ENSUITE ON INITIALISE SWAGGER AVEC CES OPTIONS
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-dialogue', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 // --- CONFIGURATION MONGODB ---
-// On utilise les variables d'environnement passées par Docker (ou .env localement)
 const dbUser = process.env.DB_USER || 'admin';
 const dbPass = process.env.DB_PASSWORD || 'password';
 const dbHost = process.env.DB_HOST || 'mongodb';
@@ -43,14 +42,10 @@ const dbName = process.env.DB_NAME || 'gameDB';
 const uri = `mongodb://${dbUser}:${dbPass}@${dbHost}:27017/${dbName}?authSource=admin`;
 
 mongoose.connect(uri)
-  .then(() => console.log('Connecté à MongoDB avec succès'))
-  .catch(err => console.error('Erreur de connexion MongoDB :', err));
+  .then(() => console.log('✅ Connecté à MongoDB avec succès'))
+  .catch(err => console.error('❌ Erreur de connexion MongoDB :', err));
 
-
-// NOS CRUD POUR LES DIALOGUES (crud_dialogue.js)
-
-
-
+// --- ROUTES ---
 
 app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
