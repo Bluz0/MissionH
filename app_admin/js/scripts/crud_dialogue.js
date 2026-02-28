@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Connexion MongoDB
+// Connexion à MongoDB
 mongoose.connect('mongodb://localhost:27017/gameDB');
 
 
