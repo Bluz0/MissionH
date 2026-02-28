@@ -87,9 +87,12 @@ app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
  * schema:
  * type: object
  * properties:
- * scenarioId: { type: string }
- * locuteur: { type: string }
- * contenu: { type: string }
+ * scenarioId:
+ * type: string
+ * locuteur:
+ * type: string
+ * contenu:
+ * type: string
  * responses:
  * 201:
  * description: Dialogue enregistré !
