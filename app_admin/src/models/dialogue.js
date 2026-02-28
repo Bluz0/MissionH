@@ -9,4 +9,4 @@ const DialogueSchema = new mongoose.Schema({
 });
 
 const Dialogue = mongoose.model('Dialogue', DialogueSchema);
-export default Dialogue;
+export default Dialogue; // Pour pouvoir l'importer dans server.js
