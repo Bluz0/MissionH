@@ -4,14 +4,35 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import Dialogue from './models/dialogue.js';
 
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+
 dotenv.config();
 
+// --- CONFIGURATION EXPRESS ---
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Mission H - API Dialogue',
+      version: '1.0.0',
+      description: 'Documentation Swagger interactive des dialogues du jeu',
+    },
+    servers: [{ url: 'http://51.38.222.173:3001' }],
+  },
+  apis: ['./src/server.js'],
+};
+
+
 // --- CONFIGURATION MONGODB ---
-// On utilise les variables d'environnement passées par Docker
+// On utilise les variables d'environnement passées par Docker (ou .env localement)
 const dbUser = process.env.DB_USER || 'admin';
 const dbPass = process.env.DB_PASSWORD || 'password';
 const dbHost = process.env.DB_HOST || 'mongodb';
@@ -39,6 +60,25 @@ app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/dialogues:
+ * post:
+ * summary: Créer un nouveau dialogue
+ * requestBody:
+ * required: true
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * properties:
+ * scenarioId: { type: string }
+ * locuteur: { type: string }
+ * contenu: { type: string }
+ * responses:
+ * 201:
+ * description: Dialogue enregistré !
+ */
 app.post('/api/dialogues', async (req, res) => {
   try {
     const nouveauDialogue = new Dialogue(req.body);
