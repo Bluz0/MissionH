@@ -51,21 +51,7 @@ app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
 });
 
-/**
- * @openapi
- * /api/scenarios/{scenarioId}/dialogues:
- * get:
- * summary: Récupérer tous les dialogues d'un scénario
- * parameters:
- * - in: path
- * name: scenarioId
- * required: true
- * schema:
- * type: string
- * responses:
- * 200:
- * description: Liste des dialogues
- */
+
 app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
   try {
     const dialogues = await Dialogue.find({ scenarioId: req.params.scenarioId }).sort('ordre');
@@ -75,28 +61,7 @@ app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
   }
 });
 
-/**
- * @openapi
- * /api/dialogues:
- * post:
- * summary: Créer un nouveau dialogue
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * properties:
- * scenarioId:
- * type: string
- * locuteur:
- * type: string
- * contenu:
- * type: string
- * responses:
- * 201:
- * description: Dialogue enregistré !
- */
+
 app.post('/api/dialogues', async (req, res) => {
   try {
     const nouveauDialogue = new Dialogue(req.body);
