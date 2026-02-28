@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Service de la base de données
+  mongodb:
+    image: mongo:latest
+    container_name: game_db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+    # On n'expose pas le port 27017 sur internet pour la sécurité !
+    # Seul le service 'api' pourra y accéder.
+
+  # Node.js
+  api:
+    build: .
+    container_name: game_api
+    restart: always
+    ports:
+      - "3000:3000" # Rend API accessible sur http://ip-serveur:3000
+    depends_on:
+      - mongodb
+    environment:
+      - DB_HOST=mongodb
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+
+volumes:
+  mongo_data:
