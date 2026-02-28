@@ -131,13 +131,7 @@ app.post('/api/dialogues', async (req, res) => {
     // Calculer le nouvel ordre
     // Si un dialogue existe, on fait +1, sinon on commence à 1
 
-    if (dernierDialogue){
-      dernierDialogue.ordre += 1;
-      nouvelOrdre = dernierDialogue.ordre;
-    }
-    else{
-      nouvelOrdre = 1;
-    }
+    const nouvelOrdre = dernierDialogue ? dernierDialogue.ordre + 1 : 1;
 
     // Créer le dialogue avec l'ordre calculé
     const nouveauDialogue = new Dialogue({
