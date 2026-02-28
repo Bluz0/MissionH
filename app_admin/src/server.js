@@ -30,7 +30,7 @@ const swaggerOptions = {
 
 // 2. ENSUITE ON INITIALISE SWAGGER AVEC CES OPTIONS
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/api-dialogue', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 // --- CONFIGURATION MONGODB ---
@@ -43,9 +43,17 @@ const uri = `mongodb://${dbUser}:${dbPass}@${dbHost}:27017/${dbName}?authSource=
 
 mongoose.connect(uri)
   .then(() => console.log('✅ Connecté à MongoDB avec succès'))
-  .catch(err => console.error('❌ Erreur de connexion MongoDB :', err));
+  .catch(err => console.error('Erreur de connexion MongoDB :', err));
+
+/**
+ * @swagger
+ * tags:
+ *  name: Dialogues
+ *  description: Opérations CRUD sur les dialogues
+ */
 
 // --- ROUTES ---
+
 
 app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
