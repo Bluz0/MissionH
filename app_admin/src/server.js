@@ -118,7 +118,33 @@ app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
  */
 app.post('/api/dialogues', async (req, res) => {
   try {
-    const nouveauDialogue = new Dialogue(req.body);
+    const { scenarioId } = req.body;
+
+    if (!scenarioId) {
+      return res.status(400).json({ error: "scenarioId est requis." });
+    }
+
+    // Trouver le dernier dialogue pour ce scénario spécifique
+    // On trie par 'ordre' descendant (-ordre) et on en prend 1 seul
+    const dernierDialogue = await Dialogue.findOne({ scenarioId }).sort('-ordre');
+
+    // Calculer le nouvel ordre
+    // Si un dialogue existe, on fait +1, sinon on commence à 1
+
+    if (dernierDialogue){
+      dernierDialogue.ordre += 1;
+      nouvelOrdre = dernierDialogue.ordre;
+    }
+    else{
+      nouvelOrdre = 1;
+    }
+
+    // Créer le dialogue avec l'ordre calculé
+    const nouveauDialogue = new Dialogue({
+      ...req.body,
+      ordre: nouvelOrdre
+    });
+
     await nouveauDialogue.save();
     res.status(201).json(nouveauDialogue);
   } catch (err) {
@@ -204,7 +230,6 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *       type: object
  *       required:
  *         - scenarioId
- *         - ordre
  *         - contenu
  *         - locuteur
  *       properties:
@@ -213,8 +238,7 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *           description: ID du scénario
  *         ordre:
  *           type: integer
- *           autoIncrement: true
- *           description: Ordre du dialogue dans le scénario
+ *           description: Ordre auto-incrémenté par scénario
  *         contenu:
  *           type: string
  *           description: Contenu du dialogue
