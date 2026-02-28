@@ -17,8 +17,24 @@ MonoBehaviour:
   dialogueLines:
   - Bonjour, chere eleve !
   - Comment vas-tu, Aujourd'hui ?
+  - Tres bonne chose.
+  - "Oh, pourquoi \xE7a ?"
+  - Ah d'accord
+  - Mince, force
   autoProgressLines: 0100
+  endDialogueLines: 000001000101
   autoProgressDelay: 1.5
-  typingSpeed: 0.05
+  typingSpeed: 0.1
   voiceSound: {fileID: 8300000, guid: 983c08dbf3aaf684d96f8fc1ba412d09, type: 3}
   voicePitch: 1
+  choices:
+  - dialogueIndex: 1
+    choices:
+    - Bien et toi ?
+    - Je vais mal
+    nextDialogueIndexes: 0200000003000000
+  - dialogueIndex: 3
+    choices:
+    - J'ai pas reussi
+    - C'est une blague
+    nextDialogueIndexes: 0500000004000000
