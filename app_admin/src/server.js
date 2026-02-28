@@ -24,7 +24,8 @@ mongoose.connect(uri)
   .catch(err => console.error('Erreur de connexion MongoDB :', err));
 
 
-// Test
+// NOS CRUD POUR LES DIALOGUES
+
 app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
 });
