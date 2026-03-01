@@ -131,6 +131,50 @@ app.post('/api/scenarios', async (req, res) => {
 
 /**
  * @swagger
+ * /api/scenarios/{scenarioName}:
+ *  delete:
+ *    summary: Supprimer un scénario et tous ses dialogues associés
+ *    tags: [Scenarios]
+ *    parameters: 
+ *      - in: path
+ *        name: scenarioName
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Le nom du scénario à supprimer
+ *    responses:
+ *      200:
+ *        description: Scénario et dialogues supprimés avec succès
+ *      404:
+ *        description: Scénario non trouvé
+ */
+app.delete('/api/scenarios/:scenarioName', async (req, res) => {
+  try {
+    const { scenarioName } = req.params;
+
+    // Supprimer le scénario
+    const scenarioSupprime = await Scenario.findOneAndDelete({ scenarioName });
+
+    if (!scenarioSupprime) {
+      return res.status(404).json({ error: "Scénario non trouvé" });
+    }
+
+    // Supprimer tous les dialogues liés à ce scénario
+    const resultDialogues = await Dialogue.deleteMany({ scenarioName });
+
+    res.json({ 
+      message: "Suppression réussie", 
+      scenario: scenarioSupprime.scenarioName,
+      dialoguesSupprimes: resultDialogues.deletedCount 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+/**
+ * @swagger
  * tags:
  *  name: Dialogues
  *  description: Opérations CRUD sur les dialogues

@@ -12,7 +12,7 @@ const scenarioSchema = new mongoose.Schema({
     type: Number,
     unique: true
   },
-  name: {
+  scenarioName: {
     type: String,
     required: true
   }
