@@ -2,7 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import Dialogue from './models/dialogue.js';
+import Scenario from './models/scenario.js';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -14,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 1. ON DÉFINIT D'ABORD LES OPTIONS
+// ON DÉFINIT D'ABORD LES OPTIONS
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -28,7 +30,7 @@ const swaggerOptions = {
   apis: ['./src/server.js'],
 };
 
-// 2. ENSUITE ON INITIALISE SWAGGER AVEC CES OPTIONS
+// ENSUITE ON INITIALISE SWAGGER AVEC CES OPTIONS
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-dialogue', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
@@ -57,6 +59,73 @@ mongoose.connect(uri)
 
 app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
+});
+
+/**
+ * @swagger
+ * /api/scenarios:
+ *   get:
+ *    summary: Récupérer tous les scénarios
+ *   tags: [Dialogues]
+ *  responses:
+ *    200:
+ *     description: Liste des scénarios
+ *    content:
+ *    application/json:
+ *    schema:
+ *    type: array
+ *   items:
+ *    $ref: '#/components/schemas/Scenario'
+ *   500:
+ *    description: Erreur serveur
+ */
+app.get('/api/scenarios', async (req, res) => {
+  try {
+    const scenarios = await Scenario.find().sort('scenarioId');
+    res.json(scenarios);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/scenarios:
+ *   post:
+ *     summary: Créer un nouveau scénario
+ *     tags: [Dialogues]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Scenario'
+ *     responses:
+ *       201:
+ *         description: Scénario créé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Scenario'
+ *       400:
+ *         description: Erreur de validation
+ */
+app.post('/api/scenarios', async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "Le nom est obligatoire" });
+    }
+
+    const newScenario = new Scenario({ name });
+    await newScenario.save();
+
+    res.status(201).json(newScenario);
+
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 /**
@@ -92,7 +161,6 @@ app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 /**
  * @swagger
