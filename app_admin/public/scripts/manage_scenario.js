@@ -41,7 +41,7 @@ axios.get(`${serveur}/api/scenarios/`).then(response => {
 });
 
 
-
+/*
 
 // gestion choppe dans mongoDB les dialogues en fonction du titre de la scenario
 
@@ -133,3 +133,4 @@ function openEditor(dialogue_id) {
                 showView('scenario');
             }, 2000);
         }
+*/
