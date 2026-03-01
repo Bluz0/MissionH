@@ -20,7 +20,6 @@ function afficheTitreScenario(scenarioName){
     let spanCard = create("span", card, cardIdStr);
     spanCard.className = "card-number";
     cardId++;
-    console.log(cardId);
 
     let h3Card = create("h3", card, scenarioName);
     h3Card.className = "font-black uppercase rapprochement-letter";
@@ -28,7 +27,7 @@ function afficheTitreScenario(scenarioName){
 }
 
 // Affiche les scenarios disponibles dans la base de données
-axios.get(`${serveur}/api/scenarios/`).then(response => {
+axios.get(`/api/scenarios/`).then(response => {
     const scenarios = response.data;
     
     console.log("Scénarios récupérés :", scenarios);
