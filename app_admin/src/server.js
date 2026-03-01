@@ -308,7 +308,20 @@ app.post('/api/dialogues', async (req, res) => {
  */
 app.put('/api/dialogues/:id', async (req, res) => {
   try {
-    const misAJour = await Dialogue.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    // On extrait l'ordre pour ne pas risquer de l'écraser par erreur
+    // Si req.body contient 'ordre', il sera ignoré dans la constante 'donneesAMettreAJour'
+    const { ordre, ...donneesAMettreAJour } = req.body;
+
+    const misAJour = await Dialogue.findByIdAndUpdate(
+      req.params.id, 
+      donneesAMettreAJour, // On n'envoie que le reste (locuteur, contenu, etc.)
+      { new: true, runValidators: true }
+    );
+
+    if (!misAJour) {
+      return res.status(404).json({ error: "Dialogue non trouvé" });
+    }
+
     res.json(misAJour);
   } catch (err) {
     res.status(400).json({ error: err.message });
