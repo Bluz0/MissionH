@@ -31,73 +31,15 @@
             </div>
 
             <div class="grid-scenarios">
-
-                <div class="scenario-card rapprochement-letter" onclick="openScenario('Mission-1')">
-                    <span class="card-number">01</span>
-                    <h3 class="font-black uppercase rapprochement-letter" style="font-size: 1.5rem;">Mission 1</h3>
-                </div>
             </div>
         </main>
 
     </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="scripts/manage_scenario.js" defer></script>
 
-
-    <script>
-
-        // pour mongodb
-        const dialogues = [
-            { id: 'd01', name: 'Eleve', text: 'Salut' },
-            { id: 'd02', name: 'Prof', text: 'Pourquoi vous etes en retard ????' },
-            { id: 'd03', name: 'Eleve', text: 'Ecoutez monsieur...' }
-        ];
-
-        const app = document.getElementById('app');
-        const notification = document.getElementById('notification');
-
-
-        function openScenario(title) {
-            window.location.href = "lib/html/dashboard.html" + "?title=" + encodeURIComponent(title);
-        }
-
-        // dialogues.forEach(d => {
-        //         const row = document.createElement('tr');
-        //         row.className = 'dialogue-row';
-        //         row.innerHTML = `
-        //             <td style="font-family:monospace; color:#888;">${d.id}</td>
-        //             <td class="font-black">${d.name}</td>
-        //             <td>${d.text}</td>
-        //             <td style="text-align: right;">
-        //                 <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="openEditor('${d.id}')">Éditer</button>
-        //             </td>
-        //         `;
-        //         listBody.appendChild(row);
-        //     });
-
-
-        function openEditor(id) {
-            const dialogue = dialogues.find(d => d.id === id);
-            document.getElementById('edit-name').value = dialogue.name;
-            document.getElementById('edit-text').value = dialogue.text;
-            updatePreview();
-            showView('editor');
-        }
-
-        // aperçu Unity
-        function updatePreview() {
-            document.getElementById('preview-name').innerText = document.getElementById('edit-name').value;
-            document.getElementById('preview-text').innerText = document.getElementById('edit-text').value;
-        }
-
-        function saveDialogue() {
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-                showView('scenario');
-            }, 2000);
-        }
-    </script>
 </body>
 
 </html>
