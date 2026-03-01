@@ -5,7 +5,7 @@ function create(tag, container, text = null) {
     return element;
 }
 
-const serveur = "http://51.38.222.173:3001";
+const serveur = window.location.origin;
 const title = new URLSearchParams(window.location.search).get('title');
 
 let gridScenarios = document.querySelector(".grid-scenarios");
@@ -27,7 +27,7 @@ function afficheTitreScenario(scenarioName){
 }
 
 // Affiche les scenarios disponibles dans la base de données
-axios.get(`/api/scenarios/`).then(response => {
+axios.get(`${serveur}/api/scenarios`).then(response => {
     const scenarios = response.data;
     
     console.log("Scénarios récupérés :", scenarios);
