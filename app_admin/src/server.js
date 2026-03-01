@@ -1,4 +1,7 @@
 import express from 'express';
+import path from "path";
+import { fileURLToPath } from "url";
+
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -15,6 +18,19 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// hack ES module (obligatoire avec "type": "module")
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use("/api", routes);
+
+// FRONT STATIQUE
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.listen(3001, "0.0.0.0", () => {
+  console.log("Serveur lancé sur le port 3001");
+});
 
 // ON DÉFINIT D'ABORD LES OPTIONS
 const swaggerOptions = {
