@@ -63,21 +63,21 @@ app.get('/', (req, res) => {
 
 /**
  * @swagger
- * /api/scenarios:
+ * /api/scenarios/:
  *   get:
- *    summary: Récupérer tous les scénarios
- *   tags: [Scenarios]
- *  responses:
- *    200:
- *     description: Liste des scénarios
- *    content:
- *    application/json:
- *    schema:
- *    type: array
- *   items:
- *    $ref: '#/components/schemas/Scenario'
- *   500:
- *    description: Erreur serveur
+ *     summary: Récupérer tous les scénarios
+ *     tags: [Scenarios]
+ *     responses:
+ *       200:
+ *         description: Liste des scénarios
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Scenario'
+ *       500:
+ *         description: Erreur serveur
  */
 app.get('/api/scenarios', async (req, res) => {
   try {
@@ -291,6 +291,25 @@ app.delete('/api/dialogues/:id', async (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Scenario:
+ *       type: object
+ *       required:
+ *         - name
+ *       properties:
+ *         name:
+ *          type: string
+ *          description: Nom du scénario
+ *         scenarioId:
+ *          type: integer
+ *          description: ID auto-incrémenté du scénario
+ */
+
 
 /**
  * @swagger
