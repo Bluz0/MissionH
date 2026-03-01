@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const DialogueSchema = new mongoose.Schema({
-  scenarioId: { type: String, required: true },
+  scenarioName: { type: String, required: true },
   locuteur: { type: String, required: true },
   contenu: { type: String, required: true },
   ordre: { type: Number, default: 0 },

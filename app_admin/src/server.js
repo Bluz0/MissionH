@@ -36,10 +36,10 @@ app.use('/api-dialogue', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 // --- CONFIGURATION MONGODB ---
-const dbUser = process.env.DB_USER || 'admin';
-const dbPass = process.env.DB_PASSWORD || 'password';
-const dbHost = process.env.DB_HOST || 'mongodb';
-const dbName = process.env.DB_NAME || 'gameDB';
+const dbUser = process.env.DB_USER;
+const dbPass = process.env.DB_PASSWORD;
+const dbHost = process.env.DB_HOST;
+const dbName = process.env.DB_NAME;
 
 const uri = `mongodb://${dbUser}:${dbPass}@${dbHost}:27017/${dbName}?authSource=admin`;
 
@@ -112,13 +112,13 @@ app.get('/api/scenarios', async (req, res) => {
  */
 app.post('/api/scenarios', async (req, res) => {
   try {
-    const { name } = req.body;
+    const { scenarioName } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: "Le nom est obligatoire" });
+    if (!scenarioName) {
+      return res.status(400).json({ error: "Le nom du scénario est obligatoire" });
     }
 
-    const newScenario = new Scenario({ name });
+    const newScenario = new Scenario({ scenarioName });
     await newScenario.save();
 
     res.status(201).json(newScenario);
@@ -138,17 +138,17 @@ app.post('/api/scenarios', async (req, res) => {
 
 /**
  * @swagger
- * /api/scenarios/{scenarioId}/dialogues:
+ * /api/scenarios/{scenarioName}/dialogues:
  *   get:
  *     summary: Récupérer tous les dialogues d'un scénario
  *     tags: [Dialogues]
  *     parameters:
  *       - in: path
- *         name: scenarioId
+ *         name: scenarioName
  *         schema:
  *           type: string
  *         required: true
- *         description: L'ID du scénario
+ *         description: Le nom du scénario
  *     responses:
  *       200:
  *         description: Liste des dialogues
@@ -161,9 +161,13 @@ app.post('/api/scenarios', async (req, res) => {
  *       500:
  *         description: Erreur serveur
  */
-app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
+app.get('/api/scenarios/:scenarioName/dialogues', async (req, res) => {
   try {
-    const dialogues = await Dialogue.find({ scenarioId: req.params.scenarioId }).sort('ordre');
+    const scenario = await Scenario.findOne({ scenarioName: req.params.scenarioName });
+    if (!scenario) {
+      return res.status(404).json({ error: "Scénario non trouvé" });
+    }
+    const dialogues = await Dialogue.find({ scenarioName: req.params.scenarioName }).sort('ordre');
     res.json(dialogues);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -194,15 +198,21 @@ app.get('/api/scenarios/:scenarioId/dialogues', async (req, res) => {
  */
 app.post('/api/dialogues', async (req, res) => {
   try {
-    const { scenarioId } = req.body;
+    const { scenarioName } = req.body;
 
-    if (!scenarioId) {
-      return res.status(400).json({ error: "scenarioId est requis." });
+    if (!scenarioName) {
+      return res.status(400).json({ error: "scenarioName est requis." });
     }
 
+    // Trouver le scénario correspondant au nom fourni
+    const scenario = await Scenario.findOne({ scenarioName });
+    if (!scenario) {
+      return res.status(404).json({ error: "Scénario non trouvé" });
+    }
+    const scenarioId = scenario._id;
     // Trouver le dernier dialogue pour ce scénario spécifique
     // On trie par 'ordre' descendant (-ordre) et on en prend 1 seul
-    const dernierDialogue = await Dialogue.findOne({ scenarioId }).sort('-ordre');
+    const dernierDialogue = await Dialogue.findOne({ scenarioName }).sort('-ordre');
 
     // Calculer le nouvel ordre
     // Si un dialogue existe, on fait +1, sinon on commence à 1
@@ -300,9 +310,9 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *     Scenario:
  *       type: object
  *       required:
- *         - name
+ *         - scenarioName
  *       properties:
- *         name:
+ *         scenarioName:
  *          type: string
  *          description: Nom du scénario
  *         scenarioId:
@@ -318,13 +328,13 @@ app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`
  *     Dialogue:
  *       type: object
  *       required:
- *         - scenarioId
+ *         - scenarioName
  *         - contenu
  *         - locuteur
  *       properties:
- *         scenarioId:
+ *         scenarioName:
  *           type: string
- *           description: ID du scénario
+ *           description: Nom du scénario
  *         ordre:
  *           type: integer
  *           description: Ordre auto-incrémenté par scénario
