@@ -47,13 +47,6 @@ mongoose.connect(uri)
   .then(() => console.log('✅ Connecté à MongoDB avec succès'))
   .catch(err => console.error('Erreur de connexion MongoDB :', err));
 
-/**
- * @swagger
- * tags:
- *  name: Dialogues
- *  description: Opérations CRUD sur les dialogues
- */
-
 // --- ROUTES ---
 
 
@@ -63,10 +56,17 @@ app.get('/', (req, res) => {
 
 /**
  * @swagger
+ * tags:
+ *  name: Scenarios
+ *  description: Opérations CRUD sur les scénarios
+ */
+
+/**
+ * @swagger
  * /api/scenarios:
  *   get:
  *    summary: Récupérer tous les scénarios
- *   tags: [Dialogues]
+ *   tags: [Scenarios]
  *  responses:
  *    200:
  *     description: Liste des scénarios
@@ -93,7 +93,7 @@ app.get('/api/scenarios', async (req, res) => {
  * /api/scenarios:
  *   post:
  *     summary: Créer un nouveau scénario
- *     tags: [Dialogues]
+ *     tags: [Scenarios]
  *     requestBody:
  *       required: true
  *       content:
@@ -127,6 +127,14 @@ app.post('/api/scenarios', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+
+/**
+ * @swagger
+ * tags:
+ *  name: Dialogues
+ *  description: Opérations CRUD sur les dialogues
+ */
 
 /**
  * @swagger
