@@ -336,8 +336,30 @@ app.put('/api/dialogues/:id', async (req, res) => {
  */
 app.delete('/api/dialogues/:id', async (req, res) => {
   try {
+    // On récupère les infos du dialogue AVANT de le supprimer
+    const dialogueASupprimer = await Dialogue.findById(req.params.id);
+    
+    if (!dialogueASupprimer) {
+      return res.status(404).json({ error: "Dialogue non trouvé" });
+    }
+
+    const { scenarioName, ordre } = dialogueASupprimer;
+
+    // Suppression du dialogue
     await Dialogue.findByIdAndDelete(req.params.id);
-    res.json({ message: "Dialogue supprimé avec succès" });
+
+    // Décrémentation de tous les dialogues qui étaient APRÈS lui
+    // On cherche les dialogues du même scénario dont l'ordre est strictement supérieur ($gt)
+    // On utilise $inc avec -1 pour soustraire 1 à chaque champ 'ordre'
+    await Dialogue.updateMany(
+      { scenarioName, ordre: { $gt: ordre } },
+      { $inc: { ordre: -1 } }
+    );
+
+    res.json({ 
+      message: "Dialogue supprimé et ordres suivants mis à jour",
+      details: `Les dialogues du scénario ${scenarioName} après le rang ${ordre} ont été décalés.`
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
