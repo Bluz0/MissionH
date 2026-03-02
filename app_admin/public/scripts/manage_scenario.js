@@ -5,8 +5,8 @@ function create(tag, container, text = null) {
     return element;
 }
 
-//const serveur = window.location.origin;
-const serveur = "http://51.38.222.173:3001";
+const serveur = window.location.origin;
+console.log("Tentative de connexion à :", serveur); // Vérifie le port affiché ici
 const title = new URLSearchParams(window.location.search).get('title');
 
 let gridScenarios = document.querySelector(".grid-scenarios");
@@ -16,6 +16,9 @@ function afficheTitreScenario(scenarioName){
     let card = create("div", gridScenarios);
     card.className = "scenario-card rapprochement-letter";
     // faire le addEventListener pour rediriger vers la page de gestion des dialogues de ce scenario
+    card.addEventListener("click", () => {
+        window.location.href = `dashboard.html?title=${scenarioName}`;
+    });
 
     let cardIdStr = cardId.toString().padStart(2, '0');
     let spanCard = create("span", card, cardIdStr);
