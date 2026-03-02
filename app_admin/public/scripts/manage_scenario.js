@@ -5,7 +5,8 @@ function create(tag, container, text = null) {
     return element;
 }
 
-const serveur = window.location.origin;
+//const serveur = window.location.origin;
+const serveur = "http://51.38.222.173:3001";
 const title = new URLSearchParams(window.location.search).get('title');
 
 let gridScenarios = document.querySelector(".grid-scenarios");
