@@ -17,7 +17,7 @@ function afficheTitreScenario(scenarioName){
     card.className = "scenario-card rapprochement-letter";
     // faire le addEventListener pour rediriger vers la page de gestion des dialogues de ce scenario
     card.addEventListener("click", () => {
-        window.location.href = `dashboard.html?title=${scenarioName}`;
+        window.location.href = `lib/html/dashboard.html?title=${scenarioName}`;
     });
 
     let cardIdStr = cardId.toString().padStart(2, '0');

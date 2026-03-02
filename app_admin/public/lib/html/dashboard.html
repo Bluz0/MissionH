@@ -17,9 +17,9 @@
         <div class="page-header" style="align-items: flex-start; flex-direction: column;">
             
             <button class="btn btn-outline"
-                style="border:none; padding-left:0; margin-bottom: 1rem;">← Retour</button>
+                style="border:none; padding-left:0; margin-bottom: 1rem;padding-left: 2.5%; border:1px solid black;" id="button-back"> < Retour</button>
             <div style="display:flex; justify-content: space-between; width:100%; align-items: flex-end;">
-                <h2 id="current-scenario-title" class="page-title uppercase rapprochement-letter">Titre</h2>
+                <h2 id="current-scenario-title" class="page-title uppercase rapprochement-letter"></h2>
                 <button class="btn btn-black">+ Nouveau dialogue</button>
             </div>
         </div>
@@ -33,12 +33,12 @@
                 </tr>
             </thead>
             <tbody class="dialogue-list-body">
-
             </tbody>
         </table>
     </main>
 
-    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../../scripts/list_dialogue_scen.js" defer></script>
 </body>
 
 </html>

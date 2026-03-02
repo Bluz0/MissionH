@@ -39,7 +39,7 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Documentation Swagger interactive des dialogues du jeu',
     },
-    servers: [{ url: 'http://51.38.222.173:3001' }],
+    servers: [{ url: 'http://51.38.222.173' }],
   },
   apis: ['./src/server.js'],
 };
