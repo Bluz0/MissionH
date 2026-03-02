@@ -5,7 +5,7 @@ function create(tag, container, text = null) {
     return element;
 }
 
-const serveur = window.location.origin;
+const serveur = "http://51.38.222.173";
 console.log("Tentative de connexion à :", serveur); // Vérifie le port affiché ici
 const title = new URLSearchParams(window.location.search).get('title');
 
