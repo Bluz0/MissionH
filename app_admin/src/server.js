@@ -63,11 +63,11 @@ mongoose.connect(uri)
 
 // --- ROUTES ---
 
-
+/*
 app.get('/', (req, res) => {
   res.send('L\'API Dialogue est en ligne !');
 });
-
+*/
 /**
  * @swagger
  * tags:
