@@ -59,6 +59,7 @@ axios.get(`${serveur}/api/scenarios/${title}/dialogues`)
             const emptyRow = create('tr', listBody);
             const emptyCell = create('td', emptyRow, "Aucun dialogue trouvé pour ce scénario.");
             emptyCell.colSpan = 4;
+            emptyCell.className = "mot-vide";
         }
 
         console.log(dialogues);
@@ -79,6 +80,9 @@ function addDialogue(locuteur, contenu) {
         .then(response => {
             console.log("Dialogue ajouté :", response.data);
             createRow(response.data._id, response.data.locuteur, response.data.contenu);
+            if (document.querySelector(".mot-vide")) {
+                document.querySelector(".mot-vide").hidden = true;
+            }
         })
         .catch(error => {
             console.error("Erreur lors de l'ajout du dialogue :", error);
@@ -214,9 +218,16 @@ function openDeleteModal(dialogueId, rowElement) {
             .then(() => {
                 rowElement.remove();
                 closeDeleteModal();
+                if (document.querySelector(".mot-vide").hidden == true) {
+                    document.querySelector(".mot-vide").hidden = false;
+                }
             })
             .catch(error => {
                 console.error("Erreur suppression :", error);
             });
     });
+}
+
+function verifieDialogue(dialogueTab) {
+   return dialogueTab.length > 0;
 }
