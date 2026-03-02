@@ -19,7 +19,7 @@ services:
     container_name: game_api
     restart: always
     ports:
-      - "3001:3000" # Rend API accessible sur http://ip-serveur:3001
+      - "3001:3001" # Rend API accessible sur http://ip-serveur:3001
     depends_on:
       - mongodb
     environment:
