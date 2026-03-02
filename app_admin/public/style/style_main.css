@@ -2,6 +2,7 @@
     --white: #ffffff;
     --black: #000000;
     --swiss-green: #008000;
+    --swiss-red: #ff0000;
     --gray-light: #f4f4f4;
     --gray-medium: #e0e0e0;
     --gray-text: #888888;
@@ -19,6 +20,8 @@ body {
     color: var(--black);
     line-height: 1.5;
     overflow-x: hidden;
+    background-image: radial-gradient(var(--gray-medium) 1px, transparent 1px);
+    background-size: 20px 20px; /* Un petit quadrillage discret */
 }
 
 .hidden {
@@ -90,23 +93,66 @@ nav {
     gap: 10px;
 }
 
+.press-effect{
+    border: none;
+    box-shadow: 
+        -4px 0 0 0 var(--black),
+        4px 0 0 0 var(--black),
+        0 -4px 0 0 var(--black),
+        0 4px 0 0 var(--black);
+    border-radius: 0;
+    color: var(--black);
+}
+
+.press-effect:hover {
+    transform: translateY(2px);
+    box-shadow: none; /* Effet d'enfoncement */
+}
+
 .btn-black {
-    background: var(--black);
-    color: var(--white);
+    background-color: var(--gray-light);
+    color: var(--black);
 }
 
 .btn-black:hover {
-    background: var(--swiss-green);
+    background: var(--gray-light);
+    color: var(--black);
 }
 
 .btn-outline {
     background: transparent;
-    border: 2px solid var(--black);
+    border: 1px solid var(--black);
 }
 
 .btn-outline:hover {
     background: var(--black);
     color: var(--white);
+}
+
+.green:hover {
+    background: var(--swiss-green);
+    border-color: var(--swiss-green);
+    color: var(--white);
+}
+
+.delete:hover {
+    background: var(--swiss-red);
+    border-color: var(--swiss-red);
+    color: var(--white);
+}
+
+.delete-dialogue {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1100; /* Un peu plus haut que l'autre au cas où */
+    background-color: white;
+    padding: 2.5rem;
+    border: 4px solid var(--swiss-red); /* Style pixel/brutaliste */
+    box-shadow: 0 0 0 4px var(--black);
+    min-width: 400px;
+    text-align: center;
 }
 
 /* --- LOGIN PAGE --- */
@@ -182,7 +228,6 @@ nav {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1px;
-    border: 1px solid var(--black);
 }
 
 .scenario-card {
@@ -194,6 +239,7 @@ nav {
     justify-content: space-between;
     cursor: pointer;
     transition: all 0.3s ease;
+    border:1px solid var(--black);
 }
 
 .scenario-card:hover {
@@ -308,4 +354,78 @@ textarea {
     resize: none;
     border: 2px solid var(--black) !important;
     padding: 1rem !important;
+}
+
+/* Style de la boîte modale */
+.add-dialogue {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrage parfait */
+    z-index: 1000; /* Passe au-dessus de tout */
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+}
+/* CARD */
+.add-dialogue form {
+    background: #ffffff;
+    width: 100%;
+    max-width: 480px;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: modalPop 0.25s ease;
+}
+
+/* TITLE */
+.add-dialogue h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+/* INPUTS */
+.add-dialogue input {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+    transition: 0.2s ease;
+}
+
+.add-dialogue input:focus {
+    outline: none;
+    border-color: #111;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.08);
+}
+
+/* BUTTON ROW */
+.add-dialogue form div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* ANIMATION */
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Optionnel : transition pour le flou */
+#scenario-view {
+    transition: filter 0.3s ease;
 }
