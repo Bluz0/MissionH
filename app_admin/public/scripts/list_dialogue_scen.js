@@ -41,7 +41,7 @@ function createRow(dialogue_id, dialogue_name, dialogue_text) {
     let buttonEditor = create("button", td_empty, "Éditer");
     buttonEditor.className = "btn btn-outline green";
     buttonEditor.style.padding = "0.5rem 1rem";
-    //buttonEditor.addEventListener("click", () => openEditor(dialogue_id));
+    buttonEditor.addEventListener("click", () => openEditor(dialogue_id));
     let buttonDelete = create("button", td_empty, "Supprimer");
     buttonDelete.className = "btn btn-outline delete";
     buttonDelete.style.padding = "0.5rem 1rem";
@@ -49,6 +49,11 @@ function createRow(dialogue_id, dialogue_name, dialogue_text) {
     buttonDelete.addEventListener("click", () => {
         openDeleteModal(dialogue_id, row);
     });
+}
+
+function openEditor(dialogueId) {
+    // Rediriger vers la page d'édition du dialogue
+    window.location.href = `edit_dialogue.html?&dialogueId=${dialogueId}`;
 }
 
 axios.get(`${serveur}/api/scenarios/${title}/dialogues`)
@@ -91,7 +96,6 @@ function addDialogue(locuteur, contenu) {
 
 let buttonNewDialogue = document.getElementById("new-d");
 let addDialogueSection = document.querySelector(".add-dialogue");
-// ... (tes variables au début restent identiques)
 
 // Fonction pour nettoyer et fermer
 function closeModal() {

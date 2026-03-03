@@ -196,6 +196,45 @@ app.delete('/api/scenarios/:scenarioName', async (req, res) => {
 
 /**
  * @swagger
+ * /api/dialogue/{id}:
+ *  get:
+ *   summary: Récupérer un dialogue par son ID
+ *   tags: [Dialogues]
+ *   parameters:
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: string
+ *       required: true
+ *       description: L'ID du dialogue à récupérer
+  *  responses:
+  *    200:
+  *     description: Dialogue trouvé
+  *    content:
+  *      application/json:
+  *      schema:
+  *       $ref: '#/components/schemas/Dialogue'
+  *   404:
+  *    description: Dialogue non trouvé
+  *  500:
+  *   description: Erreur serveur
+  */
+app.get('/api/dialogue/:id', async (req, res) => {
+  try {
+    const dialogue = await Dialogue.findById(req.params.id);
+    if (!dialogue) {
+      return res.status(404).json({ error: "Dialogue non trouvé" });
+    }
+    res.json(dialogue);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } 
+});
+
+
+
+/**
+ * @swagger
  * /api/scenarios/{scenarioName}/dialogues:
  *   get:
  *     summary: Récupérer tous les dialogues d'un scénario

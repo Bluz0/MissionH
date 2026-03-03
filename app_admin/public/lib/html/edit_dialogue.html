@@ -12,27 +12,25 @@
 <body>
     <main id="editor-view" class="container">
             <div class="page-header" style="align-items: flex-start; flex-direction: column;">
-                <button onclick="showView('scenario')" class="btn btn-outline"
-                    style="border:none; padding-left:0; margin-bottom: 1rem;">← Annuler l'édition</button>
-                <h2 class="page-title uppercase espace-letter">Édition</h2>
+                <button class="btn btn-outline press-effect"
+                    style="border:none; padding-left: 2.5em; margin-bottom: 1rem;" onclick="window.history.back()"> < Annuler l'édition</button>
+                <h2 class="page-title uppercase">Édition</h2>
             </div>
 
             <div class="editor-split">
 
                 <div class="editor-form">
                     <div class="input-group">
-                        <label class="uppercase espace-letter">Nom du personnage</label>
-                        <input type="text" id="edit-name" value="Eleve" oninput="updatePreview()">
+                        <label class="uppercase espace-letter" id="locuteur">Nom du personnage</label>
+                        <input type="text" id="edit-name">
                     </div>
 
                     <div class="input-group">
                         <label class="uppercase espace-letter">Texte du dialogue</label>
-                        <textarea id="edit-text" rows="6"
-                            oninput="updatePreview()">Halte-là ! On ne passe pas.</textarea>
+                        <textarea id="edit-text" rows="6"></textarea>
                     </div>
-                    <button class="btn btn-black" onclick="saveDialogue()"
-                        style="width:100%; justify-content:center; padding: 1.5rem;">Enregistrer en base de
-                        données</button>
+                    <button class="btn btn-black press-effect"
+                        style="width:100%; justify-content:center; padding: 1.5rem;">Enregistrer</button>
                 </div>
 
                 <!-- Aperçu Unity -->
@@ -46,12 +44,14 @@
                             <span style="color:rgba(255,255,255,0.1); font-weight:900; font-size:4rem;">JEU</span>
                         </div>
                         <div class="unity-dialogue-box">
-                            <span class="unity-name" id="preview-name">Eleve</span>
-                            <p class="unity-text" id="preview-text">Salut</p>
+                            <span class="unity-name" id="preview-name"></span>
+                            <p class="unity-text" id="preview-text"></p>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="../../scripts/edit_dialogue.js" defer></script>
 </body>
 </html>
