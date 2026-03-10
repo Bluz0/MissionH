@@ -862,6 +862,7 @@ GameObject:
   - component: {fileID: 1272420337}
   - component: {fileID: 1272420336}
   - component: {fileID: 1272420339}
+  - component: {fileID: 1272420340}
   m_Layer: 5
   m_Name: Gauche
   m_TagString: Untagged
@@ -1004,6 +1005,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1272420340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272420334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a57a0696c079c4f8958ba545ea2efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  anim: {fileID: 1272420339}
 --- !u!1 &1314203418
 GameObject:
   m_ObjectHideFlags: 0
@@ -1535,6 +1549,8 @@ GameObject:
   - component: {fileID: 2035660782}
   - component: {fileID: 2035660781}
   - component: {fileID: 2035660780}
+  - component: {fileID: 2035660784}
+  - component: {fileID: 2035660783}
   m_Layer: 5
   m_Name: Droite
   m_TagString: Untagged
@@ -1655,6 +1671,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2035660778}
   m_CullTransparentMesh: 1
+--- !u!114 &2035660783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035660778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 107a4ac8b8e18044aa0375b4ba3aa889, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  anim: {fileID: 2035660784}
+--- !u!95 &2035660784
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035660778}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 71617c1384a2a324fa17863b8be83d7e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &6589295934839373188
 PrefabInstance:
   m_ObjectHideFlags: 0

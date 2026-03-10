@@ -20,7 +20,6 @@ public class Slot : MonoBehaviour
     /// </summary>
     public void OnSlotClicked()
     {
-        FindAnyObjectByType<HotBarController>().SelectSlot(transform.GetSiblingIndex());
 
         if (currentItem != null)
         {
