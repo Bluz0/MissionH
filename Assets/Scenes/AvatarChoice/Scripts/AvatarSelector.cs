@@ -2,41 +2,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.U2D.Animation;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 /// <summary>
-/// Gère la sélection d'avatar avant de lancer la partie :
-/// - permet de naviguer entre plusieurs skins
-/// - met à jour l’aperçu visuel via SpriteResolver
-/// - sauvegarde le skin choisi dans les PlayerPrefs
-/// - charge la scène de jeu.
+/// Gère la sélection d'avatar et le nom du joueur.
 /// </summary>
 public class AvatarSelector : MonoBehaviour
 {
-    /// <summary>
-    /// Liste des skins disponibles (SpriteLibraryAsset).
-    /// </summary>
-    public SpriteLibraryAsset[] skins;
+    public SpriteLibraryAsset[] skins;      // Liste des skins disponibles
+    public SpriteResolver previewResolver;  // Aperçu du skin sélectionné
+    public TMP_InputField nameInput;        // Champ du nom du joueur
+
+    private int index = 0;                  // Index du skin sélectionné
 
     /// <summary>
-    /// SpriteResolver utilisé pour afficher l’aperçu du skin sélectionné.
-    /// </summary>
-    public SpriteResolver previewResolver;
-
-    /// <summary>
-    /// Index du skin actuellement sélectionné.
-    /// </summary>
-    private int index = 0;
-
-    /// <summary>
-    /// Initialise l’aperçu au démarrage.
+    /// Initialise l’aperçu et recharge le nom sauvegardé.
     /// </summary>
     void Start()
     {
         UpdatePreview();
+
+        if (PlayerPrefs.HasKey("PlayerName"))
+            nameInput.text = PlayerPrefs.GetString("PlayerName");
     }
 
     /// <summary>
-    /// Passe au skin suivant dans la liste.
+    /// Passe au skin suivant.
     /// </summary>
     public void Next()
     {
@@ -45,7 +36,7 @@ public class AvatarSelector : MonoBehaviour
     }
 
     /// <summary>
-    /// Revient au skin précédent dans la liste.
+    /// Passe au skin précédent.
     /// </summary>
     public void Previous()
     {
@@ -54,19 +45,22 @@ public class AvatarSelector : MonoBehaviour
     }
 
     /// <summary>
-    /// Met à jour l’aperçu visuel en appliquant le SpriteLibraryAsset sélectionné.
+    /// Met à jour l’aperçu visuel du skin sélectionné.
     /// </summary>
     void UpdatePreview()
     {
         previewResolver.spriteLibrary.spriteLibraryAsset = skins[index];
     }
-    
+
     /// <summary>
-    /// Sauvegarde le skin choisi et charge la scène de jeu.
+    /// Sauvegarde le skin et le nom, puis lance la scène du jeu.
     /// </summary>
     public void PlayGame()
     {
         PlayerPrefs.SetString("SelectedSkin", skins[index].name);
+        PlayerPrefs.SetString("PlayerName", nameInput.text);
+        PlayerPrefs.Save();
+
         SceneManager.LoadScene("map_jeu");
     }
 }
