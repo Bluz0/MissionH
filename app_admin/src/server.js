@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import Dialogue from './models/dialogue.js';
+import Dialogue from './models/dialogueTree.js';
 import Scenario from './models/scenario.js';
 
 import swaggerUi from 'swagger-ui-express';
