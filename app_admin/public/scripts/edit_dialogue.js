@@ -24,7 +24,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const scenarioTitle = urlParams.get('scenario');
 
 if (scenarioTitle) {
-    document.getElementById('scenario-title').innerText = "Scénario : " + scenarioTitle;
+    // On affiche uniquement le nom pour que ce soit plus élégant
+    document.getElementById('scenario-title').innerText = scenarioTitle;
     loadScenarioData(scenarioTitle);
 }
 

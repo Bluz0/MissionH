@@ -21,7 +21,7 @@ buttonBack.addEventListener('click', () => {
 let mainActionBtn = document.getElementById("new-d") || document.getElementById("open-tree-editor");
 
 if (mainActionBtn) {
-    mainActionBtn.innerText = "🌳 OUVRIR L'ÉDITEUR D'ARBRE";
+    mainActionBtn.innerText = " OUVRIR L'ÉDITEUR ";
     mainActionBtn.className = "btn btn-black press-effect green";
     mainActionBtn.style.padding = "1.5rem 2rem";
 

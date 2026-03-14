@@ -13,9 +13,10 @@ function afficheTitreScenario(scenarioName) {
     let card = create("div", gridScenarios);
     card.className = "scenario-card rapprochement-letter";
     
-    // Redirection vers le dashboard du scénario avec le titre en paramètre
+    // REDIRECTION DIRECTE VERS L'ÉDITEUR
     card.addEventListener("click", () => {
-        window.location.href = `lib/html/dashboard.html?title=${encodeURIComponent(scenarioName)}`;
+        // On monte d'un niveau si nécessaire selon ton arborescence de dossiers
+        window.location.href = `lib/html/edit_dialogue.html?scenario=${encodeURIComponent(scenarioName)}`;
     });
 
     let cardIdStr = cardId.toString().padStart(2, '0');
