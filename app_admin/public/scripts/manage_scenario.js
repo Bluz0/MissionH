@@ -1,3 +1,7 @@
+const serveur = "http://51.38.222.173";
+let gridScenarios = document.querySelector(".grid-scenarios");
+let cardId = 1;
+
 function create(tag, container, text = null) {
     const element = document.createElement(tag);
     element.innerText = text;
@@ -5,19 +9,13 @@ function create(tag, container, text = null) {
     return element;
 }
 
-const serveur = "http://51.38.222.173";
-console.log("Tentative de connexion à :", serveur); // Vérifie le port affiché ici
-const title = new URLSearchParams(window.location.search).get('title');
-
-let gridScenarios = document.querySelector(".grid-scenarios");
-let cardId = 1;
-
-function afficheTitreScenario(scenarioName){
+function afficheTitreScenario(scenarioName) {
     let card = create("div", gridScenarios);
     card.className = "scenario-card rapprochement-letter";
-    // faire le addEventListener pour rediriger vers la page de gestion des dialogues de ce scenario
+    
+    // Redirection vers le dashboard du scénario avec le titre en paramètre
     card.addEventListener("click", () => {
-        window.location.href = `lib/html/dashboard.html?title=${scenarioName}`;
+        window.location.href = `lib/html/dashboard.html?title=${encodeURIComponent(scenarioName)}`;
     });
 
     let cardIdStr = cardId.toString().padStart(2, '0');
@@ -30,19 +28,18 @@ function afficheTitreScenario(scenarioName){
     h3Card.style.fontSize = "1.5rem";
 }
 
-// Affiche les scenarios disponibles dans la base de données
-axios.get(`${serveur}/api/scenarios`).then(response => {
-    const scenarios = response.data;
-    
-    console.log("Scénarios récupérés :", scenarios);
-    
-    scenarios.forEach(scenario => {
-        afficheTitreScenario(scenario.scenarioName);
+// Récupération des scénarios depuis l'API
+axios.get(`${serveur}/api/scenarios`)
+    .then(response => {
+        const scenarios = response.data;
+        gridScenarios.innerHTML = ""; // On vide la grille avant d'afficher
+        scenarios.forEach(scenario => {
+            afficheTitreScenario(scenario.scenarioName);
+        });
+    })
+    .catch(error => {
+        console.error("Erreur lors de la récupération des scénarios :", error);
     });
-}).catch(error => {
-    console.error("Erreur lors de la récupération des scénarios :", error);
-});
-
 
 /*
 

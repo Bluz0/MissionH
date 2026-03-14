@@ -19,6 +19,39 @@ const editType = document.getElementById('edit-type');
 const previewName = document.getElementById('preview-name');
 const previewText = document.getElementById('preview-text');
 
+// --- CHARGEMENT DU SCÉNARIO ---
+const urlParams = new URLSearchParams(window.location.search);
+const scenarioTitle = urlParams.get('scenario');
+
+if (scenarioTitle) {
+    document.getElementById('scenario-title').innerText = "Scénario : " + scenarioTitle;
+    loadScenarioData(scenarioTitle);
+}
+
+function loadScenarioData(title) {
+    // On va chercher si un arbre existe déjà pour ce scénario
+    axios.get(`${serveur}/api/scenarios/${title}/tree`)
+        .then(response => {
+            if (response.data) {
+                // Si des données existent, on remplit nos variables locales
+                dialogues = response.data.dialogues || [];
+                connections = response.data.connections || [];
+                
+                // On affiche tout sur le whiteboard
+                renderList();
+                dialogues.forEach(d => {
+                    if (d.x !== undefined && d.y !== undefined) {
+                        createNodeOnBoard(d, d.x, d.y);
+                    }
+                });
+                updateLines();
+            }
+        })
+        .catch(error => {
+            console.log("Nouveau scénario ou erreur de chargement. On part d'une page blanche.");
+        });
+}
+
 // --- CONFIG PAN & ZOOM ---
 let scale = 1;
 let offsetX = 0;
