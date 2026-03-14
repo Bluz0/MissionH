@@ -429,3 +429,171 @@ textarea {
 #scenario-view {
     transition: filter 0.3s ease;
 }
+
+/* Drag and Drop et SlideBar */
+
+.container-fluid { padding: 1rem 2rem; }
+
+.editor-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px; /* Tableau large, sidebar étroite */
+    gap: 1rem;
+    height: calc(100vh - 180px);
+}
+
+#canvas-area {
+    position: relative;
+    overflow: hidden; /* Important pour ne pas voir ce qui sort du cadre */
+    background-color: var(--gray-light);
+    border: 4px solid var(--black);
+    cursor: grab; /* Curseur de main pour le déplacement */
+}
+
+#whiteboard {
+    transform-origin: 0 0; /* Important pour que le zoom parte du coin haut-gauche */
+    width: 5000px; /* Espace immense pour travailler */
+    height: 5000px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.canvas-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 1000;
+}
+
+.btn-zoom {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--black);
+    background: white;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-zoom:hover { background: var(--gray-medium); }
+
+#lines-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Pour pouvoir cliquer sur les cercles sous le SVG */
+}
+
+.dialogue-sidebar {
+    border-left: 2px solid var(--black);
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+}
+
+/* Les petites cartes dans la liste */
+.draggable-dialogue {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajoute les ... automatiquement si le texte déborde */
+    max-width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--black);
+    margin-bottom: 0.5rem;
+    cursor: grab;
+    background: white;
+    font-size: 12px;
+}
+
+.draggable-dialogue.npc { border-left: 10px solid var(--swiss-green); }
+.draggable-dialogue.player { border-left: 10px solid #007bff; } /* Bleu joueur */
+
+/* Positionnement de la vue édition par-dessus tout */
+#modal-edit-dialogue {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: white; /* Ou transparent avec un flou */
+    z-index: 2000;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.hidden { display: none; }
+
+/* Les cercles sur le tableau */
+.node-circle {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: white;
+    cursor: move;
+    z-index: 100;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+    user-select: none;
+}
+
+/* Couleurs selon le type (assure-toi que ces variables sont définies) */
+.node-npc { 
+    background-color: var(--swiss-green); 
+}
+.node-player { 
+    background-color: #007bff; /* Bleu joueur */
+}
+
+.mini-unity-preview { margin-top: auto; padding-top: 1rem; }
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Aligne verticalement au centre */
+}
+
+/* --- CORRECTION ALIGNEMENT DES BOUTONS DE L'ÉDITEUR --- */
+.editor-controls {
+    display: flex;
+    flex-direction: row; /* Horizontal */
+    gap: 15px; /* Espacement entre les boutons */
+    align-items: center; /* Aligne verticalement au centre de la ligne */
+}
+
+/* --- STYLE BOUTON SUPPRESSION --- */
+.delete {
+    background-color: transparent;
+    border-color: var(--swiss-red) !important;
+    color: var(--swiss-red) !important;
+}
+
+.delete:hover {
+    background-color: var(--swiss-red);
+    color: var(--white) !important;
+}
+
+/* Classe active quand le mode suppression est enclenché */
+.active-delete {
+    background-color: var(--swiss-red);
+    color: var(--white) !important;
+    animation: pulse-red 1.5s infinite; /* Optionnel : petit effet de pulsation */
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}

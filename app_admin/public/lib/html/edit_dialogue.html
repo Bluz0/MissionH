@@ -1,57 +1,104 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Éditeur de Scénario - Dialogue Tree</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../style/style_main.css">
 </head>
+
 <body>
-    <main id="editor-view" class="container">
+
+    <main id="editor-view" class="container-fluid">
+        <div class="page-header editor-header">
+            <button class="btn btn-outline press-effect" onclick="window.history.back()">
+                < Retour</button>
+                    <h2 id="scenario-title" class="page-title uppercase">Scénario</h2>
+                    <div class="editor-controls">
+                        <button id="btn-link" class="btn btn-black press-effect">Relier deux dialogues</button>
+                        <button id="btn-unlink" class="btn btn-black press-effect delete">Supprimer lien</button>
+                        <button id="btn-save-all" class="btn btn-black press-effect green">Sauvegarder</button>
+                    </div>
+        </div>
+
+        <div class="editor-layout">
+            <div id="canvas-area">
+                <div id="whiteboard">
+                    <svg id="lines-svg"></svg>
+                </div>
+
+                <div class="canvas-controls">
+                    <button id="btn-zoom-in" class="btn-zoom">+</button>
+                    <button id="btn-zoom-out" class="btn-zoom">-</button>
+                    <button id="btn-recenter" class="btn-zoom">↺</button>
+                </div>
+            </div>
+
+            <aside class="dialogue-sidebar">
+                <div class="sidebar-header">
+                    <h3 class="uppercase espace-letter">Dialogues</h3>
+                    <button id="btn-add-dialogue" class="btn btn-black press-effect">+ Nouveau</button>
+                </div>
+
+                <div id="dialogue-list-container">
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div id="modal-edit-dialogue" class="hidden">
+        <div class="modal-content">
             <div class="page-header" style="align-items: flex-start; flex-direction: column;">
-                <button class="btn btn-outline press-effect"
-                    style="border:none; padding-left: 2.5em; margin-bottom: 1rem;" onclick="window.history.back()"> < Annuler l'édition</button>
-                <h2 class="page-title uppercase">Édition</h2>
+                <button class="btn btn-outline press-effect" id="btn-close-edit">
+                    < Annuler l'édition</button>
+                        <h2 class="page-title uppercase">Édition de la ligne</h2>
             </div>
 
             <div class="editor-split">
-
                 <div class="editor-form">
                     <div class="input-group">
-                        <label class="uppercase espace-letter" id="locuteur">Nom du personnage</label>
-                        <input type="text" id="edit-name">
+                        <label class="uppercase espace-letter">Type de personnage</label>
+                        <select id="edit-type">
+                            <option value="npc">Professeur (Vert)</option>
+                            <option value="player">Joueur (Bleu)</option>
+                        </select>
                     </div>
 
                     <div class="input-group">
                         <label class="uppercase espace-letter">Texte du dialogue</label>
-                        <textarea id="edit-text" rows="6"></textarea>
+                        <textarea id="edit-text" rows="6" placeholder="Écrivez votre texte ici..."></textarea>
                     </div>
-                    <button class="btn btn-black press-effect" id="enregistre"
-                        style="width:100%; justify-content:center; padding: 1.5rem;">Enregistrer</button>
+
+                    <button class="btn btn-black press-effect" id="btn-validate-line"
+                        style="width:100%; justify-content:center; padding: 1.5rem;">
+                        Valider et retourner au tableau
+                    </button>
                 </div>
 
-                <!-- Aperçu Unity -->
                 <div class="unity-preview">
                     <div class="uppercase espace-letter font-black" style="font-size: 10px; margin-bottom: 1rem;">
                         Simulateur Jeu</div>
                     <div class="unity-screen">
-                        <!-- Image de fond fictive (placeholder) -->
                         <div
                             style="width:100%; height:100%; background: linear-gradient(45deg, #222, #444); display:flex; align-items:center; justify-content:center;">
                             <span style="color:rgba(255,255,255,0.1); font-weight:900; font-size:4rem;">JEU</span>
                         </div>
                         <div class="unity-dialogue-box">
-                            <span class="unity-name" id="preview-name"></span>
-                            <p class="unity-text" id="preview-text"></p>
+                            <span class="unity-name" id="preview-name">PROFESSEUR</span>
+                            <p class="unity-text" id="preview-text">Aperçu du texte...</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script src="../../scripts/edit_dialogue.js" defer></script>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../../scripts/edit_dialogue.js" defer></script>
 </body>
+
 </html>
