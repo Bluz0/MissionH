@@ -525,3 +525,36 @@ document.addEventListener('mouseup', () => {
     isPanning = false;
     canvasArea.style.cursor = 'grab';
 });
+
+// Bouton sauvegarde
+document.getElementById('btn-save-all').addEventListener('click', () => {
+    const dataToSave = {
+        scenarioName: scenarioTitle, // Récupéré de l'URL
+        nodes: dialogues,           // Tes objets cercles
+        connections: connections    // Tes objets flèches
+    };
+
+    axios.post(`${serveur}/api/scenarios/tree/save`, dataToSave)
+        .then(() => alert("Scénario sauvegardé avec succès !"))
+        .catch(err => console.error("Erreur sauvegarde :", err));
+});
+
+const btnSaveAll = document.getElementById('btn-save-all');
+
+btnSaveAll.addEventListener('click', () => {
+    // On regroupe tout ce qu'on a fait sur le tableau blanc
+    const payload = {
+        scenarioName: scenarioTitle, 
+        nodes: dialogues,           
+        connections: connections    
+    };
+
+    axios.post(`${serveur}/api/scenarios/tree/save`, payload)
+        .then(response => {
+            alert("Scénario sauvegardé avec succès !");
+        })
+        .catch(err => {
+            console.error("Erreur sauvegarde :", err);
+            alert("Erreur de connexion au serveur.");
+        });
+});
