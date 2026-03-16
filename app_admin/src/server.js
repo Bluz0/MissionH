@@ -274,6 +274,7 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
     }
     res.json({ message: "Arbre sauvegardé avec succès", idMap });
   } catch (err) {
+    console.error('ERREUR tree/save :', err);
     res.status(500).json({ error: err.message });
   }
 });
