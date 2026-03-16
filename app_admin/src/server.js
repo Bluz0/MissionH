@@ -176,10 +176,19 @@ app.delete('/api/scenarios/:scenarioName', async (req, res) => {
   try {
     const { scenarioName } = req.params;
     const scenarioSupprime = await Scenario.findOneAndDelete({ scenarioName });
+
     if (!scenarioSupprime) {
       return res.status(404).json({ error: "Scénario non trouvé" });
     }
+
     const resultDialogues = await Dialogue.deleteMany({ scenarioName });
+
+    // Renuméroter tous les scénarios restants par ordre alphabétique ou d'insertion
+    const scenariosRestants = await Scenario.find().sort({ scenarioId: 1 });
+    for (let i = 0; i < scenariosRestants.length; i++) {
+      await Scenario.findByIdAndUpdate(scenariosRestants[i]._id, { scenarioId: i + 1 });
+    }
+
     res.json({
       message: "Suppression réussie",
       scenario: scenarioSupprime.scenarioName,
@@ -193,7 +202,7 @@ app.delete('/api/scenarios/:scenarioName', async (req, res) => {
 
 // ============================================================
 // ROUTES ARBRE (WHITEBOARD)
-// ⚠️  Ces deux routes DOIVENT être avant DELETE /api/scenarios/:scenarioName
+//     Ces deux routes DOIVENT être avant DELETE /api/scenarios/:scenarioName
 //     pour qu'Express ne confonde pas "tree" avec un scenarioName
 // ============================================================
 
