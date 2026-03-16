@@ -64,8 +64,10 @@ mongoose.connect(uri)
 /**
  * @swagger
  * tags:
- *  name: Scenarios
- *  description: Opérations CRUD sur les scénarios
+ *   - name: Scenarios
+ *     description: Opérations CRUD sur les scénarios
+ *   - name: Dialogues
+ *     description: Opérations CRUD sur les dialogues
  */
 
 /**
@@ -76,7 +78,15 @@ mongoose.connect(uri)
  *     tags: [Scenarios]
  *     responses:
  *       200:
- *         description: Liste des scénarios
+ *         description: Liste de tous les scénarios triés par ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Scenario'
+ *       500:
+ *         description: Erreur serveur
  */
 app.get('/api/scenarios', async (req, res) => {
   try {
@@ -93,18 +103,36 @@ app.get('/api/scenarios', async (req, res) => {
  *   post:
  *     summary: Créer un nouveau scénario
  *     tags: [Scenarios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - scenarioName
+ *             properties:
+ *               scenarioName:
+ *                 type: string
+ *                 example: "Mission Alpha"
+ *     responses:
+ *       201:
+ *         description: Scénario créé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Scenario'
+ *       400:
+ *         description: scenarioName manquant ou erreur de validation
  */
 app.post('/api/scenarios', async (req, res) => {
   try {
     const { scenarioName } = req.body;
-
     if (!scenarioName) {
       return res.status(400).json({ error: "Le nom du scénario est obligatoire" });
     }
-
     const newScenario = new Scenario({ scenarioName });
     await newScenario.save();
-
     res.status(201).json(newScenario);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -114,22 +142,44 @@ app.post('/api/scenarios', async (req, res) => {
 /**
  * @swagger
  * /api/scenarios/{scenarioName}:
- *  delete:
- *    summary: Supprimer un scénario et tous ses dialogues associés
- *    tags: [Scenarios]
+ *   delete:
+ *     summary: Supprimer un scénario et tous ses dialogues associés
+ *     tags: [Scenarios]
+ *     parameters:
+ *       - in: path
+ *         name: scenarioName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Le nom exact du scénario à supprimer
+ *         example: "Mission Alpha"
+ *     responses:
+ *       200:
+ *         description: Scénario et dialogues supprimés avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 scenario:
+ *                   type: string
+ *                 dialoguesSupprimes:
+ *                   type: integer
+ *       404:
+ *         description: Scénario non trouvé
+ *       500:
+ *         description: Erreur serveur
  */
 app.delete('/api/scenarios/:scenarioName', async (req, res) => {
   try {
     const { scenarioName } = req.params;
-
     const scenarioSupprime = await Scenario.findOneAndDelete({ scenarioName });
-
     if (!scenarioSupprime) {
       return res.status(404).json({ error: "Scénario non trouvé" });
     }
-
     const resultDialogues = await Dialogue.deleteMany({ scenarioName });
-
     res.json({
       message: "Suppression réussie",
       scenario: scenarioSupprime.scenarioName,
@@ -142,14 +192,16 @@ app.delete('/api/scenarios/:scenarioName', async (req, res) => {
 
 
 // ============================================================
-// ROUTES ARBRE (WHITEBOARD) — NOUVELLES ROUTES CLÉS
+// ROUTES ARBRE (WHITEBOARD)
+// ⚠️  Ces deux routes DOIVENT être avant DELETE /api/scenarios/:scenarioName
+//     pour qu'Express ne confonde pas "tree" avec un scenarioName
 // ============================================================
 
 /**
  * @swagger
  * /api/scenarios/{scenarioName}/tree:
  *   get:
- *     summary: Récupérer l'arbre complet d'un scénario (dialogues + connexions)
+ *     summary: Récupérer l'arbre complet d'un scénario (nœuds + connexions)
  *     tags: [Scenarios]
  *     parameters:
  *       - in: path
@@ -157,41 +209,80 @@ app.delete('/api/scenarios/:scenarioName', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
+ *         description: Le nom du scénario dont on veut récupérer l'arbre
+ *         example: "Mission Alpha"
  *     responses:
  *       200:
- *         description: >
- *           Retourne { dialogues, connections } où connections est reconstruit
- *           depuis les nextDialogues de chaque nœud.
+ *         description: Arbre complet avec dialogues et connexions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 dialogues:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: _id MongoDB (string)
+ *                         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *                       text:
+ *                         type: string
+ *                         description: Alias de contenu, utilisé côté frontend
+ *                         example: "Bonjour !"
+ *                       contenu:
+ *                         type: string
+ *                         example: "Bonjour !"
+ *                       type:
+ *                         type: string
+ *                         enum: [npc, player]
+ *                       locuteur:
+ *                         type: string
+ *                         example: "Professeur Dupont"
+ *                       scenarioName:
+ *                         type: string
+ *                       x:
+ *                         type: number
+ *                         example: 320
+ *                       y:
+ *                         type: number
+ *                         example: 150
+ *                 connections:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       fromId:
+ *                         type: string
+ *                         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *                       toId:
+ *                         type: string
+ *                         example: "664f1a2b3c4d5e6f7a8b9c1e"
  *       404:
  *         description: Scénario non trouvé
+ *       500:
+ *         description: Erreur serveur
  */
 app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
   try {
     const { scenarioName } = req.params;
-
     const scenario = await Scenario.findOne({ scenarioName });
     if (!scenario) {
       return res.status(404).json({ error: "Scénario non trouvé" });
     }
-
     const dialogues = await Dialogue.find({ scenarioName });
-
-    // Reconstituer les connexions { fromId, toId } depuis nextDialogues
     const connections = [];
     dialogues.forEach(d => {
       d.nextDialogues.forEach(childId => {
-        connections.push({
-          fromId: d._id.toString(),
-          toId: childId.toString()
-        });
+        connections.push({ fromId: d._id.toString(), toId: childId.toString() });
       });
     });
-
-    // Mapper les dialogues au format attendu par le frontend
     const nodes = dialogues.map(d => ({
-      id: d._id.toString(),       // ← string, pas ObjectId brut
+      id: d._id.toString(),
       _id: d._id.toString(),
-      text: d.contenu,            // ← "text" utilisé côté frontend
+      text: d.contenu,
       contenu: d.contenu,
       type: d.type,
       locuteur: d.locuteur,
@@ -199,7 +290,6 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
       x: d.position?.x ?? 100,
       y: d.position?.y ?? 100,
     }));
-
     res.json({ dialogues: nodes, connections });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -211,10 +301,12 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
  * @swagger
  * /api/scenarios/tree/save:
  *   post:
- *     summary: >
- *       Sauvegarder l'état complet du whiteboard d'un scénario
- *       (positions, connexions). Crée les nouveaux nœuds, met à jour
- *       les existants, nettoie les supprimés.
+ *     summary: Sauvegarder l'état complet du whiteboard d'un scénario
+ *     description: >
+ *       Crée les nouveaux nœuds (id préfixé tmp_), met à jour les existants,
+ *       supprime les nœuds retirés du whiteboard, et reconstruit toutes les
+ *       connexions (nextDialogues). Retourne un idMap { tempId → realMongoId }
+ *       pour que le frontend remplace ses IDs temporaires.
  *     tags: [Scenarios]
  *     requestBody:
  *       required: true
@@ -222,52 +314,92 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - scenarioName
+ *               - nodes
+ *               - connections
  *             properties:
  *               scenarioName:
  *                 type: string
+ *                 example: "Mission Alpha"
  *               nodes:
  *                 type: array
+ *                 description: Tous les nœuds présents sur le whiteboard
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       description: ID MongoDB existant, ou ID temporaire (préfixe tmp_)
+ *                       example: "tmp_1718000000000"
+ *                     text:
+ *                       type: string
+ *                       example: "Bonjour !"
+ *                     type:
+ *                       type: string
+ *                       enum: [npc, player]
+ *                     locuteur:
+ *                       type: string
+ *                       example: "Professeur Dupont"
+ *                     x:
+ *                       type: number
+ *                       example: 320
+ *                     y:
+ *                       type: number
+ *                       example: 150
  *               connections:
  *                 type: array
+ *                 description: Toutes les flèches entre nœuds
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     fromId:
+ *                       type: string
+ *                       example: "tmp_1718000000000"
+ *                     toId:
+ *                       type: string
+ *                       example: "664f1a2b3c4d5e6f7a8b9c1e"
  *     responses:
  *       200:
- *         description: Arbre sauvegardé
+ *         description: Arbre sauvegardé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 idMap:
+ *                   type: object
+ *                   description: Correspondance tempId → _id MongoDB réel
+ *                   additionalProperties:
+ *                     type: string
+ *       400:
+ *         description: scenarioName manquant
+ *       404:
+ *         description: Scénario non trouvé
+ *       500:
+ *         description: Erreur serveur
  */
-// IMPORTANT : cette route DOIT être définie avant /api/scenarios/:scenarioName
-// pour éviter que "tree" soit interprété comme un scenarioName.
 app.post('/api/scenarios/tree/save', async (req, res) => {
   try {
     const { scenarioName, nodes, connections } = req.body;
-
     if (!scenarioName) {
       return res.status(400).json({ error: "scenarioName est obligatoire" });
     }
-
-    // Vérifier que le scénario existe
     const scenario = await Scenario.findOne({ scenarioName });
     if (!scenario) {
       return res.status(404).json({ error: "Scénario non trouvé" });
     }
-
-    // IDs des nœuds envoyés par le frontend qui sont déjà en base (vrais ObjectId)
     const existingIds = nodes
       .filter(n => mongoose.Types.ObjectId.isValid(n.id))
       .map(n => n.id);
+    await Dialogue.deleteMany({ scenarioName, _id: { $nin: existingIds } });
 
-    // Supprimer les dialogues du scénario qui ne sont plus dans le whiteboard
-    await Dialogue.deleteMany({
-      scenarioName,
-      _id: { $nin: existingIds }
-    });
-
-    // Upsert chaque nœud
-    const idMap = {}; // tempId (Date.now) → _id MongoDB réel
-
+    const idMap = {};
     for (const node of nodes) {
       const isNew = !mongoose.Types.ObjectId.isValid(node.id);
-
       if (isNew) {
-        // Créer un nouveau document
         const created = await Dialogue.create({
           scenarioName,
           contenu: node.text || node.contenu || '',
@@ -278,32 +410,25 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
         });
         idMap[node.id] = created._id.toString();
       } else {
-        // Mettre à jour la position et le contenu
         await Dialogue.findByIdAndUpdate(node.id, {
           $set: {
             contenu: node.text || node.contenu,
             type: node.type,
             locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
             position: { x: node.x ?? 100, y: node.y ?? 100 },
-            nextDialogues: [] // reset, on remet depuis connections ci-dessous
+            nextDialogues: []
           }
         });
         idMap[node.id] = node.id;
       }
     }
-
-    // Reconstruire les nextDialogues depuis connections
     for (const conn of connections) {
       const fromId = idMap[conn.fromId] || conn.fromId;
       const toId   = idMap[conn.toId]   || conn.toId;
-
       if (mongoose.Types.ObjectId.isValid(fromId) && mongoose.Types.ObjectId.isValid(toId)) {
-        await Dialogue.findByIdAndUpdate(fromId, {
-          $addToSet: { nextDialogues: toId }
-        });
+        await Dialogue.findByIdAndUpdate(fromId, { $addToSet: { nextDialogues: toId } });
       }
     }
-
     res.json({ message: "Arbre sauvegardé avec succès", idMap });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -317,17 +442,31 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
 
 /**
  * @swagger
- * tags:
- *  name: Dialogues
- *  description: Opérations CRUD sur les dialogues
- */
-
-/**
- * @swagger
  * /api/scenarios/{scenarioName}/dialogues:
  *   get:
- *     summary: Récupérer tous les dialogues d'un scénario (liste ordonnée)
+ *     summary: Récupérer tous les dialogues d'un scénario
  *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: scenarioName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Le nom du scénario
+ *         example: "Mission Alpha"
+ *     responses:
+ *       200:
+ *         description: Liste des dialogues du scénario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Dialogue'
+ *       404:
+ *         description: Scénario non trouvé
+ *       500:
+ *         description: Erreur serveur
  */
 app.get('/api/scenarios/:scenarioName/dialogues', async (req, res) => {
   try {
@@ -345,9 +484,28 @@ app.get('/api/scenarios/:scenarioName/dialogues', async (req, res) => {
 /**
  * @swagger
  * /api/dialogue/{id}:
- *  get:
- *   summary: Récupérer un dialogue par son ID
- *   tags: [Dialogues]
+ *   get:
+ *     summary: Récupérer un dialogue par son ID MongoDB
+ *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du dialogue
+ *         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *     responses:
+ *       200:
+ *         description: Dialogue trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dialogue'
+ *       404:
+ *         description: Dialogue non trouvé
+ *       500:
+ *         description: Erreur serveur
  */
 app.get('/api/dialogue/:id', async (req, res) => {
   try {
@@ -367,6 +525,48 @@ app.get('/api/dialogue/:id', async (req, res) => {
  *   post:
  *     summary: Créer un nouveau dialogue
  *     tags: [Dialogues]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - scenarioName
+ *               - contenu
+ *               - locuteur
+ *             properties:
+ *               scenarioName:
+ *                 type: string
+ *                 example: "Mission Alpha"
+ *               contenu:
+ *                 type: string
+ *                 example: "Bonjour, comment vas-tu ?"
+ *               locuteur:
+ *                 type: string
+ *                 example: "Professeur Dupont"
+ *               type:
+ *                 type: string
+ *                 enum: [npc, player]
+ *                 default: npc
+ *               position:
+ *                 type: object
+ *                 properties:
+ *                   x:
+ *                     type: number
+ *                     example: 150
+ *                   y:
+ *                     type: number
+ *                     example: 200
+ *     responses:
+ *       201:
+ *         description: Dialogue créé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dialogue'
+ *       400:
+ *         description: Erreur de validation
  */
 app.post('/api/dialogues', async (req, res) => {
   try {
@@ -386,8 +586,54 @@ app.post('/api/dialogues', async (req, res) => {
  * @swagger
  * /api/dialogues/{id}:
  *   put:
- *     summary: Mettre à jour un dialogue
+ *     summary: Mettre à jour un dialogue (tous les champs envoyés)
  *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du dialogue à mettre à jour
+ *         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               contenu:
+ *                 type: string
+ *                 example: "Texte modifié"
+ *               locuteur:
+ *                 type: string
+ *                 example: "Professeur Dupont"
+ *               type:
+ *                 type: string
+ *                 enum: [npc, player]
+ *               position:
+ *                 type: object
+ *                 properties:
+ *                   x:
+ *                     type: number
+ *                   y:
+ *                     type: number
+ *               nextDialogues:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Dialogue mis à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dialogue'
+ *       404:
+ *         description: Dialogue non trouvé
+ *       400:
+ *         description: Erreur de validation
  */
 app.put('/api/dialogues/:id', async (req, res) => {
   try {
@@ -396,11 +642,9 @@ app.put('/api/dialogues/:id', async (req, res) => {
       { $set: req.body },
       { new: true, runValidators: true }
     );
-
     if (!misAJour) {
       return res.status(404).json({ error: "Dialogue non trouvé" });
     }
-
     res.json(misAJour);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -411,8 +655,43 @@ app.put('/api/dialogues/:id', async (req, res) => {
  * @swagger
  * /api/dialogues/{id}/position:
  *   put:
- *     summary: Mettre à jour la position d'un dialogue
+ *     summary: Mettre à jour uniquement la position d'un dialogue sur le whiteboard
  *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du dialogue
+ *         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - x
+ *               - y
+ *             properties:
+ *               x:
+ *                 type: number
+ *                 description: Position horizontale en pixels
+ *                 example: 320
+ *               y:
+ *                 type: number
+ *                 description: Position verticale en pixels
+ *                 example: 150
+ *     responses:
+ *       200:
+ *         description: Position mise à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dialogue'
+ *       400:
+ *         description: Erreur de validation
  */
 app.put('/api/dialogues/:id/position', async (req, res) => {
   try {
@@ -432,8 +711,38 @@ app.put('/api/dialogues/:id/position', async (req, res) => {
  * @swagger
  * /api/dialogues/{id}/link:
  *   patch:
- *     summary: Lier un dialogue parent à un enfant
+ *     summary: Ajouter un lien vers un dialogue enfant (relation parent → enfant)
  *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du dialogue parent
+ *         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - childId
+ *             properties:
+ *               childId:
+ *                 type: string
+ *                 description: L'ID MongoDB du dialogue enfant à lier
+ *                 example: "664f1a2b3c4d5e6f7a8b9c1e"
+ *     responses:
+ *       200:
+ *         description: Lien ajouté, dialogue parent retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dialogue'
+ *       400:
+ *         description: Erreur de validation
  */
 app.patch('/api/dialogues/:id/link', async (req, res) => {
   try {
@@ -455,6 +764,38 @@ app.patch('/api/dialogues/:id/link', async (req, res) => {
  *   patch:
  *     summary: Supprimer le lien entre un dialogue parent et un enfant
  *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du dialogue parent
+ *         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - childId
+ *             properties:
+ *               childId:
+ *                 type: string
+ *                 description: L'ID MongoDB du dialogue enfant à délier
+ *                 example: "664f1a2b3c4d5e6f7a8b9c1e"
+ *     responses:
+ *       200:
+ *         description: Lien supprimé, dialogue parent retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dialogue'
+ *       404:
+ *         description: Dialogue non trouvé
+ *       400:
+ *         description: Erreur de validation
  */
 app.patch('/api/dialogues/:id/unlink', async (req, res) => {
   try {
@@ -477,20 +818,37 @@ app.patch('/api/dialogues/:id/unlink', async (req, res) => {
  * @swagger
  * /api/dialogues/{id}:
  *   delete:
- *     summary: Supprimer un dialogue et nettoyer ses liens
+ *     summary: Supprimer un dialogue et nettoyer tous ses liens entrants
  *     tags: [Dialogues]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du dialogue à supprimer
+ *         example: "664f1a2b3c4d5e6f7a8b9c0d"
+ *     responses:
+ *       200:
+ *         description: Dialogue et liens supprimés avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Erreur serveur
  */
 app.delete('/api/dialogues/:id', async (req, res) => {
   try {
     const id = req.params.id;
     await Dialogue.findByIdAndDelete(id);
-
-    // Nettoyer les références dans les autres dialogues
     await Dialogue.updateMany(
       { nextDialogues: id },
       { $pull: { nextDialogues: id } }
     );
-
     res.json({ message: "Dialogue et liens supprimés" });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -511,10 +869,14 @@ app.delete('/api/dialogues/:id', async (req, res) => {
  *       required:
  *         - scenarioName
  *       properties:
- *         scenarioName:
- *          type: string
  *         scenarioId:
- *          type: integer
+ *           type: integer
+ *           description: ID auto-incrémenté
+ *           example: 1
+ *         scenarioName:
+ *           type: string
+ *           description: Nom unique du scénario
+ *           example: "Mission Alpha"
  *     Dialogue:
  *       type: object
  *       required:
@@ -522,22 +884,41 @@ app.delete('/api/dialogues/:id', async (req, res) => {
  *         - contenu
  *         - locuteur
  *       properties:
+ *         _id:
+ *           type: string
+ *           description: ID MongoDB auto-généré
+ *           example: "664f1a2b3c4d5e6f7a8b9c0d"
  *         scenarioName:
  *           type: string
+ *           description: Nom du scénario auquel ce dialogue appartient
+ *           example: "Mission Alpha"
  *         contenu:
  *           type: string
+ *           description: Texte du dialogue
+ *           example: "Bonjour, comment vas-tu ?"
  *         locuteur:
  *           type: string
+ *           description: Nom du personnage qui parle
+ *           example: "Professeur Dupont"
  *         type:
  *           type: string
  *           enum: [npc, player]
+ *           default: npc
+ *           description: Type de personnage (npc = vert, player = bleu)
  *         position:
  *           type: object
+ *           description: Position du nœud sur le whiteboard
  *           properties:
- *             x: { type: number }
- *             y: { type: number }
+ *             x:
+ *               type: number
+ *               example: 320
+ *             y:
+ *               type: number
+ *               example: 150
  *         nextDialogues:
  *           type: array
+ *           description: IDs des dialogues suivants (enfants dans l'arbre)
  *           items:
  *             type: string
+ *             example: "664f1a2b3c4d5e6f7a8b9c1e"
  */
