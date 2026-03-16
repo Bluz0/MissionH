@@ -1,6 +1,4 @@
-// ============================================================
-// CONFIGURATION & ÉTAT
-// ============================================================
+
 const serveur = "http://51.38.222.173";
 
 let dialogues = [];
@@ -11,9 +9,6 @@ let isLinking = false;
 let isUnlinking = false;
 let firstNodeSelected = null;
 
-// ============================================================
-// ÉLÉMENTS DOM
-// ============================================================
 const modal         = document.getElementById('modal-edit-dialogue');
 const listContainer = document.getElementById('dialogue-list-container');
 const btnAdd        = document.getElementById('btn-add-dialogue');
@@ -32,16 +27,12 @@ const editType      = document.getElementById('edit-type');
 const previewName   = document.getElementById('preview-name');
 const previewText   = document.getElementById('preview-text');
 
-// ============================================================
-// SYSTÈME DE TOAST
-// ============================================================
-
 const toastContainer = document.createElement('div');
 toastContainer.id = 'toast-container';
 document.body.appendChild(toastContainer);
 
 function showToast(message, type = 'info', duration = 3500) {
-    const icons = { success: '✅', error: '❌', info: 'ℹ', warning: '⚠' };
+    const icons = { success: '', error: '✕', info: 'ℹ', warning: '⚠' };
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -64,12 +55,9 @@ function showToast(message, type = 'info', duration = 3500) {
         }, duration);
     }
 
-    return toast; // retourner pour pouvoir le supprimer manuellement
+    return toast; 
 }
 
-// ============================================================
-// SYSTÈME DE CONFIRM PERSONNALISÉ
-// ============================================================
 
 const confirmOverlay = document.createElement('div');
 confirmOverlay.id = 'confirm-overlay';
@@ -116,9 +104,6 @@ function showConfirm(message, { title = 'Confirmer', icon = '🗑️', okLabel =
     });
 }
 
-// ============================================================
-// CHARGEMENT DU SCÉNARIO
-// ============================================================
 const urlParams     = new URLSearchParams(window.location.search);
 const scenarioTitle = urlParams.get('scenario');
 
@@ -150,9 +135,6 @@ function loadScenarioData(title) {
         });
 }
 
-// ============================================================
-// PAN & ZOOM
-// ============================================================
 let scale = 1, offsetX = 0, offsetY = 0;
 let isPanning = false, startX, startY;
 
@@ -193,10 +175,6 @@ document.addEventListener('mouseup', () => {
     isPanning = false;
     canvasArea.style.cursor = 'grab';
 });
-
-// ============================================================
-// ÉDITEUR (MODAL)
-// ============================================================
 
 function openEditor(id = null) {
     currentEditId = id;
@@ -263,9 +241,6 @@ btnValidate.addEventListener('click', () => {
 
 btnAdd.addEventListener('click', () => openEditor());
 
-// ============================================================
-// LISTE (SIDEBAR)
-// ============================================================
 
 function renderList() {
     listContainer.innerHTML = "";
@@ -324,9 +299,6 @@ async function deleteLine(id) {
     showToast("Dialogue supprimé.", 'info', 2500);
 }
 
-// ============================================================
-// WHITEBOARD — DRAG & DROP
-// ============================================================
 
 whiteboard.addEventListener('dragover', (e) => e.preventDefault());
 
@@ -342,10 +314,6 @@ whiteboard.addEventListener('drop', (e) => {
         createNodeOnBoard(dialogue, x, y);
     }
 });
-
-// ============================================================
-// CRÉATION / MISE À JOUR D'UN NŒUD SUR LE WHITEBOARD
-// ============================================================
 
 function createNodeOnBoard(dialogue, x, y) {
     let node = document.getElementById(`node-${dialogue.id}`);
@@ -407,9 +375,6 @@ function resetBorder(id) {
     if (n) n.style.border = "3px solid var(--black)";
 }
 
-// ============================================================
-// DÉPLACEMENT DES NŒUDS
-// ============================================================
 
 function makeNodeDraggable(node, dialogue) {
     let isDragging = false;
@@ -444,9 +409,6 @@ function makeNodeDraggable(node, dialogue) {
     });
 }
 
-// ============================================================
-// LIAISONS (FLÈCHES SVG)
-// ============================================================
 
 btnLink.addEventListener('click', () => {
     isLinking = !isLinking;
@@ -522,9 +484,6 @@ function updateLines() {
     });
 }
 
-// ============================================================
-// SAUVEGARDE COMPLÈTE
-// ============================================================
 
 btnSaveAll.addEventListener('click', async () => {
     const payload = {

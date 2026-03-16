@@ -57,9 +57,6 @@ mongoose.connect(uri)
   .catch(err => console.error('Erreur de connexion MongoDB :', err));
 
 
-// ============================================================
-// ROUTES SCENARIOS
-// ============================================================
 
 /**
  * @swagger
@@ -280,11 +277,6 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
 });
 
 
-// ============================================================
-// ROUTES ARBRE (WHITEBOARD)
-//     Ces deux routes DOIVENT être avant DELETE /api/scenarios/:scenarioName
-//     pour qu'Express ne confonde pas "tree" avec un scenarioName
-// ============================================================
 
 /**
  * @swagger
@@ -386,9 +378,6 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
 });
 
 
-// ============================================================
-// ROUTES DIALOGUES (CRUD individuel)
-// ============================================================
 
 /**
  * @swagger
@@ -869,9 +858,6 @@ app.delete('/api/dialogues/:id', async (req, res) => {
 });
 
 
-// ============================================================
-// SWAGGER SCHEMAS
-// ============================================================
 
 /**
  * @swagger
