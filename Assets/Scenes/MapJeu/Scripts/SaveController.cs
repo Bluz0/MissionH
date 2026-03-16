@@ -22,11 +22,6 @@ public class SaveController : MonoBehaviour
     private InventoryController inventoryController;
 
     /// <summary>
-    /// Référence au contrôleur de la hotbar.
-    /// </summary>
-    private HotBarController hotbarController;
-
-    /// <summary>
     /// Initialise les références, définit l'emplacement du fichier
     /// et tente de charger une sauvegarde existante.
     /// </summary>
@@ -35,7 +30,6 @@ public class SaveController : MonoBehaviour
         saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");
 
         inventoryController = FindAnyObjectByType<InventoryController>();
-        hotbarController = FindAnyObjectByType<HotBarController>();
 
         LoadGame();
     }
@@ -51,7 +45,6 @@ public class SaveController : MonoBehaviour
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position,
             mapBoundary = FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D.gameObject.name,
             inventorySaveData = inventoryController.GetInventoryItems(),
-            hotbarSaveData = hotbarController.GetHotBarItems(),
         };
 
         File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
@@ -61,7 +54,6 @@ public class SaveController : MonoBehaviour
     /// Charge les données si une sauvegarde existe :
     /// - replace le joueur
     /// - restaure la zone active
-    /// - recharge l'inventaire et la hotbar.
     /// Si aucune sauvegarde n'existe, en crée une nouvelle.
     /// </summary>
     public void LoadGame()
@@ -76,7 +68,6 @@ public class SaveController : MonoBehaviour
                 GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
 
             inventoryController.SetInventoryItems(saveData.inventorySaveData);
-            hotbarController.SetHotBarItems(saveData.hotbarSaveData);
         }
         else
         {
