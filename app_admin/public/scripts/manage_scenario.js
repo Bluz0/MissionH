@@ -2,6 +2,12 @@ const serveur = "http://51.38.222.173";
 let gridScenarios = document.querySelector(".grid-scenarios");
 let cardId = 1;
 
+let nbChapitresElement = document.getElementById("nb-chap");
+
+function updateNbChapitres(count) {
+    nbChapitresElement.innerText = `${count} Chapitre${count > 1 ? 's' : ''}`;
+}
+
 function create(tag, container, text = null) {
     const element = document.createElement(tag);
     element.innerText = text;
@@ -33,6 +39,7 @@ function afficheTitreScenario(scenarioName) {
 axios.get(`${serveur}/api/scenarios`)
     .then(response => {
         const scenarios = response.data;
+        updateNbChapitres(scenarios.length);
         gridScenarios.innerHTML = ""; // On vide la grille avant d'afficher
         scenarios.forEach(scenario => {
             afficheTitreScenario(scenario.scenarioName);

@@ -3,8 +3,8 @@
 // ============================================================
 const serveur = "http://51.38.222.173";
 
-let dialogues = [];       // [{ id (MongoDB _id string), text, type, locuteur, x, y }]
-let connections = [];     // [{ fromId, toId }]
+let dialogues = [];
+let connections = [];
 let currentEditId = null;
 
 let isLinking = false;
@@ -14,23 +14,107 @@ let firstNodeSelected = null;
 // ============================================================
 // ÉLÉMENTS DOM
 // ============================================================
-const modal             = document.getElementById('modal-edit-dialogue');
-const listContainer     = document.getElementById('dialogue-list-container');
-const btnAdd            = document.getElementById('btn-add-dialogue');
-const btnClose          = document.getElementById('btn-close-edit');
-const btnValidate       = document.getElementById('btn-validate-line');
-const btnLink           = document.getElementById('btn-link');
-const btnUnlink         = document.getElementById('btn-unlink');
-const btnSaveAll        = document.getElementById('btn-save-all');
-const canvasArea        = document.getElementById('canvas-area');
-const whiteboard        = document.getElementById('whiteboard');
-const svgCanvas         = document.getElementById('lines-svg');
+const modal         = document.getElementById('modal-edit-dialogue');
+const listContainer = document.getElementById('dialogue-list-container');
+const btnAdd        = document.getElementById('btn-add-dialogue');
+const btnClose      = document.getElementById('btn-close-edit');
+const btnValidate   = document.getElementById('btn-validate-line');
+const btnLink       = document.getElementById('btn-link');
+const btnUnlink     = document.getElementById('btn-unlink');
+const btnSaveAll    = document.getElementById('btn-save-all');
+const canvasArea    = document.getElementById('canvas-area');
+const whiteboard    = document.getElementById('whiteboard');
+const svgCanvas     = document.getElementById('lines-svg');
 
-const editText          = document.getElementById('edit-text');
-const editLocuteur      = document.getElementById('edit-locuteur'); // <input> pour le nom du locuteur
-const editType          = document.getElementById('edit-type');
-const previewName       = document.getElementById('preview-name');
-const previewText       = document.getElementById('preview-text');
+const editText      = document.getElementById('edit-text');
+const editLocuteur  = document.getElementById('edit-locuteur');
+const editType      = document.getElementById('edit-type');
+const previewName   = document.getElementById('preview-name');
+const previewText   = document.getElementById('preview-text');
+
+// ============================================================
+// SYSTÈME DE TOAST
+// ============================================================
+
+const toastContainer = document.createElement('div');
+toastContainer.id = 'toast-container';
+document.body.appendChild(toastContainer);
+
+function showToast(message, type = 'info', duration = 3500) {
+    const icons = { success: '✅', error: '❌', info: 'ℹ', warning: '⚠' };
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type]}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add('show'));
+    });
+
+    if (duration > 0) {
+        setTimeout(() => {
+            toast.classList.add('hide');
+            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+        }, duration);
+    }
+
+    return toast; // retourner pour pouvoir le supprimer manuellement
+}
+
+// ============================================================
+// SYSTÈME DE CONFIRM PERSONNALISÉ
+// ============================================================
+
+const confirmOverlay = document.createElement('div');
+confirmOverlay.id = 'confirm-overlay';
+confirmOverlay.innerHTML = `
+    <div class="confirm-box">
+        <div class="confirm-icon" id="confirm-icon">🗑️</div>
+        <div class="confirm-title" id="confirm-title">Confirmer</div>
+        <div class="confirm-message" id="confirm-message"></div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline press-effect" id="confirm-cancel">Annuler</button>
+            <button class="btn btn-black press-effect" id="confirm-ok">Confirmer</button>
+        </div>
+    </div>
+`;
+document.body.appendChild(confirmOverlay);
+
+function showConfirm(message, { title = 'Confirmer', icon = '🗑️', okLabel = 'Confirmer', okClass = 'btn-black' } = {}) {
+    return new Promise((resolve) => {
+        document.getElementById('confirm-icon').textContent    = icon;
+        document.getElementById('confirm-title').textContent   = title;
+        document.getElementById('confirm-message').textContent = message;
+
+        const btnOk     = document.getElementById('confirm-ok');
+        const btnCancel = document.getElementById('confirm-cancel');
+
+        // Clone pour retirer les anciens listeners
+        const newOk     = btnOk.cloneNode(true);
+        const newCancel = btnCancel.cloneNode(true);
+        btnOk.replaceWith(newOk);
+        btnCancel.replaceWith(newCancel);
+
+        newOk.textContent = okLabel;
+        newOk.className   = `btn ${okClass} press-effect`;
+
+        function close(result) {
+            confirmOverlay.classList.remove('show');
+            resolve(result);
+        }
+
+        document.getElementById('confirm-ok').addEventListener('click',     () => close(true));
+        document.getElementById('confirm-cancel').addEventListener('click', () => close(false));
+
+        confirmOverlay.classList.add('show');
+    });
+}
 
 // ============================================================
 // CHARGEMENT DU SCÉNARIO
@@ -52,7 +136,6 @@ function loadScenarioData(title) {
 
                 renderList();
 
-                // Placer les cercles sur le whiteboard
                 dialogues.forEach(d => {
                     if (d.x !== undefined && d.y !== undefined) {
                         createNodeOnBoard(d, d.x, d.y);
@@ -119,12 +202,12 @@ function openEditor(id = null) {
     currentEditId = id;
     if (id !== null) {
         const d = dialogues.find(item => item.id === id);
-        editText.value     = d.text;
-        editType.value     = d.type;
+        editText.value = d.text;
+        editType.value = d.type;
         if (editLocuteur) editLocuteur.value = d.locuteur || '';
     } else {
-        editText.value     = "";
-        editType.value     = "npc";
+        editText.value = "";
+        editType.value = "npc";
         if (editLocuteur) editLocuteur.value = "";
     }
     updatePreview();
@@ -137,37 +220,35 @@ function updatePreview() {
     previewText.innerText = editText.value || "Aperçu du texte...";
     const locuteurVal = editLocuteur ? editLocuteur.value : '';
     const isNPC       = editType.value === "npc";
-
-    previewName.innerText    = locuteurVal || (isNPC ? "PROFESSEUR" : "JOUEUR");
-    previewName.style.color  = isNPC ? "var(--swiss-green)" : "#007bff";
+    previewName.innerText   = locuteurVal || (isNPC ? "PROFESSEUR" : "JOUEUR");
+    previewName.style.color = isNPC ? "var(--swiss-green)" : "#007bff";
 }
 
 editText.addEventListener('input', updatePreview);
 editType.addEventListener('change', updatePreview);
 if (editLocuteur) editLocuteur.addEventListener('input', updatePreview);
 
-// Valider la ligne (Ajout local — la sauvegarde API se fait via "Sauvegarder")
 btnValidate.addEventListener('click', () => {
-    if (editText.value.trim() === "") return alert("Le texte ne peut pas être vide");
+    if (editText.value.trim() === "") {
+        showToast("Le texte du dialogue ne peut pas être vide.", 'warning');
+        return;
+    }
 
     const locuteurVal = editLocuteur ? editLocuteur.value.trim() : '';
     const typeVal     = editType.value;
     const defaultLoc  = typeVal === 'npc' ? 'NPC' : 'Joueur';
 
     if (currentEditId !== null) {
-        // Mise à jour locale
-        const d = dialogues.find(d => d.id === currentEditId);
+        const d    = dialogues.find(d => d.id === currentEditId);
         d.text     = editText.value;
         d.type     = typeVal;
         d.locuteur = locuteurVal || defaultLoc;
 
-        // Mettre à jour visuellement le cercle si déjà posé
         const node = document.getElementById(`node-${currentEditId}`);
         if (node) node.className = `node-circle node-${d.type}`;
     } else {
-        // Nouveau dialogue (ID temporaire — sera remplacé lors de la sauvegarde)
         dialogues.push({
-            id:       `tmp_${Date.now()}`,   // préfixe tmp_ pour distinguer les nouveaux
+            id:       `tmp_${Date.now()}`,
             text:     editText.value,
             type:     typeVal,
             locuteur: locuteurVal || defaultLoc,
@@ -189,11 +270,11 @@ btnAdd.addEventListener('click', () => openEditor());
 function renderList() {
     listContainer.innerHTML = "";
     dialogues.forEach((d, index) => {
-        const item      = document.createElement('div');
-        item.className  = `draggable-dialogue ${d.type}`;
-        item.draggable  = true;
+        const item     = document.createElement('div');
+        item.className = `draggable-dialogue ${d.type}`;
+        item.draggable = true;
 
-        const maxLength  = 35;
+        const maxLength   = 35;
         const displayText = d.text.length > maxLength
             ? d.text.substring(0, maxLength) + "..."
             : d.text;
@@ -223,8 +304,12 @@ function refreshNodeNumbers() {
     });
 }
 
-function deleteLine(id) {
-    if (!confirm("Supprimer cette ligne et toutes ses liaisons ?")) return;
+async function deleteLine(id) {
+    const confirmed = await showConfirm(
+        "Cette action supprimera le dialogue et toutes ses liaisons. Impossible d'annuler.",
+        { title: 'Supprimer ce dialogue ?', icon: '🗑️', okLabel: 'Supprimer', okClass: 'delete' }
+    );
+    if (!confirmed) return;
 
     dialogues   = dialogues.filter(d => d.id !== id);
     connections = connections.filter(c => c.fromId !== id && c.toId !== id);
@@ -235,6 +320,8 @@ function deleteLine(id) {
     renderList();
     refreshNodeNumbers();
     updateLines();
+
+    showToast("Dialogue supprimé.", 'info', 2500);
 }
 
 // ============================================================
@@ -245,7 +332,7 @@ whiteboard.addEventListener('dragover', (e) => e.preventDefault());
 
 whiteboard.addEventListener('drop', (e) => {
     e.preventDefault();
-    const id      = e.dataTransfer.getData("dialogueId");
+    const id       = e.dataTransfer.getData("dialogueId");
     const dialogue = dialogues.find(d => d.id == id);
 
     if (dialogue) {
@@ -272,35 +359,33 @@ function createNodeOnBoard(dialogue, x, y) {
         node.innerText = index;
 
         node.addEventListener('click', (e) => {
-            // --- CAS 1 : SUPPRIMER UN LIEN ---
             if (isUnlinking) {
                 if (!firstNodeSelected) {
-                    firstNodeSelected    = dialogue.id;
-                    node.style.border   = "5px solid red";
+                    firstNodeSelected  = dialogue.id;
+                    node.style.border  = "5px solid red";
                 } else {
                     removeConnection(firstNodeSelected, dialogue.id);
                     resetBorder(firstNodeSelected);
-                    firstNodeSelected   = null;
-                    isUnlinking         = false;
+                    firstNodeSelected  = null;
+                    isUnlinking        = false;
                     btnUnlink.innerText = "Supprimer lien";
                     btnUnlink.classList.remove('active-delete');
                 }
                 return;
             }
 
-            // --- CAS 2 : CRÉER UN LIEN ---
             if (isLinking) {
                 if (!firstNodeSelected) {
-                    firstNodeSelected  = dialogue.id;
-                    node.style.border  = "5px solid gold";
+                    firstNodeSelected = dialogue.id;
+                    node.style.border = "5px solid gold";
                 } else {
                     if (firstNodeSelected !== dialogue.id) {
                         addConnection(firstNodeSelected, dialogue.id);
                     }
                     resetBorder(firstNodeSelected);
-                    firstNodeSelected  = null;
-                    isLinking          = false;
-                    btnLink.innerText  = "Relier deux dialogues";
+                    firstNodeSelected = null;
+                    isLinking         = false;
+                    btnLink.innerText = "Relier deux dialogues";
                     btnLink.classList.remove('green');
                 }
             }
@@ -332,7 +417,7 @@ function makeNodeDraggable(node, dialogue) {
 
     node.addEventListener('mousedown', (e) => {
         e.stopPropagation();
-        isDragging  = true;
+        isDragging        = true;
         node.style.cursor = 'grabbing';
         startMouseX = e.clientX;
         startMouseY = e.clientY;
@@ -394,6 +479,9 @@ function addConnection(fromId, toId) {
     if (!exists) {
         connections.push({ fromId, toId });
         updateLines();
+        showToast("Lien créé entre les deux dialogues.", 'success', 2000);
+    } else {
+        showToast("Ce lien existe déjà.", 'warning', 2500);
     }
 }
 
@@ -402,8 +490,9 @@ function removeConnection(fromId, toId) {
     connections  = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
     if (connections.length < before) {
         updateLines();
+        showToast("Lien supprimé.", 'info', 2000);
     } else {
-        alert("Aucun lien n'existe entre ces deux dialogues.");
+        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 3000);
     }
 }
 
@@ -444,20 +533,18 @@ btnSaveAll.addEventListener('click', async () => {
         connections:  connections
     };
 
+    const loadingToast = showToast("Sauvegarde en cours...", 'info', 0);
+
     try {
-        const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
+        const response  = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         const { idMap } = response.data;
 
-        // Mettre à jour les IDs temporaires (tmp_xxx) avec les vrais _id MongoDB
         if (idMap) {
             dialogues = dialogues.map(d => {
                 if (idMap[d.id]) {
-                    // Mettre à jour le nœud visuel (son id DOM)
                     const oldNode = document.getElementById(`node-${d.id}`);
-                    if (oldNode) {
-                        oldNode.id = `node-${idMap[d.id]}`;
-                    }
-                    // Mettre à jour les connexions qui pointaient vers l'ancien ID
+                    if (oldNode) oldNode.id = `node-${idMap[d.id]}`;
+
                     connections = connections.map(c => ({
                         fromId: c.fromId === d.id ? idMap[d.id] : c.fromId,
                         toId:   c.toId   === d.id ? idMap[d.id] : c.toId
@@ -470,9 +557,13 @@ btnSaveAll.addEventListener('click', async () => {
 
         renderList();
         refreshNodeNumbers();
-        alert("Scénario sauvegardé avec succès !");
+
+        loadingToast.remove();
+        showToast("Scénario sauvegardé avec succès !", 'success', 3500);
+
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
-        alert("Erreur de connexion au serveur.");
+        loadingToast.remove();
+        showToast("Erreur de connexion au serveur.", 'error', 5000);
     }
 });
