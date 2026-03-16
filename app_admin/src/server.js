@@ -139,6 +139,146 @@ app.post('/api/scenarios', async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /api/scenarios/tree/save:
+ *   post:
+ *     summary: Sauvegarder l'état complet du whiteboard d'un scénario
+ *     description: >
+ *       Crée les nouveaux nœuds (id préfixé tmp_), met à jour les existants,
+ *       supprime les nœuds retirés du whiteboard, et reconstruit toutes les
+ *       connexions (nextDialogues). Retourne un idMap { tempId → realMongoId }
+ *       pour que le frontend remplace ses IDs temporaires.
+ *     tags: [Scenarios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - scenarioName
+ *               - nodes
+ *               - connections
+ *             properties:
+ *               scenarioName:
+ *                 type: string
+ *                 example: "Mission Alpha"
+ *               nodes:
+ *                 type: array
+ *                 description: Tous les nœuds présents sur le whiteboard
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       description: ID MongoDB existant, ou ID temporaire (préfixe tmp_)
+ *                       example: "tmp_1718000000000"
+ *                     text:
+ *                       type: string
+ *                       example: "Bonjour !"
+ *                     type:
+ *                       type: string
+ *                       enum: [npc, player]
+ *                     locuteur:
+ *                       type: string
+ *                       example: "Professeur Dupont"
+ *                     x:
+ *                       type: number
+ *                       example: 320
+ *                     y:
+ *                       type: number
+ *                       example: 150
+ *               connections:
+ *                 type: array
+ *                 description: Toutes les flèches entre nœuds
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     fromId:
+ *                       type: string
+ *                       example: "tmp_1718000000000"
+ *                     toId:
+ *                       type: string
+ *                       example: "664f1a2b3c4d5e6f7a8b9c1e"
+ *     responses:
+ *       200:
+ *         description: Arbre sauvegardé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 idMap:
+ *                   type: object
+ *                   description: Correspondance tempId → _id MongoDB réel
+ *                   additionalProperties:
+ *                     type: string
+ *       400:
+ *         description: scenarioName manquant
+ *       404:
+ *         description: Scénario non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+app.post('/api/scenarios/tree/save', async (req, res) => {
+  try {
+    const { scenarioName, nodes, connections } = req.body;
+    if (!scenarioName) {
+      return res.status(400).json({ error: "scenarioName est obligatoire" });
+    }
+    const scenario = await Scenario.findOne({ scenarioName });
+    if (!scenario) {
+      return res.status(404).json({ error: "Scénario non trouvé" });
+    }
+    const existingIds = nodes
+      .filter(n => mongoose.Types.ObjectId.isValid(n.id))
+      .map(n => n.id);
+    await Dialogue.deleteMany({ scenarioName, _id: { $nin: existingIds } });
+
+    const idMap = {};
+    for (const node of nodes) {
+      const isNew = !mongoose.Types.ObjectId.isValid(node.id);
+      if (isNew) {
+        const created = await Dialogue.create({
+          scenarioName,
+          contenu: node.text || node.contenu || '',
+          locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
+          type: node.type || 'npc',
+          position: { x: node.x ?? 100, y: node.y ?? 100 },
+          nextDialogues: []
+        });
+        idMap[node.id] = created._id.toString();
+      } else {
+        await Dialogue.findByIdAndUpdate(node.id, {
+          $set: {
+            contenu: node.text || node.contenu,
+            type: node.type,
+            locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
+            position: { x: node.x ?? 100, y: node.y ?? 100 },
+            nextDialogues: []
+          }
+        });
+        idMap[node.id] = node.id;
+      }
+    }
+    for (const conn of connections) {
+      const fromId = idMap[conn.fromId] || conn.fromId;
+      const toId   = idMap[conn.toId]   || conn.toId;
+      if (mongoose.Types.ObjectId.isValid(fromId) && mongoose.Types.ObjectId.isValid(toId)) {
+        await Dialogue.findByIdAndUpdate(fromId, { $addToSet: { nextDialogues: toId } });
+      }
+    }
+    res.json({ message: "Arbre sauvegardé avec succès", idMap });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 /**
  * @swagger
  * /api/scenarios/{scenarioName}:
@@ -300,145 +440,6 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
       y: d.position?.y ?? 100,
     }));
     res.json({ dialogues: nodes, connections });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-/**
- * @swagger
- * /api/scenarios/tree/save:
- *   post:
- *     summary: Sauvegarder l'état complet du whiteboard d'un scénario
- *     description: >
- *       Crée les nouveaux nœuds (id préfixé tmp_), met à jour les existants,
- *       supprime les nœuds retirés du whiteboard, et reconstruit toutes les
- *       connexions (nextDialogues). Retourne un idMap { tempId → realMongoId }
- *       pour que le frontend remplace ses IDs temporaires.
- *     tags: [Scenarios]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - scenarioName
- *               - nodes
- *               - connections
- *             properties:
- *               scenarioName:
- *                 type: string
- *                 example: "Mission Alpha"
- *               nodes:
- *                 type: array
- *                 description: Tous les nœuds présents sur le whiteboard
- *                 items:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       description: ID MongoDB existant, ou ID temporaire (préfixe tmp_)
- *                       example: "tmp_1718000000000"
- *                     text:
- *                       type: string
- *                       example: "Bonjour !"
- *                     type:
- *                       type: string
- *                       enum: [npc, player]
- *                     locuteur:
- *                       type: string
- *                       example: "Professeur Dupont"
- *                     x:
- *                       type: number
- *                       example: 320
- *                     y:
- *                       type: number
- *                       example: 150
- *               connections:
- *                 type: array
- *                 description: Toutes les flèches entre nœuds
- *                 items:
- *                   type: object
- *                   properties:
- *                     fromId:
- *                       type: string
- *                       example: "tmp_1718000000000"
- *                     toId:
- *                       type: string
- *                       example: "664f1a2b3c4d5e6f7a8b9c1e"
- *     responses:
- *       200:
- *         description: Arbre sauvegardé avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 idMap:
- *                   type: object
- *                   description: Correspondance tempId → _id MongoDB réel
- *                   additionalProperties:
- *                     type: string
- *       400:
- *         description: scenarioName manquant
- *       404:
- *         description: Scénario non trouvé
- *       500:
- *         description: Erreur serveur
- */
-app.post('/api/scenarios/tree/save', async (req, res) => {
-  try {
-    const { scenarioName, nodes, connections } = req.body;
-    if (!scenarioName) {
-      return res.status(400).json({ error: "scenarioName est obligatoire" });
-    }
-    const scenario = await Scenario.findOne({ scenarioName });
-    if (!scenario) {
-      return res.status(404).json({ error: "Scénario non trouvé" });
-    }
-    const existingIds = nodes
-      .filter(n => mongoose.Types.ObjectId.isValid(n.id))
-      .map(n => n.id);
-    await Dialogue.deleteMany({ scenarioName, _id: { $nin: existingIds } });
-
-    const idMap = {};
-    for (const node of nodes) {
-      const isNew = !mongoose.Types.ObjectId.isValid(node.id);
-      if (isNew) {
-        const created = await Dialogue.create({
-          scenarioName,
-          contenu: node.text || node.contenu || '',
-          locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
-          type: node.type || 'npc',
-          position: { x: node.x ?? 100, y: node.y ?? 100 },
-          nextDialogues: []
-        });
-        idMap[node.id] = created._id.toString();
-      } else {
-        await Dialogue.findByIdAndUpdate(node.id, {
-          $set: {
-            contenu: node.text || node.contenu,
-            type: node.type,
-            locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
-            position: { x: node.x ?? 100, y: node.y ?? 100 },
-            nextDialogues: []
-          }
-        });
-        idMap[node.id] = node.id;
-      }
-    }
-    for (const conn of connections) {
-      const fromId = idMap[conn.fromId] || conn.fromId;
-      const toId   = idMap[conn.toId]   || conn.toId;
-      if (mongoose.Types.ObjectId.isValid(fromId) && mongoose.Types.ObjectId.isValid(toId)) {
-        await Dialogue.findByIdAndUpdate(fromId, { $addToSet: { nextDialogues: toId } });
-      }
-    }
-    res.json({ message: "Arbre sauvegardé avec succès", idMap });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

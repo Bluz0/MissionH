@@ -470,9 +470,9 @@ btnSaveAll.addEventListener('click', async () => {
 
         renderList();
         refreshNodeNumbers();
-        alert("✅ Scénario sauvegardé avec succès !");
+        alert("Scénario sauvegardé avec succès !");
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
-        alert("❌ Erreur de connexion au serveur.");
+        alert("Erreur de connexion au serveur.");
     }
 });
