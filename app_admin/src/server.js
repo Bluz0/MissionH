@@ -279,67 +279,6 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
 });
 
 
-/**
- * @swagger
- * /api/scenarios/{scenarioName}:
- *   delete:
- *     summary: Supprimer un scénario et tous ses dialogues associés
- *     tags: [Scenarios]
- *     parameters:
- *       - in: path
- *         name: scenarioName
- *         required: true
- *         schema:
- *           type: string
- *         description: Le nom exact du scénario à supprimer
- *         example: "Mission Alpha"
- *     responses:
- *       200:
- *         description: Scénario et dialogues supprimés avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 scenario:
- *                   type: string
- *                 dialoguesSupprimes:
- *                   type: integer
- *       404:
- *         description: Scénario non trouvé
- *       500:
- *         description: Erreur serveur
- */
-app.delete('/api/scenarios/:scenarioName', async (req, res) => {
-  try {
-    const { scenarioName } = req.params;
-    const scenarioSupprime = await Scenario.findOneAndDelete({ scenarioName });
-
-    if (!scenarioSupprime) {
-      return res.status(404).json({ error: "Scénario non trouvé" });
-    }
-
-    const resultDialogues = await Dialogue.deleteMany({ scenarioName });
-
-    // Renuméroter tous les scénarios restants par ordre alphabétique ou d'insertion
-    const scenariosRestants = await Scenario.find().sort({ scenarioId: 1 });
-    for (let i = 0; i < scenariosRestants.length; i++) {
-      await Scenario.findByIdAndUpdate(scenariosRestants[i]._id, { scenarioId: i + 1 });
-    }
-
-    res.json({
-      message: "Suppression réussie",
-      scenario: scenarioSupprime.scenarioName,
-      dialoguesSupprimes: resultDialogues.deletedCount
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
 // ============================================================
 // ROUTES ARBRE (WHITEBOARD)
 //     Ces deux routes DOIVENT être avant DELETE /api/scenarios/:scenarioName
@@ -490,6 +429,69 @@ app.get('/api/scenarios/:scenarioName/dialogues', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+/**
+ * @swagger
+ * /api/scenarios/{scenarioName}:
+ *   delete:
+ *     summary: Supprimer un scénario et tous ses dialogues associés
+ *     tags: [Scenarios]
+ *     parameters:
+ *       - in: path
+ *         name: scenarioName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Le nom exact du scénario à supprimer
+ *         example: "Mission Alpha"
+ *     responses:
+ *       200:
+ *         description: Scénario et dialogues supprimés avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 scenario:
+ *                   type: string
+ *                 dialoguesSupprimes:
+ *                   type: integer
+ *       404:
+ *         description: Scénario non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+app.delete('/api/scenarios/:scenarioName', async (req, res) => {
+  try {
+    const { scenarioName } = req.params;
+    const scenarioSupprime = await Scenario.findOneAndDelete({ scenarioName });
+
+    if (!scenarioSupprime) {
+      return res.status(404).json({ error: "Scénario non trouvé" });
+    }
+
+    const resultDialogues = await Dialogue.deleteMany({ scenarioName });
+
+    // Renuméroter tous les scénarios restants par ordre alphabétique ou d'insertion
+    const scenariosRestants = await Scenario.find().sort({ scenarioId: 1 });
+    for (let i = 0; i < scenariosRestants.length; i++) {
+      await Scenario.findByIdAndUpdate(scenariosRestants[i]._id, { scenarioId: i + 1 });
+    }
+
+    res.json({
+      message: "Suppression réussie",
+      scenario: scenarioSupprime.scenarioName,
+      dialoguesSupprimes: resultDialogues.deletedCount
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 
 /**
  * @swagger
