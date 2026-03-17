@@ -35,6 +35,6 @@ MonoBehaviour:
     nextDialogueIndexes: 0200000003000000
   - dialogueIndex: 3
     choices:
-    - J'ai pas reussi
-    - C'est une blague
+    - J'ai pas reussi mon examen
+    - C'est une blague tonton
     nextDialogueIndexes: 0500000004000000

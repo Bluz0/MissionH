@@ -7,7 +7,7 @@ public class HUDController : MonoBehaviour
     public TMP_Text moneyText;  // Texte affichant l'argent
 
     private float time = 12f;   // Heure de départ (12:00)
-    private int money = 163;    // Argent de départ
+    private int money = 0;    // Argent de départ
 
     /// <summary>
     /// Initialise l'affichage du HUD au lancement.
@@ -46,4 +46,35 @@ public class HUDController : MonoBehaviour
         time = newTime;
         UpdateHUD();
     }
+
+    /// <summary>
+    /// Enleve de l'argent au joueur et met à jour le HUD.
+    /// </summary>
+    public bool SpendMoney(int amount)
+    {
+        if (money < amount)
+            return false;
+
+        money -= amount;
+        UpdateHUD();
+        return true;
+    }
+
+    /// <summary>
+    /// Retourne le nombre actuel de pièces du joueur.
+    /// </summary>
+    public int GetMoney()
+    {
+        return money;
+    }
+
+    /// <summary>
+    /// Définit le nombre de pièces du joueur et met à jour l'affichage du HUD.
+    /// </summary>
+    public void SetMoney(int value)
+    {
+        money = value;
+        UpdateHUD();
+    }
+
 }

@@ -40,11 +40,13 @@ public class SaveController : MonoBehaviour
     /// </summary>
     public void SaveGame()
     {
+        HUDController hud = FindAnyObjectByType<HUDController>();
         SaveData saveData = new SaveData
         {
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position,
             mapBoundary = FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D.gameObject.name,
             inventorySaveData = inventoryController.GetInventoryItems(),
+            money = hud.GetMoney()
         };
 
         File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
@@ -68,6 +70,8 @@ public class SaveController : MonoBehaviour
                 GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
 
             inventoryController.SetInventoryItems(saveData.inventorySaveData);
+            HUDController hud = FindAnyObjectByType<HUDController>();
+            hud.SetMoney(saveData.money);
         }
         else
         {

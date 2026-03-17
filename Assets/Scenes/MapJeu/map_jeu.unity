@@ -426239,6 +426239,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2046038478}
     - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
+      propertyPath: rewardAmount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
       propertyPath: dialoguePanel
       value: 
       objectReference: {fileID: 1347592166}

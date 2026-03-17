@@ -40,6 +40,11 @@ public class NPC : MonoBehaviour, IInteractable
     private bool isDialogueActive;
 
     /// <summary>
+    /// Indique le montant de piece remporté.
+    /// </summary>
+    public int rewardAmount = 0;
+
+    /// <summary>
     /// Récupère la référence au DialogueController.
     /// </summary>
     public void Start()
@@ -186,12 +191,31 @@ public class NPC : MonoBehaviour, IInteractable
     }
 
     /// <summary>
+    /// Donne la récompense en pièces au joueur.
+    /// </summary>
+    void GiveReward()
+    {
+        if (rewardAmount > 0)
+        {
+            HUDController hud = FindAnyObjectByType<HUDController>();
+            hud.AddMoney(rewardAmount);
+        }
+    }
+
+    /// <summary>
     /// Termine le dialogue, cache l'UI et réactive le jeu.
     /// </summary>
     public void EndDialogue()
     {
         StopAllCoroutines();
         isDialogueActive = false;
+
+        if (rewardAmount > 0)
+        {
+            HUDController hud = FindAnyObjectByType<HUDController>();
+            hud.AddMoney(rewardAmount);
+        }
+
         dialogueUI.SetDialogueText("");
         dialogueUI.ShowDialogueUI(false);
         PauseController.SetPause(false);
