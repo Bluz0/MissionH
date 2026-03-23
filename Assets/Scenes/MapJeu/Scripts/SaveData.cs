@@ -31,4 +31,10 @@ public class SaveData
     /// Données de sauvegarde de la hotbar.
     /// </summary>
     public List<InventorySaveData> hotbarSaveData = new List<InventorySaveData>();
+
+    /// <summary>
+    /// Nombre de pièces du joueur.
+    /// </summary>
+    public int money;
+
 }

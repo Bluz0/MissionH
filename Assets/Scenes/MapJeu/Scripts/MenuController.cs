@@ -14,6 +14,11 @@ public class MenuController : MonoBehaviour
     public GameObject menuCanvas;
 
     /// <summary>
+    /// Canvas contenant l'interface du HUD.
+    /// </summary>
+    public GameObject menuHUD;
+
+    /// <summary>
     /// Bouton permettant d'ouvrir le menu.
     /// </summary>
     public GameObject menuButton;
@@ -47,6 +52,7 @@ public class MenuController : MonoBehaviour
         bool isOpen = !menuCanvas.activeSelf;
 
         menuCanvas.SetActive(isOpen);
+        menuHUD.SetActive(!isOpen);
         joystick.SetActive(!isOpen);
         interactButton.SetActive(!isOpen);
         PauseController.SetPause(isOpen);

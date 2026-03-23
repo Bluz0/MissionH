@@ -98,4 +98,13 @@ public class MapTransitions : MonoBehaviour
 
         player.transform.position = newPos;
     }
+
+    /// <summary>
+    /// Permet de déclencher la transition via une interaction (E, bouton mobile).
+    /// </summary>
+    public void TriggerFromInteract()
+    {
+        FadeTransition(GameObject.FindGameObjectWithTag("Player"));
+    }
+
 }
