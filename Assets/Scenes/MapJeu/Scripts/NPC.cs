@@ -15,14 +15,50 @@ using System.Collections;
 public class NPC : MonoBehaviour, IInteractable
 {
     /// <summary>
-    /// Données du dialogue du PNJ (texte, choix, portrait, etc.).
+    /// Nom du scénario à charger depuis l'API ou la source de dialogues.
     /// </summary>
-    public NPCDialogue dialogueData;
+    [Header("Scénario API")]
+    public string scenarioName;       
 
     /// <summary>
-    /// Référence à l'UI de dialogue (singleton).
+    /// Nom affiché du PNJ dans l'interface de dialogue.
+    /// </summary>
+    public string npcName;
+
+    /// <summary>
+    /// Portrait du PNJ affiché pendant la conversation.
+    /// </summary>
+    public Sprite npcPortrait;
+
+    /// <summary>
+    /// Montant de pièces accordé au joueur à la fin du dialogue.
+    /// </summary>
+    public int rewardAmount = 0;
+
+    /// <summary>
+    /// Données du dialogue actuellement chargées pour ce PNJ.
+    /// </summary>
+    private NPCDialogue dialogueData;
+
+    /// <summary>
+    /// Référence au contrôleur d'interface de dialogue.
     /// </summary>
     private DialogueController dialogueUI;
+
+    /// <summary>
+    /// Composant chargé de récupérer et préparer les dialogues.
+    /// </summary>
+    private DialogueLoader loader;
+
+    /// <summary>
+    /// Indique si une conversation avec ce PNJ est en cours.
+    /// </summary>
+    private bool isDialogueActive;
+
+    /// <summary>
+    /// Indique si la ligne actuelle est en cours d'écriture progressive.
+    /// </summary>
+    private bool isTyping;
 
     /// <summary>
     /// Index de la ligne de dialogue actuellement affichée.
@@ -30,36 +66,32 @@ public class NPC : MonoBehaviour, IInteractable
     private int dialogueIndex;
 
     /// <summary>
-    /// Indique si le texte est en train d'être écrit lettre par lettre.
+    /// Indique si les données de dialogue ont bien été préchargées.
     /// </summary>
-    private bool isTyping;
+    private bool isLoaded = false;
 
-    /// <summary>
-    /// Indique si un dialogue est actuellement actif.
-    /// </summary>
-    private bool isDialogueActive;
-
-    /// <summary>
-    /// Indique le montant de piece remporté.
-    /// </summary>
-    public int rewardAmount = 0;
-
-    /// <summary>
-    /// Récupère la référence au DialogueController.
-    /// </summary>
     public void Start()
     {
         dialogueUI = DialogueController.Instance;
-    }
+        loader = GetComponent<DialogueLoader>();
+        if (loader == null) loader = gameObject.AddComponent<DialogueLoader>();
 
+        // Précharge le dialogue au démarrage
+        StartCoroutine(loader.LoadDialogue(scenarioName, (data) =>
+        {
+            data.npcName = npcName;
+            data.npcPortrait = npcPortrait;
+            dialogueData = data;
+            isLoaded = true;
+        }));
+    }
     /// <summary>
     /// Le joueur peut interagir seulement si aucun dialogue n'est en cours.
     /// </summary>
-    public bool CanInteract()
-    {
-        return !isDialogueActive;
-    }
 
+    public bool CanInteract() => isLoaded && !isDialogueActive;
+
+    
     /// <summary>
     /// Déclenche ou avance le dialogue selon l'état actuel.
     /// </summary>
