@@ -4,20 +4,16 @@ const title = urlParams.get('title');
 
 let titleScenario = document.getElementById('current-scenario-title');
 let buttonBack = document.getElementById('button-back');
-let openEditorBtn = document.getElementById('open-tree-editor'); // Assure-toi que l'ID correspond dans le HTML
+let openEditorBtn = document.getElementById('open-tree-editor');
 
-// Affichage du titre
 if (title) {
     titleScenario.innerText = title;
 }
 
-// Retour à l'accueil
 buttonBack.addEventListener('click', () => {
     window.location.href = '../../index.html';
 });
 
-// Bouton principal pour ouvrir l'éditeur d'arbre
-// On réutilise ton bouton "new-d" ou le nouveau "open-tree-editor"
 let mainActionBtn = document.getElementById("new-d") || document.getElementById("open-tree-editor");
 
 if (mainActionBtn) {
@@ -30,7 +26,6 @@ if (mainActionBtn) {
     });
 }
 
-// Optionnel : Afficher un petit récapitulatif du scénario
 axios.get(`${serveur}/api/scenarios/${title}/dialogues`)
     .then(response => {
         const dialogues = response.data;

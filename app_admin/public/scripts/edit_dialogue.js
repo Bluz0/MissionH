@@ -31,6 +31,14 @@ const toastContainer = document.createElement('div');
 toastContainer.id = 'toast-container';
 document.body.appendChild(toastContainer);
 
+/**
+ * Affiche une notification toast dans l'interface.
+ *
+ * @param {string} message - Message à afficher.
+ * @param {'success'|'error'|'info'|'warning'} [type='info'] - Type visuel du toast.
+ * @param {number} [duration=3500] - Durée d'affichage en millisecondes (0 pour persistant).
+ * @returns {HTMLDivElement} Élément DOM du toast créé.
+ */
 function showToast(message, type = 'info', duration = 3500) {
     const icons = { success: '', error: '✕', info: 'ℹ', warning: '⚠' };
 
@@ -74,6 +82,13 @@ confirmOverlay.innerHTML = `
 `;
 document.body.appendChild(confirmOverlay);
 
+/**
+ * Ouvre une modale de confirmation et retourne le choix utilisateur.
+ *
+ * @param {string} message - Message de confirmation.
+ * @param {{title?: string, icon?: string, okLabel?: string, okClass?: string}} [options={}] - Options d'affichage du dialogue.
+ * @returns {Promise<boolean>} Résout à true si confirmé, sinon false.
+ */
 function showConfirm(message, { title = 'Confirmer', icon = '🗑️', okLabel = 'Confirmer', okClass = 'btn-black' } = {}) {
     return new Promise((resolve) => {
         document.getElementById('confirm-icon').textContent    = icon;
@@ -112,6 +127,13 @@ if (scenarioTitle) {
     loadScenarioData(scenarioTitle);
 }
 
+/**
+ * Charge les données d'un scénario (dialogues + connexions) depuis l'API,
+ * puis reconstruit la liste et les nœuds sur le tableau.
+ *
+ * @param {string} title - Nom du scénario à charger.
+ * @returns {void}
+ */
 function loadScenarioData(title) {
     axios.get(`${serveur}/api/scenarios/${title}/tree`)
         .then(response => {
@@ -142,6 +164,11 @@ const zoomIn   = document.getElementById('btn-zoom-in');
 const zoomOut  = document.getElementById('btn-zoom-out');
 const recenter = document.getElementById('btn-recenter');
 
+/**
+ * Applique la translation et le zoom courant sur le tableau blanc.
+ *
+ * @returns {void}
+ */
 function applyTransform() {
     whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
 }
@@ -176,6 +203,12 @@ document.addEventListener('mouseup', () => {
     canvasArea.style.cursor = 'grab';
 });
 
+/**
+ * Ouvre la modale d'édition pour un dialogue existant ou un nouveau dialogue.
+ *
+ * @param {string|null} [id=null] - Identifiant du dialogue à éditer, ou null pour création.
+ * @returns {void}
+ */
 function openEditor(id = null) {
     currentEditId = id;
     if (id !== null) {
@@ -194,6 +227,11 @@ function openEditor(id = null) {
 
 btnClose.addEventListener('click', () => modal.classList.add('hidden'));
 
+/**
+ * Met à jour l'aperçu du dialogue (texte + nom + couleur) selon le formulaire.
+ *
+ * @returns {void}
+ */
 function updatePreview() {
     previewText.innerText = editText.value || "Aperçu du texte...";
     const locuteurVal = editLocuteur ? editLocuteur.value : '';
@@ -242,6 +280,11 @@ btnValidate.addEventListener('click', () => {
 btnAdd.addEventListener('click', () => openEditor());
 
 
+/**
+ * Rend la liste des dialogues dans le panneau latéral avec actions d'édition/suppression.
+ *
+ * @returns {void}
+ */
 function renderList() {
     listContainer.innerHTML = "";
     dialogues.forEach((d, index) => {
@@ -272,6 +315,11 @@ function renderList() {
     });
 }
 
+/**
+ * Met à jour les numéros affichés sur les nœuds en fonction de l'ordre des dialogues.
+ *
+ * @returns {void}
+ */
 function refreshNodeNumbers() {
     dialogues.forEach((d, index) => {
         const node = document.getElementById(`node-${d.id}`);
@@ -279,6 +327,12 @@ function refreshNodeNumbers() {
     });
 }
 
+/**
+ * Supprime un dialogue après confirmation utilisateur, puis retire ses liaisons associées.
+ *
+ * @param {string} id - Identifiant du dialogue à supprimer.
+ * @returns {Promise<void>}
+ */
 async function deleteLine(id) {
     const confirmed = await showConfirm(
         "Cette action supprimera le dialogue et toutes ses liaisons. Impossible d'annuler.",
@@ -315,6 +369,15 @@ whiteboard.addEventListener('drop', (e) => {
     }
 });
 
+/**
+ * Crée (ou repositionne) un nœud de dialogue sur le tableau blanc.
+ * Configure aussi les interactions de sélection/lien si le nœud est nouveau.
+ *
+ * @param {{id: string, type: string, x?: number, y?: number}} dialogue - Dialogue lié au nœud.
+ * @param {number} x - Position horizontale du nœud.
+ * @param {number} y - Position verticale du nœud.
+ * @returns {void}
+ */
 function createNodeOnBoard(dialogue, x, y) {
     let node = document.getElementById(`node-${dialogue.id}`);
 
@@ -370,12 +433,25 @@ function createNodeOnBoard(dialogue, x, y) {
     updateLines();
 }
 
+/**
+ * Réinitialise la bordure visuelle d'un nœud à son style par défaut.
+ *
+ * @param {string} id - Identifiant du dialogue/nœud.
+ * @returns {void}
+ */
 function resetBorder(id) {
     const n = document.getElementById(`node-${id}`);
     if (n) n.style.border = "3px solid var(--black)";
 }
 
 
+/**
+ * Rend un nœud déplaçable à la souris et synchronise sa position dans les données.
+ *
+ * @param {HTMLDivElement} node - Élément DOM du nœud.
+ * @param {{x: number, y: number}} dialogue - Objet dialogue associé contenant les coordonnées.
+ * @returns {void}
+ */
 function makeNodeDraggable(node, dialogue) {
     let isDragging = false;
     let startMouseX, startMouseY, startNodeX, startNodeY;
@@ -436,6 +512,13 @@ btnUnlink.addEventListener('click', () => {
     }
 });
 
+/**
+ * Ajoute une connexion orientée entre deux dialogues si elle n'existe pas déjà.
+ *
+ * @param {string} fromId - Identifiant du nœud source.
+ * @param {string} toId - Identifiant du nœud cible.
+ * @returns {void}
+ */
 function addConnection(fromId, toId) {
     const exists = connections.some(c => c.fromId === fromId && c.toId === toId);
     if (!exists) {
@@ -447,6 +530,13 @@ function addConnection(fromId, toId) {
     }
 }
 
+/**
+ * Supprime une connexion orientée entre deux dialogues.
+ *
+ * @param {string} fromId - Identifiant du nœud source.
+ * @param {string} toId - Identifiant du nœud cible.
+ * @returns {void}
+ */
 function removeConnection(fromId, toId) {
     const before = connections.length;
     connections  = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
@@ -458,6 +548,11 @@ function removeConnection(fromId, toId) {
     }
 }
 
+/**
+ * Redessine toutes les lignes de connexion sur le canvas SVG.
+ *
+ * @returns {void}
+ */
 function updateLines() {
     svgCanvas.innerHTML = `
         <defs>
