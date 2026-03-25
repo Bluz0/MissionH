@@ -609,7 +609,6 @@ textarea {
 /* ============================================================
    TOAST NOTIFICATIONS
    ============================================================ */
-
 #toast-container {
     position: fixed;
     bottom: 2rem;
@@ -620,7 +619,7 @@ textarea {
     gap: 0.75rem;
     pointer-events: none;
 }
-
+ 
 .toast {
     pointer-events: all;
     display: flex;
@@ -636,29 +635,23 @@ textarea {
     text-transform: uppercase;
     min-width: 280px;
     max-width: 380px;
-    transform: translateX(120%);
-    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: none;
 }
-
+ 
 .toast.show {
-    transform: translateX(0);
+    display: flex;
 }
-
-.toast.hide {
-    transform: translateX(120%);
-    transition: transform 0.25s ease-in;
-}
-
+ 
 .toast-icon {
     font-size: 1.4rem;
     flex-shrink: 0;
 }
-
+ 
 .toast-message {
     flex: 1;
     line-height: 1.4;
 }
-
+ 
 .toast-close {
     background: none;
     border: none;
@@ -670,48 +663,44 @@ textarea {
     transition: opacity 0.2s;
     flex-shrink: 0;
 }
-
+ 
 .toast-close:hover { opacity: 1; }
-
+ 
 /* Variantes */
 .toast-success {
     border-left: 8px solid var(--swiss-green);
 }
-
+ 
 .toast-error {
     border-left: 8px solid var(--swiss-red);
 }
-
+ 
 .toast-info {
     border-left: 8px solid #007bff;
 }
-
+ 
 .toast-warning {
     border-left: 8px solid #f59e0b;
 }
-
+ 
 /* ============================================================
    MODAL DE CONFIRMATION (remplace confirm())
    ============================================================ */
-
+ 
 #confirm-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.55);
     z-index: 8000;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    pointer-events: none;
 }
-
+ 
 #confirm-overlay.show {
-    opacity: 1;
-    pointer-events: all;
+    display: flex;
 }
-
+ 
 .confirm-box {
     background: var(--white);
     border: 4px solid var(--black);
@@ -719,19 +708,13 @@ textarea {
     padding: 2.5rem;
     max-width: 420px;
     width: 90%;
-    transform: scale(0.9);
-    transition: transform 0.10s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
-#confirm-overlay.show .confirm-box {
-    transform: scale(1);
-}
-
+ 
 .confirm-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
 }
-
+ 
 .confirm-title {
     font-size: 1.1rem;
     font-weight: 900;
@@ -739,20 +722,20 @@ textarea {
     letter-spacing: 0.1em;
     margin-bottom: 0.5rem;
 }
-
+ 
 .confirm-message {
     font-size: 13px;
     color: #555;
     margin-bottom: 2rem;
     line-height: 1.5;
 }
-
+ 
 .confirm-actions {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
 }
-
+ 
 .confirm-actions .btn {
     padding: 0.8rem 1.5rem;
     font-size: 10px;

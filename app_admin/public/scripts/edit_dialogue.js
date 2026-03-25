@@ -39,8 +39,8 @@ document.body.appendChild(toastContainer);
  * @param {number} [duration=3500] - Durée d'affichage en millisecondes (0 pour persistant).
  * @returns {HTMLDivElement} Élément DOM du toast créé.
  */
-function showToast(message, type = 'info', duration = 3500) {
-    const icons = { success: '', error: '✕', info: 'ℹ', warning: '⚠' };
+function showToast(message, type = 'info', duration = 100) {
+    const icons = { success: 'OK', error: 'X', info: 'ℹ', warning: '⚠︎' };
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -52,6 +52,7 @@ function showToast(message, type = 'info', duration = 3500) {
 
     toastContainer.appendChild(toast);
 
+    // Le double rAF est nécessaire pour que le navigateur applique opacity:0 avant la transition
     requestAnimationFrame(() => {
         requestAnimationFrame(() => toast.classList.add('show'));
     });
@@ -63,7 +64,7 @@ function showToast(message, type = 'info', duration = 3500) {
         }, duration);
     }
 
-    return toast; 
+    return toast;
 }
 
 
