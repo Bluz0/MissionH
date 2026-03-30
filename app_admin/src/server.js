@@ -112,6 +112,9 @@ app.get('/api/scenarios', async (req, res) => {
  *               scenarioName:
  *                 type: string
  *                 example: "Mission Alpha"
+ *               recap:
+ *                 type: string
+ *                 example: "Texte pédagogique optionnel"
  *     responses:
  *       201:
  *         description: Scénario créé avec succès
@@ -124,11 +127,17 @@ app.get('/api/scenarios', async (req, res) => {
  */
 app.post('/api/scenarios', async (req, res) => {
   try {
-    const { scenarioName } = req.body;
+    const { scenarioName, recap } = req.body; // AJOUT : on accepte le recap dès la création
     if (!scenarioName) {
       return res.status(400).json({ error: "Le nom du scénario est obligatoire" });
     }
-    const newScenario = new Scenario({ scenarioName });
+    
+    // On crée le scénario avec le recap s'il est fourni (sinon ce sera "" par défaut)
+    const newScenario = new Scenario({ 
+        scenarioName, 
+        recap: recap || "" 
+    });
+    
     await newScenario.save();
     res.status(201).json(newScenario);
   } catch (err) {
@@ -199,6 +208,9 @@ app.post('/api/scenarios', async (req, res) => {
  *                     toId:
  *                       type: string
  *                       example: "664f1a2b3c4d5e6f7a8b9c1e"
+ *               recap:
+ *                type: string
+ *                description: Texte récapitulatif des notions pédagogiques
  *     responses:
  *       200:
  *         description: Arbre sauvegardé avec succès
@@ -223,11 +235,20 @@ app.post('/api/scenarios', async (req, res) => {
  */
 app.post('/api/scenarios/tree/save', async (req, res) => {
   try {
-    const { scenarioName, nodes, connections } = req.body;
+    // 1. On récupère 'recap' en plus du reste
+    const { scenarioName, nodes, connections, recap } = req.body; 
+
     if (!scenarioName) {
       return res.status(400).json({ error: "scenarioName est obligatoire" });
     }
-    const scenario = await Scenario.findOne({ scenarioName });
+
+    // 2. On cherche le scénario et on met à jour le champ 'recap'
+    const scenario = await Scenario.findOneAndUpdate(
+      { scenarioName },
+      { $set: { recap: recap || "" } }, // On enregistre le texte récap
+      { new: true }
+    );
+
     if (!scenario) {
       return res.status(404).json({ error: "Scénario non trouvé" });
     }
@@ -269,7 +290,8 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
         await Dialogue.findByIdAndUpdate(fromId, { $addToSet: { nextDialogues: toId } });
       }
     }
-    res.json({ message: "Arbre sauvegardé avec succès", idMap });
+
+    res.json({ message: "Arbre et récapitulatif sauvegardés avec succès", idMap });
   } catch (err) {
     console.error('ERREUR tree/save :', err);
     res.status(500).json({ error: err.message });
@@ -341,6 +363,9 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
  *                       toId:
  *                         type: string
  *                         example: "664f1a2b3c4d5e6f7a8b9c1e"
+ *                recap:
+ *                  type: string
+ *                  example: "Voici ce qu'il fallait retenir..." 
  *       404:
  *         description: Scénario non trouvé
  *       500:
@@ -371,7 +396,12 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
       x: d.position?.x ?? 100,
       y: d.position?.y ?? 100,
     }));
-    res.json({ dialogues: nodes, connections });
+    // On renvoie tout, y compris le recap qui vient du modèle Scenario
+    res.json({ 
+      dialogues: nodes, 
+      connections: connections,
+      recap: scenario.recap || "" 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

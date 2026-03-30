@@ -14,6 +14,11 @@ const scenarioSchema = new mongoose.Schema({
   scenarioName: {
     type: String,
     required: true
+  },
+  // --- AJOUT : Champ pour la fiche récapitulative ---
+  recap: {
+    type: String,
+    default: ""
   }
 });
 
