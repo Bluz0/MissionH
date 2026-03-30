@@ -9,6 +9,8 @@ let isLinking = false;
 let isUnlinking = false;
 let firstNodeSelected = null;
 
+let scenarioRecap = "";
+
 const modal         = document.getElementById('modal-edit-dialogue');
 const listContainer = document.getElementById('dialogue-list-container');
 const btnAdd        = document.getElementById('btn-add-dialogue');
@@ -30,6 +32,11 @@ const previewText   = document.getElementById('preview-text');
 const toastContainer = document.createElement('div');
 toastContainer.id = 'toast-container';
 document.body.appendChild(toastContainer);
+
+const btnRecap = document.getElementById('btn-recap');
+const modalRecap = document.getElementById('modal-recap');
+const btnCloseRecap = document.getElementById('close-recap');
+const btnSaveRecapLocal = document.getElementById('save-recap-local');
 
 /**
  * Affiche une notification toast dans l'interface.
@@ -585,7 +592,8 @@ btnSaveAll.addEventListener('click', async () => {
     const payload = {
         scenarioName: scenarioTitle,
         nodes:        dialogues,
-        connections:  connections
+        connections:  connections,
+        recap:        scenarioRecap
     };
 
     const loadingToast = showToast("Sauvegarde en cours...", 'info', 0);
@@ -621,4 +629,19 @@ btnSaveAll.addEventListener('click', async () => {
         loadingToast.remove();
         showToast("Erreur de connexion au serveur.", 'error', 5000);
     }
+});
+
+// Ouvrir la modale
+btnRecap.addEventListener('click', () => {
+    modalRecap.classList.remove('hidden');
+});
+
+// Fermer la modale (Annuler)
+btnCloseRecap.addEventListener('click', () => {
+    modalRecap.classList.add('hidden');
+});
+
+// Valider (Fermer et garder en mémoire)
+btnSaveRecapLocal.addEventListener('click', () => {
+    modalRecap.classList.add('hidden');
 });

@@ -17,12 +17,12 @@
         <div class="page-header editor-header">
             <button class="btn btn-outline press-effect" onclick="window.history.back()">
                 < Retour</button>
-                    <h2 id="scenario-title" class="page-title uppercase">Scénario</h2>
-                    <div class="editor-controls">
-                        <button id="btn-link" class="btn btn-black press-effect">Relier deux dialogues</button>
-                        <button id="btn-unlink" class="btn btn-black press-effect delete">Supprimer lien</button>
-                        <button id="btn-save-all" class="btn btn-black press-effect green">Sauvegarder</button>
-                    </div>
+            <h2 id="scenario-title" class="page-title uppercase">Scénario</h2>
+            <div class="editor-controls">
+                <button id="btn-link" class="btn btn-black press-effect">Relier deux dialogues</button>
+                <button id="btn-unlink" class="btn btn-black press-effect delete">Supprimer lien</button>
+                <button id="btn-save-all" class="btn btn-black press-effect green">Sauvegarder</button>
+            </div>
         </div>
 
         <div class="editor-layout">
@@ -41,11 +41,14 @@
             <aside class="dialogue-sidebar">
                 <div class="sidebar-header">
                     <h3 class="uppercase espace-letter">Dialogues</h3>
-                    <button id="btn-add-dialogue" class="btn btn-black press-effect">+ Nouveau</button>
+                    <div class="header-actions">
+                        <button id="btn-add-dialogue" class="btn btn-black press-effect">+ Nouveau</button>
+                        <button id="btn-recap" class="btn btn-black press-effect blue-border">Fiche Récap</button>
+                    </div>
                 </div>
-
+                
                 <div id="dialogue-list-container">
-                </div>
+                    </div>
             </aside>
         </div>
     </main>
@@ -55,7 +58,7 @@
             <div class="page-header" style="align-items: flex-start; flex-direction: column;">
                 <button class="btn btn-outline press-effect" id="btn-close-edit">
                     < Annuler l'édition</button>
-                        <h2 class="page-title uppercase">Édition de la ligne</h2>
+                <h2 class="page-title uppercase">Édition de la ligne</h2>
             </div>
 
             <div class="editor-split">
@@ -83,8 +86,7 @@
                     <div class="uppercase espace-letter font-black" style="font-size: 10px; margin-bottom: 1rem;">
                         Simulateur Jeu</div>
                     <div class="unity-screen">
-                        <div
-                            style="width:100%; height:100%; background: linear-gradient(45deg, #222, #444); display:flex; align-items:center; justify-content:center;">
+                        <div style="width:100%; height:100%; background: linear-gradient(45deg, #222, #444); display:flex; align-items:center; justify-content:center;">
                             <span style="color:rgba(255,255,255,0.1); font-weight:900; font-size:4rem;">JEU</span>
                         </div>
                         <div class="unity-dialogue-box">
@@ -93,6 +95,20 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-recap" class="modal-overlay hidden">
+        <div class="modal-content recap-modal">
+            <h3 class="uppercase espace-letter">Notions pédagogiques</h3>
+            <p class="subtitle">Ce texte récapitulatif s'affichera à la fin du dialogue dans le jeu.</p>
+            
+            <textarea id="recap-text" placeholder="Décrivez ici les notions clés abordées dans ce scénario..."></textarea>
+            
+            <div class="modal-actions">
+                <button class="btn btn-outline press-effect" id="close-recap">Annuler</button>
+                <button class="btn btn-black green press-effect" id="save-recap-local">Valider le récap</button>
             </div>
         </div>
     </div>
