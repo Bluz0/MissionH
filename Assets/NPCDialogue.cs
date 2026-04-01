@@ -64,6 +64,9 @@ public class NPCDialogue : ScriptableObject
     /// </summary>
     public DialogueChoice[] choices;
 
+    /// <summary>
+    /// Test récapitulatif en fin de dialogue.
+    /// </summary>
     public string recapText;
 }
 
