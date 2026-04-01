@@ -39,23 +39,54 @@ function create(tag, container, text = null) {
  * @returns {void}
  */
 function afficheTitreScenario(scenarioName) {
-    let card = create("div", gridScenarios);
+    let card = document.createElement("div");
     card.className = "scenario-card rapprochement-letter";
     
-    // REDIRECTION DIRECTE VERS L'ÉDITEUR
-    card.addEventListener("click", () => {
-        // On monte d'un niveau si nécessaire selon ton arborescence de dossiers
+    card.innerHTML = `
+        <div class="card-header">
+            <span class="card-number">${cardId.toString().padStart(2, '0')}</span>
+            <div class="card-actions">
+                <button class="action-btn edit-btn" title="Renommer">✏️</button>
+                <button class="action-btn delete-btn" title="Supprimer">🗑️</button>
+            </div>
+        </div>
+        <h3 class="font-black uppercase rapprochement-letter scenario-display-name">${scenarioName}</h3>
+    `;
+    
+    gridScenarios.appendChild(card);
+    cardId++;
+
+    card.addEventListener("click", (e) => {
+        
+        if (e.target.closest('.action-btn')) return;
         window.location.href = `lib/html/edit_dialogue.html?scenario=${encodeURIComponent(scenarioName)}`;
     });
 
-    let cardIdStr = cardId.toString().padStart(2, '0');
-    let spanCard = create("span", card, cardIdStr);
-    spanCard.className = "card-number";
-    cardId++;
+    card.querySelector(".delete-btn").addEventListener("click", async () => {
+        const confirmSuppr = confirm(`ATTENTION : Supprimer "${scenarioName}" effacera TOUS les dialogues associés. Continuer ?`);
+        if (confirmSuppr) {
+            try {
+                await axios.delete(`${serveur}/api/scenarios/${encodeURIComponent(scenarioName)}`);
+                window.location.reload(); // On rafraîchit la liste
+            } catch (err) {
+                alert("Erreur lors de la suppression");
+            }
+        }
+    });
 
-    let h3Card = create("h3", card, scenarioName);
-    h3Card.className = "font-black uppercase rapprochement-letter";
-    h3Card.style.fontSize = "1.5rem";
+    card.querySelector(".edit-btn").addEventListener("click", async () => {
+        const newName = prompt(`Nouveau nom pour "${scenarioName}" :`, scenarioName);
+        if (newName && newName.trim() !== "" && newName !== scenarioName) {
+            try {
+                await axios.put(`${serveur}/api/scenarios/${encodeURIComponent(scenarioName)}`, {
+                    newName: newName.trim()
+                });
+                window.location.reload();
+            } catch (err) {
+                alert("Erreur lors du renommage");
+            }
+        }
+    });
 }
 
 // Récupération des scénarios depuis l'API

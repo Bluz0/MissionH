@@ -847,3 +847,58 @@ textarea {
     font-weight: 800;
     margin-top: 10px;
 }
+
+
+/* MODIF INDEX CSS */
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    opacity: 0; /* Caché par défaut */
+    transition: opacity 0.2s ease;
+}
+
+.scenario-card:hover .card-actions {
+    opacity: 1; /* Apparaît au survol de la carte */
+}
+
+.action-btn {
+    background: white;
+    border: 2px solid var(--black);
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+    background: var(--gray-light);
+}
+
+.delete-btn:hover {
+    background: var(--swiss-red);
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #3498db;
+    color: white;
+}
+
+/* Ajustement pour le titre dans la carte */
+.scenario-display-name {
+    font-size: 1.5rem;
+    margin-top: auto;
+}

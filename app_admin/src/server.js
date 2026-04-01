@@ -146,6 +146,66 @@ app.post('/api/scenarios', async (req, res) => {
 });
 
 
+
+/**
+ * @swagger
+ * /api/scenarios/:oldName:
+ *   put:
+ *     summary: Renommer un scénario existant
+ *     tags: [Scenarios]
+ *     parameters:
+ *       - name: oldName
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - newName
+ *             properties:
+ *               newName:
+ *                 type: string
+ *                 example: "Mission Beta"
+ *     responses:
+ *       200:
+ *         description: Scénario renommé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Scenario'
+ *       404:
+ *         description: Scénario non trouvé
+ */
+app.put('/api/scenarios/:oldName', async (req, res) => {
+  try {
+    const { newName } = req.body;
+    const { oldName } = req.params;
+
+    const scenario = await Scenario.findOneAndUpdate(
+      { scenarioName: oldName },
+      { scenarioName: newName },
+      { new: true }
+    );
+
+    if (!scenario) return res.status(404).json({ error: "Scénario non trouvé" });
+
+    await Dialogue.updateMany(
+      { scenarioName: oldName },
+      { $set: { scenarioName: newName } }
+    );
+
+    res.json({ message: "Scénario et dialogues renommés", scenario });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 /**
  * @swagger
  * /api/scenarios/tree/save:
