@@ -63,6 +63,8 @@ public class NPCDialogue : ScriptableObject
     /// Liste des choix possibles pour certaines lignes.
     /// </summary>
     public DialogueChoice[] choices;
+
+    public string recapText;
 }
 
 /// <summary>
