@@ -816,3 +816,34 @@ textarea {
 .hidden {
     display: none !important;
 }
+
+
+/* --- CARTE AJOUT SCÉNARIO --- */
+.scenario-card.add-new {
+    border: 3px dashed var(--gray-medium);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--gray-text);
+    background: transparent;
+}
+
+.scenario-card.add-new:hover {
+    border-color: var(--black);
+    color: var(--black);
+    background: var(--gray-light);
+    transform: scale(1.02);
+}
+
+.add-new .plus-icon {
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.add-new span {
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 10px;
+}

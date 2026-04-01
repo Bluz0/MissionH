@@ -63,11 +63,46 @@ axios.get(`${serveur}/api/scenarios`)
     .then(response => {
         const scenarios = response.data;
         updateNbChapitres(scenarios.length);
-        gridScenarios.innerHTML = ""; // On vide la grille avant d'afficher
+        gridScenarios.innerHTML = ""; 
+
         scenarios.forEach(scenario => {
             afficheTitreScenario(scenario.scenarioName);
         });
+
+        afficheBoutonAjout();
     })
     .catch(error => {
-        console.error("Erreur lors de la récupération des scénarios :", error);
+        console.error("Erreur lors de la récupération :", error);
     });
+
+/**
+ * Crée la carte interactive pour ajouter un nouveau scénario
+ */
+function afficheBoutonAjout() {
+    let card = document.createElement("div");
+    card.className = "scenario-card add-new rapprochement-letter";
+    card.innerHTML = `
+        <div class="plus-icon">+</div>
+        <span class="uppercase espace-letter">Créer une mission</span>
+    `;
+
+    card.addEventListener("click", async () => {
+        const name = prompt("Nom du nouveau scénario (ex: Mission Alpha) :");
+        
+        if (name && name.trim() !== "") {
+            try {
+                const res = await axios.post(`${serveur}/api/scenarios`, { 
+                    scenarioName: name.trim() 
+                });
+                
+                if(res.status === 201) {
+                    window.location.reload();
+                }
+            } catch (err) {
+                alert("Erreur lors de la création : " + (err.response?.data?.error || err.message));
+            }
+        }
+    });
+
+    gridScenarios.appendChild(card);
+}
