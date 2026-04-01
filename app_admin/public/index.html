@@ -37,6 +37,21 @@
 
     </div>
 
+    <div id="custom-modal" class="confirm-overlay">
+        <div class="confirm-box">
+            <div class="confirm-title" id="modal-title">TITRE</div>
+            <div class="confirm-message" id="modal-message">Message ici...</div>
+            
+            <div class="input-group hidden" id="modal-input-container">
+                <input type="text" id="modal-input-field" placeholder="Saisir ici...">
+            </div>
+
+            <div class="confirm-actions">
+                <button class="btn btn-outline press-effect" id="modal-cancel">Annuler</button>
+                <button class="btn btn-black press-effect" id="modal-ok">Confirmer</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="scripts/manage_scenario.js" defer></script>

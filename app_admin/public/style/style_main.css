@@ -902,3 +902,40 @@ textarea {
     font-size: 1.5rem;
     margin-top: auto;
 }
+
+/* pop up de confirmation de suppression */
+
+#modal-input-container {
+    margin: 1.5rem 0;
+}
+
+#modal-input-field {
+    width: 100%;
+    border: 3px solid var(--black);
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    outline: none;
+    background: var(--gray-light);
+}
+
+#modal-input-field:focus {
+    background: var(--white);
+    box-shadow: 4px 4px 0px var(--black);
+}
+
+/* On s'assure que l'overlay est bien centré et caché par défaut */
+.confirm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-overlay.show {
+    display: flex;
+}

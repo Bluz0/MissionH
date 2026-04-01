@@ -1,42 +1,61 @@
 const serveur = "http://51.38.222.173";
 let gridScenarios = document.querySelector(".grid-scenarios");
 let cardId = 1;
-
 let nbChapitresElement = document.getElementById("nb-chap");
 
-
 /**
- * Met à jour le compteur de chapitres affiché dans l'interface.
- *
- * @param {number} count - Nombre total de scénarios/chapitres.
- * @returns {void}
+ * MODALE PERSONNALISÉE (PROMPT / CONFIRM)
  */
+function openModal({ title, message, isPrompt = false, defaultValue = '', okText = 'Confirmer', okClass = 'btn-black' }) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-modal');
+        const inputContainer = document.getElementById('modal-input-container');
+        const inputField = document.getElementById('modal-input-field');
+        const btnOk = document.getElementById('modal-ok');
+        const btnCancel = document.getElementById('modal-cancel');
+
+        document.getElementById('modal-title').innerText = title.toUpperCase();
+        document.getElementById('modal-message').innerText = message;
+        btnOk.innerText = okText.toUpperCase();
+        btnOk.className = `btn press-effect ${okClass}`;
+
+        if (isPrompt) {
+            inputContainer.classList.remove('hidden');
+            inputField.value = defaultValue;
+            setTimeout(() => inputField.focus(), 100);
+        } else {
+            inputContainer.classList.add('hidden');
+        }
+
+        modal.classList.add('show');
+
+        const cleanup = () => {
+            modal.classList.remove('show');
+            const newOk = btnOk.cloneNode(true);
+            const newCancel = btnCancel.cloneNode(true);
+            btnOk.replaceWith(newOk);
+            btnCancel.replaceWith(newCancel);
+        };
+
+        document.getElementById('modal-ok').addEventListener('click', () => {
+            const val = isPrompt ? document.getElementById('modal-input-field').value : true;
+            cleanup();
+            resolve(val);
+        });
+
+        document.getElementById('modal-cancel').addEventListener('click', () => {
+            cleanup();
+            resolve(null);
+        });
+    });
+}
+
 function updateNbChapitres(count) {
     nbChapitresElement.innerText = `${count} Chapitre${count > 1 ? 's' : ''}`;
 }
 
 /**
- * Crée un élément HTML, lui assigne éventuellement un texte,
- * puis l'ajoute au conteneur fourni.
- *
- * @param {string} tag - Nom de la balise à créer (ex: "div", "span").
- * @param {HTMLElement} container - Élément parent qui recevra le nouvel élément.
- * @param {string|null} [text=null] - Texte à injecter dans l'élément.
- * @returns {HTMLElement} L'élément HTML créé et ajouté au DOM.
- */
-function create(tag, container, text = null) {
-    const element = document.createElement(tag);
-    element.innerText = text;
-    container.appendChild(element);
-    return element;
-}
-
-/**
- * Construit et affiche une carte de scénario dans la grille.
- * Un clic sur la carte redirige vers l'éditeur du scénario ciblé.
- *
- * @param {string} scenarioName - Nom du scénario à afficher.
- * @returns {void}
+ * AFFICHER UNE CARTE DE MISSION EXISTANTE
  */
 function afficheTitreScenario(scenarioName) {
     let card = document.createElement("div");
@@ -56,58 +75,54 @@ function afficheTitreScenario(scenarioName) {
     gridScenarios.appendChild(card);
     cardId++;
 
+    // CLIC SUR LA CARTE -> Aller à l'éditeur
     card.addEventListener("click", (e) => {
-        
+        // Si on clique sur un bouton d'action, on ne redirige pas
         if (e.target.closest('.action-btn')) return;
         window.location.href = `lib/html/edit_dialogue.html?scenario=${encodeURIComponent(scenarioName)}`;
     });
 
-    card.querySelector(".delete-btn").addEventListener("click", async () => {
-        const confirmSuppr = confirm(`ATTENTION : Supprimer "${scenarioName}" effacera TOUS les dialogues associés. Continuer ?`);
-        if (confirmSuppr) {
+    // BOUTON SUPPRIMER
+    card.querySelector(".delete-btn").addEventListener("click", async (e) => {
+        e.stopPropagation(); // Empêche le clic sur la carte
+        const result = await openModal({
+            title: "Supprimer",
+            message: `Voulez-vous vraiment effacer "${scenarioName}" ?`,
+            okText: "Supprimer",
+            okClass: "delete"
+        });
+
+        if (result) {
             try {
                 await axios.delete(`${serveur}/api/scenarios/${encodeURIComponent(scenarioName)}`);
-                window.location.reload(); // On rafraîchit la liste
-            } catch (err) {
-                alert("Erreur lors de la suppression");
-            }
+                window.location.reload();
+            } catch (err) { console.error(err); }
         }
     });
 
-    card.querySelector(".edit-btn").addEventListener("click", async () => {
-        const newName = prompt(`Nouveau nom pour "${scenarioName}" :`, scenarioName);
+    // BOUTON RENOMMER
+    card.querySelector(".edit-btn").addEventListener("click", async (e) => {
+        e.stopPropagation(); // Empêche le clic sur la carte
+        const newName = await openModal({
+            title: "Renommer",
+            message: "Entrez le nouveau nom :",
+            isPrompt: true,
+            defaultValue: scenarioName
+        });
+
         if (newName && newName.trim() !== "" && newName !== scenarioName) {
             try {
                 await axios.put(`${serveur}/api/scenarios/${encodeURIComponent(scenarioName)}`, {
                     newName: newName.trim()
                 });
                 window.location.reload();
-            } catch (err) {
-                alert("Erreur lors du renommage");
-            }
+            } catch (err) { console.error(err); }
         }
     });
 }
 
-// Récupération des scénarios depuis l'API
-axios.get(`${serveur}/api/scenarios`)
-    .then(response => {
-        const scenarios = response.data;
-        updateNbChapitres(scenarios.length);
-        gridScenarios.innerHTML = ""; 
-
-        scenarios.forEach(scenario => {
-            afficheTitreScenario(scenario.scenarioName);
-        });
-
-        afficheBoutonAjout();
-    })
-    .catch(error => {
-        console.error("Erreur lors de la récupération :", error);
-    });
-
 /**
- * Crée la carte interactive pour ajouter un nouveau scénario
+ * AFFICHER LE BOUTON "+" POUR CRÉER
  */
 function afficheBoutonAjout() {
     let card = document.createElement("div");
@@ -118,22 +133,36 @@ function afficheBoutonAjout() {
     `;
 
     card.addEventListener("click", async () => {
-        const name = prompt("Nom du nouveau scénario (ex: Mission Alpha) :");
+        const name = await openModal({
+            title: "Nouveau Scénario",
+            message: "Nom de la mission :",
+            isPrompt: true
+        });
         
         if (name && name.trim() !== "") {
             try {
                 const res = await axios.post(`${serveur}/api/scenarios`, { 
                     scenarioName: name.trim() 
                 });
-                
-                if(res.status === 201) {
-                    window.location.reload();
-                }
+                if(res.status === 201) window.location.reload();
             } catch (err) {
-                alert("Erreur lors de la création : " + (err.response?.data?.error || err.message));
+                alert("Erreur : " + (err.response?.data?.error || err.message));
             }
         }
     });
 
     gridScenarios.appendChild(card);
 }
+
+// CHARGEMENT INITIAL
+axios.get(`${serveur}/api/scenarios`)
+    .then(response => {
+        const scenarios = response.data;
+        updateNbChapitres(scenarios.length);
+        gridScenarios.innerHTML = ""; 
+        scenarios.forEach(scenario => {
+            afficheTitreScenario(scenario.scenarioName);
+        });
+        afficheBoutonAjout();
+    })
+    .catch(error => { console.error(error); });
