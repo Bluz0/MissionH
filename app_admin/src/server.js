@@ -114,7 +114,7 @@ app.get('/api/scenarios', async (req, res) => {
  *                 example: "Mission Alpha"
  *               recap:
  *                 type: string
- *                 example: "Texte pédagogique optionnel"
+ *                 example: "Texte pédagogique récapitulatif à afficher dans l'éditeur"
  *     responses:
  *       201:
  *         description: Scénario créé avec succès
@@ -127,12 +127,12 @@ app.get('/api/scenarios', async (req, res) => {
  */
 app.post('/api/scenarios', async (req, res) => {
   try {
-    const { scenarioName, recap } = req.body; // AJOUT : on accepte le recap dès la création
+    const { scenarioName, recap } = req.body;
     if (!scenarioName) {
       return res.status(400).json({ error: "Le nom du scénario est obligatoire" });
     }
     
-    // On crée le scénario avec le recap s'il est fourni (sinon ce sera "" par défaut)
+    // On crée le scénario avec le recap s'il est fourni (sinon "" par défaut)
     const newScenario = new Scenario({ 
         scenarioName, 
         recap: recap || "" 
@@ -150,12 +150,9 @@ app.post('/api/scenarios', async (req, res) => {
  * @swagger
  * /api/scenarios/tree/save:
  *   post:
- *     summary: Sauvegarder l'état complet du whiteboard d'un scénario
- *     description: >
- *       Crée les nouveaux nœuds (id préfixé tmp_), met à jour les existants,
- *       supprime les nœuds retirés du whiteboard, et reconstruit toutes les
- *       connexions (nextDialogues). Retourne un idMap { tempId → realMongoId }
- *       pour que le frontend remplace ses IDs temporaires.
+ *     summary: Sauvegarder l'arbre complet d'un scénario (dialogues + connexions + recap)
+ *     description:
+ *       Sauvegarde l'état complet du whiteboard d'un scénario. Les nœuds (dialogues) peuvent être nouveaux (id temporaire avec préfixe tmp_) ou existants (MongoDB _id). Les connexions sont mises à jour automatiquement. Le texte récapitulatif est stocké dans le modèle Scenario.
  *     tags: [Scenarios]
  *     requestBody:
  *       required: true
@@ -170,50 +167,67 @@ app.post('/api/scenarios', async (req, res) => {
  *             properties:
  *               scenarioName:
  *                 type: string
+ *                 description: Nom unique du scénario à mettre à jour
  *                 example: "Mission Alpha"
  *               nodes:
  *                 type: array
- *                 description: Tous les nœuds présents sur le whiteboard
+ *                 description: Liste des dialogues (nœuds) du whiteboard
  *                 items:
  *                   type: object
+ *                   required:
+ *                     - id
+ *                     - text
+ *                     - type
+ *                     - locuteur
  *                   properties:
  *                     id:
  *                       type: string
- *                       description: ID MongoDB existant, ou ID temporaire (préfixe tmp_)
- *                       example: "tmp_1718000000000"
+ *                       description: ID MongoDB (ObjectId string) pour dialogues existants, ou ID temporaire (tmp_*) pour nouveaux
+ *                       example: "664f1a2b3c4d5e6f7a8b9c0d"
  *                     text:
  *                       type: string
+ *                       description: Contenu du dialogue
  *                       example: "Bonjour !"
  *                     type:
  *                       type: string
  *                       enum: [npc, player]
+ *                       description: Type de locuteur
  *                     locuteur:
  *                       type: string
+ *                       description: Nom du personnage
  *                       example: "Professeur Dupont"
  *                     x:
  *                       type: number
+ *                       description: Position horizontale sur le whiteboard
  *                       example: 320
  *                     y:
  *                       type: number
+ *                       description: Position verticale sur le whiteboard
  *                       example: 150
  *               connections:
  *                 type: array
- *                 description: Toutes les flèches entre nœuds
+ *                 description: Liste des flèches entre dialogues (parent → enfant)
  *                 items:
  *                   type: object
+ *                   required:
+ *                     - fromId
+ *                     - toId
  *                   properties:
  *                     fromId:
  *                       type: string
- *                       example: "tmp_1718000000000"
+ *                       description: ID du dialogue parent
+ *                       example: "664f1a2b3c4d5e6f7a8b9c0d"
  *                     toId:
  *                       type: string
+ *                       description: ID du dialogue enfant
  *                       example: "664f1a2b3c4d5e6f7a8b9c1e"
  *               recap:
- *                type: string
- *                description: Texte récapitulatif des notions pédagogiques
+ *                 type: string
+ *                 description: Texte récapitulatif pédagogique (stocké dans Scenario)
+ *                 example: "Voici les points clés à retenir..."
  *     responses:
  *       200:
- *         description: Arbre sauvegardé avec succès
+ *         description: Arbre et informations sauvegardés avec succès
  *         content:
  *           application/json:
  *             schema:
@@ -221,13 +235,15 @@ app.post('/api/scenarios', async (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: "Arbre et récapitulatif sauvegardés avec succès"
  *                 idMap:
  *                   type: object
- *                   description: Correspondance tempId → _id MongoDB réel
+ *                   description: Mapping des IDs temporaires (tmp_*) vers les vrais MongoDB ObjectId
  *                   additionalProperties:
  *                     type: string
+ *                   example: { "tmp_1718000000000": "664f1a2b3c4d5e6f7a8b9c0d" }
  *       400:
- *         description: scenarioName manquant
+ *         description: scenarioName manquant ou données invalides
  *       404:
  *         description: Scénario non trouvé
  *       500:
@@ -235,23 +251,22 @@ app.post('/api/scenarios', async (req, res) => {
  */
 app.post('/api/scenarios/tree/save', async (req, res) => {
   try {
-    // 1. On récupère 'recap' en plus du reste
-    const { scenarioName, nodes, connections, recap } = req.body; 
+    const { scenarioName, nodes, connections, recap } = req.body;
 
     if (!scenarioName) {
       return res.status(400).json({ error: "scenarioName est obligatoire" });
     }
 
-    // 2. On cherche le scénario et on met à jour le champ 'recap'
     const scenario = await Scenario.findOneAndUpdate(
       { scenarioName },
-      { $set: { recap: recap || "" } }, // On enregistre le texte récap
+      { $set: { recap: recap || "" } },
       { new: true }
     );
 
     if (!scenario) {
       return res.status(404).json({ error: "Scénario non trouvé" });
     }
+
     const existingIds = nodes
       .filter(n => mongoose.Types.ObjectId.isValid(n.id))
       .map(n => n.id);
@@ -283,6 +298,7 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
         idMap[node.id] = node.id;
       }
     }
+
     for (const conn of connections) {
       const fromId = idMap[conn.fromId] || conn.fromId;
       const toId   = idMap[conn.toId]   || conn.toId;
@@ -363,9 +379,10 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
  *                       toId:
  *                         type: string
  *                         example: "664f1a2b3c4d5e6f7a8b9c1e"
- *                recap:
- *                  type: string
- *                  example: "Voici ce qu'il fallait retenir..." 
+ *                 recap:
+ *                   type: string
+ *                   description: Texte récapitulatif pédagogique du scénario
+ *                   example: "Voici ce qu'il fallait retenir..."
  *       404:
  *         description: Scénario non trouvé
  *       500:
@@ -396,7 +413,6 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
       x: d.position?.x ?? 100,
       y: d.position?.y ?? 100,
     }));
-    // On renvoie tout, y compris le recap qui vient du modèle Scenario
     res.json({ 
       dialogues: nodes, 
       connections: connections,
@@ -906,6 +922,10 @@ app.delete('/api/dialogues/:id', async (req, res) => {
  *           type: string
  *           description: Nom unique du scénario
  *           example: "Mission Alpha"
+ *         recap:
+ *           type: string
+ *           description: Texte récapitulatif pédagogique associé au scénario
+ *           example: "Résumé des points clés à retenir pour cette mission"
  *     Dialogue:
  *       type: object
  *       required:
