@@ -7,10 +7,7 @@ public class GlobalTextFollower : MonoBehaviour
     private float _baseSize;
     private bool _isInitialized = false;
 
-    void Awake()
-    {
-        Initialize();
-    }
+    void Awake() => Initialize();
 
     void Initialize()
     {
@@ -23,21 +20,19 @@ public class GlobalTextFollower : MonoBehaviour
         }
     }
 
-    // Elle s'exécute dès que l'objet devient actif dans la scène
     void OnEnable()
     {
-        if (!_isInitialized) Initialize();
-        
-        // On va chercher la sauvegarde directement
-        float savedOffset = PlayerPrefs.GetFloat("TextSizeOffset", 0f);
-        ApplyOffset(savedOffset);
+        // On récupère le multiplicateur sauvegardé (défaut : 1.0)
+        float savedScale = PlayerPrefs.GetFloat("GlobalTextScale", 1.0f);
+        ApplyScale(savedScale);
     }
 
-    public void ApplyOffset(float offset)
+    public void ApplyScale(float scaleFactor)
     {
+        if (!_isInitialized) Initialize();
         if (_textMesh != null)
         {
-            _textMesh.fontSize = _baseSize + offset;
+            _textMesh.fontSize = _baseSize * scaleFactor;
         }
     }
 }

@@ -1,49 +1,44 @@
 using UnityEngine;
+using TMPro;
 
 public class GlobalSizeController : MonoBehaviour
 {
-    public float step = 2f;
-    public float minOffset = -10f;
-    public float maxOffset = 20f;
+    [Header("Réglages des Multiplicateurs")]
+    public float scaleSmall = 0.7f;  // Taille réduite (70%)
+    public float scaleNormal = 1.0f; // Taille normale (100%)
+    public float scaleLarge = 1.4f;  // Taille augmentée (140%)
 
-    private float currentOffset = 0f;
+    private float currentScale = 1.0f;
+    private const string SaveKey = "GlobalTextScale";
 
     void Awake()
     {
-        currentOffset = PlayerPrefs.GetFloat("TextSizeOffset", 0f);
+        currentScale = PlayerPrefs.GetFloat(SaveKey, 1.0f);
     }
 
-    public void Increase()
+    void Start()
     {
-        if (currentOffset + step <= maxOffset)
-        {
-            currentOffset += step;
-            ApplyToAll();
-        }
+        ApplyToAll(); // Applique la taille sauvegardée au lancement
     }
 
-    public void Decrease()
-    {
-        if (currentOffset - step >= minOffset)
-        {
-            currentOffset -= step;
-            ApplyToAll();
-        }
-    }
+    // Fonctions pour les 3 boutons
+    public void SetSmall() { currentScale = scaleSmall; ApplyToAll(); }
+    public void SetNormal() { currentScale = scaleNormal; ApplyToAll(); }
+    public void SetLarge() { currentScale = scaleLarge; ApplyToAll(); }
 
     private void ApplyToAll()
     {
-        // On sauvegarde AVANT d'appliquer
-        PlayerPrefs.SetFloat("TextSizeOffset", currentOffset);
+        // Sauvegarde
+        PlayerPrefs.SetFloat(SaveKey, currentScale);
         PlayerPrefs.Save();
 
-        // On cherche TOUS les scripts (actifs et inactifs si possible)
-        // Note: FindObjectsByType ne trouve que les objets ACTIFS par défaut
+        // Mise à jour de TOUS les textes avec le script Follower
         GlobalTextFollower[] followers = Object.FindObjectsByType<GlobalTextFollower>(FindObjectsSortMode.None);
-        
         foreach (GlobalTextFollower f in followers)
         {
-            f.ApplyOffset(currentOffset);
+            f.ApplyScale(currentScale);
         }
+
+        Debug.Log($"Taille globale réglée sur : {currentScale * 100}%");
     }
 }
