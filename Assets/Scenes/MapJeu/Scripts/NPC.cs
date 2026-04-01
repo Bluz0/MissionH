@@ -252,6 +252,8 @@ public class NPC : MonoBehaviour, IInteractable
         dialogueUI.ShowDialogueUI(false);
         PauseController.SetPause(false);
 
-        dialogueUI.ShowRecap("");
+        if (!string.IsNullOrEmpty(dialogueData.recapText)){
+        dialogueUI.ShowRecap(dialogueData.recapText);
+        }
     }
 }
