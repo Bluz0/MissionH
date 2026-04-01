@@ -148,7 +148,7 @@ function loadScenarioData(title) {
             if (response.data) {
                 dialogues   = response.data.dialogues   || [];
                 connections = response.data.connections || [];
-
+                scenarioRecap = response.data.recap || "";
                 renderList();
 
                 dialogues.forEach(d => {
@@ -633,6 +633,7 @@ btnSaveAll.addEventListener('click', async () => {
 
 // Ouvrir la modale
 btnRecap.addEventListener('click', () => {
+    document.getElementById('recap-text').value = scenarioRecap;
     modalRecap.classList.remove('hidden');
 });
 
@@ -643,5 +644,8 @@ btnCloseRecap.addEventListener('click', () => {
 
 // Valider (Fermer et garder en mémoire)
 btnSaveRecapLocal.addEventListener('click', () => {
+    const textVal = document.getElementById('recap-text').value;
+    scenarioRecap = textVal;
     modalRecap.classList.add('hidden');
+    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 3000);
 });
