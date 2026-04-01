@@ -56,5 +56,9 @@ public class MenuController : MonoBehaviour
         joystick.SetActive(!isOpen);
         interactButton.SetActive(!isOpen);
         PauseController.SetPause(isOpen);
+        if (DialogueController.Instance.recapPanel.activeSelf)
+        {
+            DialogueController.Instance.CloseRecap();
+        }
     }
 }

@@ -12,40 +12,21 @@ using System.Collections;
 /// </summary>
 public class DialogueController : MonoBehaviour
 {
-    /// <summary>
-    /// Instance unique du DialogueController (singleton).
-    /// </summary>
     public static DialogueController Instance { get; private set; }
 
-    /// <summary>
-    /// Panneau principal du dialogue.
-    /// </summary>
+    [Header("Dialogue UI")]
     public GameObject dialoguePanel;
-
-    /// <summary>
-    /// Texte principal du dialogue.
-    /// </summary>
     public TMP_Text dialogueText;
-
-    /// <summary>
-    /// Nom du PNJ affiché dans l’UI.
-    /// </summary>
     public TMP_Text nameText;
-
-    /// <summary>
-    /// Portrait du PNJ.
-    /// </summary>
     public Image portraitImage;
 
-    /// <summary>
-    /// Conteneur où seront instanciés les boutons de choix.
-    /// </summary>
+    [Header("Choix")]
     public Transform choiceContainer;
-
-    /// <summary>
-    /// Prefab d’un bouton de choix.
-    /// </summary>
     public GameObject choiceButtonPrefab;
+
+    [Header("Page Récap")]
+    public GameObject recapPanel;
+    public TMP_Text recapText;
 
     /// <summary>
     /// Initialise le singleton.
@@ -54,6 +35,8 @@ public class DialogueController : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+        if (recapPanel != null)
+            recapPanel.SetActive(false);
     }
 
     /// <summary>
@@ -95,12 +78,32 @@ public class DialogueController : MonoBehaviour
     /// - instancie le prefab
     /// - définit le texte
     /// - ajoute l’action associée.
-/// </summary>
+    /// </summary>
     public GameObject CreateChoiceButton(string choiceText, UnityEngine.Events.UnityAction onClick)
     {
         GameObject choiceButton = Instantiate(choiceButtonPrefab, choiceContainer);
         choiceButton.GetComponentInChildren<TMP_Text>().text = choiceText;
         choiceButton.GetComponent<Button>().onClick.AddListener(onClick);
         return choiceButton;
+    }
+
+
+    /// <summary>
+    /// Affiche la page récap avec un texte donné.
+    /// Appelé par le script NPC à la fin d’un dialogue.
+    /// </summary>
+    public void ShowRecap(string text)
+    {
+        recapText.text = text;
+        recapPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// Ferme la page récap.
+    /// Appelé par un bouton UI.
+    /// </summary>
+    public void CloseRecap()
+    {
+        recapPanel.SetActive(false);
     }
 }
