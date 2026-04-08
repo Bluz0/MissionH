@@ -7,46 +7,37 @@ async function init() {
 }
 
 async function loadScenarios() {
-    const res = await axios.get('/api/scenarios');
-    allScenarios = res.data;
-    const select = document.getElementById('scenario-select');
-    select.innerHTML = allScenarios.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+    try {
+        const res = await axios.get('/api/scenarios');
+        allScenarios = res.data;
+        const select = document.getElementById('scenario-select');
+        // ATTENTION : utilise s.scenarioName et non s.name
+        select.innerHTML = allScenarios.map(s => `<option value="${s.scenarioName}">${s.scenarioName}</option>`).join('');
+    } catch (e) { console.error("Erreur chargement scénarios", e); }
 }
 
 async function loadNpcs() {
-    const response = await axios.get('/api/npc');
-    const npcs = response.data;
-    const list = document.getElementById('npc-list');
-
-    list.innerHTML = npcs.map(npc => `
-        <tr>
-            <td class="font-black"># ${npc.npcId}</td>
-            <td>
-                <span class="tag ${npc.scenarioName ? 'green-bg' : 'red-bg'}">
-                    ${npc.scenarioName || 'NON ASSIGNÉ'}
-                </span>
-            </td>
-            <td>
-                <button class="btn btn-outline" onclick="openAssignModal('${npc.npcId}')">
-                    Changer Scénario
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    try {
+        const response = await axios.get('/api/npc');
+        allNpcs = response.data;
+        renderNpcTable(); // On appelle la fonction de rendu ici
+    } catch (e) { console.error("Erreur chargement NPCs", e); }
 }
 
 function renderNpcTable() {
     const body = document.getElementById('npc-list-body');
+    if (!body) return;
+
     body.innerHTML = allNpcs.map(npc => `
         <tr class="dialogue-row">
             <td class="font-black"># ${npc.npcId}</td>
             <td>
-                <span class="tag" style="background: ${npc.scenarioName ? 'var(--gray-medium)' : 'var(--swiss-red)'}; padding: 5px 10px; font-size: 10px; font-weight: 900;">
+                <span class="tag" style="background: ${npc.scenarioName ? 'var(--swiss-green)' : 'var(--swiss-red)'}; color: white; padding: 5px 10px; font-size: 10px; font-weight: 900; text-transform: uppercase;">
                     ${npc.scenarioName || 'NON ASSIGNÉ'}
                 </span>
             </td>
             <td style="text-align: right;">
-                <button class="btn btn-outline green" onclick="openAssignModal('${npc.npcId}')">Modifier</button>
+                <button class="btn btn-outline green" onclick="openAssignModal('${npc.npcId}')">Assigner</button>
             </td>
         </tr>
     `).join('');
@@ -61,10 +52,8 @@ function openAssignModal(npcId) {
         try {
             await axios.put(`/api/npc/${npcId}/scenario`, { scenarioName });
             closeModal();
-            loadNpcs(); // Recharger la liste
-        } catch (e) {
-            console.error(e);
-        }
+            await loadNpcs(); // On recharge proprement la liste
+        } catch (e) { console.error(e); }
     };
 }
 
