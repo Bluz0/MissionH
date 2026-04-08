@@ -60,8 +60,12 @@ mongoose.connect(uri)
 // Route de login simple
 app.post('/api/login', (req, res) => {
     const { password } = req.body;
+    
+    
+    console.log("MDP Reçu:", password);
+    console.log("MDP Attendu (env):", process.env.ADMIN_PASSWORD);
+
     if (password === process.env.ADMIN_PASSWORD) {
-        
         res.json({ success: true, token: "authorized_access_key" });
     } else {
         res.status(401).json({ success: false, message: "Mot de passe incorrect" });
