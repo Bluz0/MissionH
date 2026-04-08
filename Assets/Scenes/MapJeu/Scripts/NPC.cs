@@ -87,7 +87,7 @@ public class NPC : MonoBehaviour, IInteractable
         while (true)
         {
             yield return new WaitForSeconds(5f); // toutes les 5s
-            yield return loader.FetchAssignedScenario(npcId, (newScenarioName) =>
+            yield return loader.FetchAssignedScenario(npcId, npcName, (newScenarioName) =>
             {
                 if (!string.IsNullOrWhiteSpace(newScenarioName) && newScenarioName != scenarioName && !isDialogueActive)
                 {
@@ -138,7 +138,7 @@ public class NPC : MonoBehaviour, IInteractable
         if (loader == null) loader = gameObject.AddComponent<DialogueLoader>();
 
         // Récupère d'abord le scénario assigné depuis l'API admin
-        StartCoroutine(loader.FetchAssignedScenario(npcId, (assignedScenario) =>
+        StartCoroutine(loader.FetchAssignedScenario(npcId, npcName, (assignedScenario) =>
         {
             if (!string.IsNullOrWhiteSpace(assignedScenario))
                 scenarioName = assignedScenario;

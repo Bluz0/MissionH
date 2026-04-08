@@ -16,7 +16,7 @@ public class DialogueLoader : MonoBehaviour
     private const string NPC_API_URL = "http://51.38.222.173/api/npc";
     public IEnumerator FetchAssignedScenario(int npcId, System.Action<string> onLoaded)
     {
-        string url = $"{NPC_API_URL}/{npcId}/config";
+        string url = $"{NPC_API_URL}/{npcId}/config?name={UnityWebRequest.EscapeURL(npcName)}";
 
         using UnityWebRequest req = UnityWebRequest.Get(url);
         req.certificateHandler = new AcceptAllCertificates();

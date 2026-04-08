@@ -26,11 +26,12 @@ async function loadNpcs() {
 
 function renderNpcTable() {
     const body = document.getElementById('npc-list-body');
-    if (!body) return;
-
     body.innerHTML = allNpcs.map(npc => `
         <tr class="dialogue-row">
-            <td class="font-black"># ${npc.npcId}</td>
+            <td class="font-black">
+                <span style="color: var(--gray-text); font-size: 0.8em;">#${npc.npcId}</span> 
+                ${npc.npcName} 
+            </td>
             <td>
                 <span class="tag" style="background: ${npc.scenarioName ? 'var(--swiss-green)' : 'var(--swiss-red)'}; color: white; padding: 5px 10px; font-size: 10px; font-weight: 900; text-transform: uppercase;">
                     ${npc.scenarioName || 'NON ASSIGNÉ'}
