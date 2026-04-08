@@ -25,9 +25,17 @@
                 <div class="flex" style="gap: 20px;">
                     <a href="index.html" class="nav-info uppercase espace-letter remove-blue-link" style="color: var(--black); border-bottom: 2px solid var(--black);">Scénarios</a>
                     <a href="lib/html/assign_pnj.html" class="nav-info uppercase espace-letter remove-blue-link">PNJ & Assignation</a>
+                    <a href="lib/html/download.html" class="nav-info uppercase espace-letter remove-blue-link">Builds</a>
                 </div>
             </div>
-            <div class="nav-info uppercase espace-letter" id="nb-chap"></div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="nav-info uppercase espace-letter" id="nb-chap"></div>
+                <button class="nav-info uppercase espace-letter" 
+                        style="background: none; border: none; cursor: pointer; color: var(--swiss-red); font-weight: 900;" 
+                        onclick="localStorage.removeItem('admin_session'); window.location.href='login.html';">
+                    [ Quitter ]
+                </button>
+            </div>
         </nav>
 
 
