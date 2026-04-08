@@ -14,6 +14,10 @@ using System.Collections;
 /// </summary>
 public class NPC : MonoBehaviour, IInteractable
 {
+
+    [Header("Id PNJ")]
+    public int npcId;
+
     /// <summary>
     /// Nom du scénario à charger depuis l'API ou la source de dialogues.
     /// </summary>
@@ -70,6 +74,63 @@ public class NPC : MonoBehaviour, IInteractable
     /// </summary>
     private bool isLoaded = false;
 
+    private Coroutine typeLineCoroutine;
+    private Coroutine scenarioPollCoroutine;
+
+    private IEnumerator PollScenarioChange()
+    {
+        while (loader == null)
+        {
+            yield return null;
+        }
+
+        while (true)
+        {
+            yield return new WaitForSeconds(5f); // toutes les 5s
+            yield return loader.FetchAssignedScenario(npcId, (newScenarioName) =>
+            {
+                if (!string.IsNullOrWhiteSpace(newScenarioName) && newScenarioName != scenarioName && !isDialogueActive)
+                {
+                    scenarioName = newScenarioName;
+                    StartCoroutine(loader.LoadDialogue(scenarioName, (data) => {
+                        data.npcName = npcName;
+                        data.npcPortrait = npcPortrait;
+                        dialogueData = data;
+                        isLoaded = true;
+                    }));
+                }
+            });
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (scenarioPollCoroutine == null)
+        {
+            scenarioPollCoroutine = StartCoroutine(PollScenarioChange());
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (scenarioPollCoroutine != null)
+        {
+            StopCoroutine(scenarioPollCoroutine);
+            scenarioPollCoroutine = null;
+        }
+
+        StopTypingCoroutine();
+    }
+
+    private void StopTypingCoroutine()
+    {
+        if (typeLineCoroutine != null)
+        {
+            StopCoroutine(typeLineCoroutine);
+            typeLineCoroutine = null;
+        }
+    }
+
     public void Start()
     {
         dialogueUI = DialogueController.Instance;
@@ -84,6 +145,9 @@ public class NPC : MonoBehaviour, IInteractable
             dialogueData = data;
             isLoaded = true;
         }));
+
+        
+
     }
     /// <summary>
     /// Le joueur peut interagir seulement si aucun dialogue n'est en cours.
@@ -132,7 +196,7 @@ public class NPC : MonoBehaviour, IInteractable
     {
         if (isTyping)
         {
-            StopAllCoroutines();
+            StopTypingCoroutine();
             dialogueUI.SetDialogueText(dialogueData.dialogueLines[dialogueIndex]);
             isTyping = false;
         }
@@ -218,8 +282,8 @@ public class NPC : MonoBehaviour, IInteractable
     /// </summary>
     void DisplayCurrentLine()
     {
-        StopAllCoroutines();
-        StartCoroutine(TypeLine());
+        StopTypingCoroutine();
+        typeLineCoroutine = StartCoroutine(TypeLine());
     }
 
     /// <summary>
@@ -239,7 +303,7 @@ public class NPC : MonoBehaviour, IInteractable
     /// </summary>
     public void EndDialogue()
     {
-        StopAllCoroutines();
+        StopTypingCoroutine();
         isDialogueActive = false;
 
         if (rewardAmount > 0)

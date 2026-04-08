@@ -13,6 +13,25 @@ public class DialogueLoader : MonoBehaviour
 {
     private const string API_URL = "http://51.38.222.173/api/scenarios";
 
+    public IEnumerator FetchAssignedScenario(int npcId, System.Action<string> onLoaded)
+    {
+        string url = $"{API_URL}/assigned/{npcId}";
+
+        using UnityWebRequest req = UnityWebRequest.Get(url);
+        req.certificateHandler = new AcceptAllCertificates();
+        yield return req.SendWebRequest();
+
+        if (req.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogWarning($"Impossible de récupérer le scénario assigné pour le PNJ {npcId} : {req.error}");
+            onLoaded?.Invoke(null);
+            yield break;
+        }
+
+        string scenario = TryExtractAssignedScenario(req.downloadHandler.text);
+        onLoaded?.Invoke(scenario);
+    }
+
     public IEnumerator LoadDialogue(string scenarioName, System.Action<NPCDialogue> onLoaded)
     {
         string url = $"{API_URL}/{scenarioName}/tree";
@@ -149,6 +168,34 @@ public class DialogueLoader : MonoBehaviour
         dialogue.recapText = response.recap;
         return dialogue;
     }
+
+    private string TryExtractAssignedScenario(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return null;
+        }
+
+        string trimmed = raw.Trim();
+
+        // API can return a plain string or a small JSON payload.
+        if (!trimmed.StartsWith("{"))
+        {
+            return trimmed.Trim('"');
+        }
+
+        AssignedScenarioResponse wrapped = JsonUtility.FromJson<AssignedScenarioResponse>(trimmed);
+        if (!string.IsNullOrWhiteSpace(wrapped?.scenarioName)) return wrapped.scenarioName;
+        if (!string.IsNullOrWhiteSpace(wrapped?.scenario)) return wrapped.scenario;
+        if (!string.IsNullOrWhiteSpace(wrapped?.name)) return wrapped.name;
+
+        AssignedScenarioDataResponse dataWrapped = JsonUtility.FromJson<AssignedScenarioDataResponse>(trimmed);
+        if (!string.IsNullOrWhiteSpace(dataWrapped?.data?.scenarioName)) return dataWrapped.data.scenarioName;
+        if (!string.IsNullOrWhiteSpace(dataWrapped?.data?.scenario)) return dataWrapped.data.scenario;
+        if (!string.IsNullOrWhiteSpace(dataWrapped?.data?.name)) return dataWrapped.data.name;
+
+        return null;
+    }
 }
 
 // Modèles JSON
@@ -172,4 +219,16 @@ public class DialogueLoader : MonoBehaviour
 {
     public string fromId;
     public string toId;
+}
+
+[System.Serializable] public class AssignedScenarioResponse
+{
+    public string scenarioName;
+    public string scenario;
+    public string name;
+}
+
+[System.Serializable] public class AssignedScenarioDataResponse
+{
+    public AssignedScenarioResponse data;
 }
