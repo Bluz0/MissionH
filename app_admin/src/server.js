@@ -962,37 +962,34 @@ app.delete('/api/dialogues/:id', async (req, res) => {
     );
     res.json({ message: "Dialogue et liens supprimés" });
   } catch (err) {
-  
-  
-    /**
-   * @swagger
-   * /api/npc:
-   *   get:
-   *     summary: Récupérer toutes les associations NPC -> scénario
-   *     tags: [NPCs]
-   *     description: Retourne la liste de toutes les configurations NPC enregistrées (npcId défini manuellement, non auto-incrémenté).
-   *     responses:
-   *       200:
-   *         description: Liste des configurations NPC
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items:
-   *                 $ref: '#/components/schemas/NPCConfig'
-   *             example:
-   *               - npcId: "12"
-   *                 scenarioName: "Mission Alpha"
-   *               - npcId: "13"
-   *                 scenarioName: "Mission Beta"
-   *       500:
-   *         description: Erreur serveur
-   */
-    res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message });
   }
 });
 
-
+/**
+  * @swagger
+  * /api/npc:
+  *   get:
+  *     summary: Récupérer toutes les associations NPC -> scénario
+  *     tags: [NPCs]
+  *     description: Retourne la liste de toutes les configurations NPC enregistrées (npcId défini manuellement, non auto-incrémenté).
+  *     responses:
+  *       200:
+  *         description: Liste des configurations NPC
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: array
+  *               items:
+  *                 $ref: '#/components/schemas/NPCConfig'
+  *             example:
+  *               - npcId: "12"
+  *                 scenarioName: "Mission Alpha"
+  *               - npcId: "13"
+  *                 scenarioName: "Mission Beta"
+  *       500:
+  *         description: Erreur serveur
+  */
 app.get('/api/npc', async (req, res) => {
   try {
     const configs = await NPCConfig.find(); // Récupère tous les NPCs en base
