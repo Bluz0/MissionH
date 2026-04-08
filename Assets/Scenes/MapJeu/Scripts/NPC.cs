@@ -18,7 +18,7 @@ public class NPC : MonoBehaviour, IInteractable
     /// Nom du scénario à charger depuis l'API ou la source de dialogues.
     /// </summary>
     [Header("Scénario API")]
-    public string scenarioName;       
+    public string scenarioName;
 
     /// <summary>
     /// Nom affiché du PNJ dans l'interface de dialogue.
@@ -91,7 +91,7 @@ public class NPC : MonoBehaviour, IInteractable
 
     public bool CanInteract() => isLoaded && !isDialogueActive;
 
-    
+
     /// <summary>
     /// Déclenche ou avance le dialogue selon l'état actuel.
     /// </summary>
@@ -251,5 +251,9 @@ public class NPC : MonoBehaviour, IInteractable
         dialogueUI.SetDialogueText("");
         dialogueUI.ShowDialogueUI(false);
         PauseController.SetPause(false);
+
+        if (!string.IsNullOrEmpty(dialogueData.recapText)){
+        dialogueUI.ShowRecap(dialogueData.recapText);
+        }
     }
 }

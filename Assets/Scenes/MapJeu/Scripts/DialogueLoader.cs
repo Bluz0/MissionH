@@ -146,7 +146,7 @@ public class DialogueLoader : MonoBehaviour
         dialogue.choices = choices.ToArray();
         dialogue.typingSpeed = 0.05f;
         dialogue.autoProgressDelay = 1.5f;
-
+        dialogue.recapText = response.recap;
         return dialogue;
     }
 }
@@ -156,6 +156,7 @@ public class DialogueLoader : MonoBehaviour
 {
     public List<DialogueNode> dialogues;
     public List<DialogueConnection> connections;
+    public string recap;
 }
 
 [System.Serializable] public class DialogueNode
