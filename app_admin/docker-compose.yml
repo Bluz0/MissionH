@@ -27,7 +27,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
-      - ADMIN_PASSWORD=0ZLeA3PArp
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     env_file:
       - .env
 
