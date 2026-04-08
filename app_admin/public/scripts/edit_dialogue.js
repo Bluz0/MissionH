@@ -1,4 +1,7 @@
-
+// Vérification de session au chargement de la page
+if (localStorage.getItem('admin_session') !== 'authorized_access_key') {
+    window.location.href = 'login.html';
+}
 const serveur = "http://51.38.222.173";
 
 let dialogues = [];

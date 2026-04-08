@@ -1,3 +1,8 @@
+// Vérification de session au chargement de la page
+if (localStorage.getItem('admin_session') !== 'authorized_access_key') {
+    window.location.href = 'login.html';
+}
+
 let allScenarios = [];
 let allNpcs = [];
 

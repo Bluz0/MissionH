@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../style/style_main.css">
+</head>
+<body>
+    <main class="container">
+    <div class="page-header">
+        <h2 class="page-title uppercase">Téléchargement</h2>
+    </div>
+
+    <div class="editor-split">
+        <div class="unity-preview" style="height: auto; text-align: center; padding: 3rem;">
+            <div class="card-number" style="font-size: 3rem; opacity: 1;">APK</div>
+            <h3 class="uppercase" style="margin: 1rem 0;">Mission H - Android</h3>
+            <p style="color: var(--gray-text); margin-bottom: 2rem;">Version de test actuelle</p>
+            
+            <a href="builds/mission_h_v1.apk" download class="btn btn-black press-effect" style="font-size: 1.5rem; padding: 1.5rem 3rem;">
+                TÉLÉCHARGER L'APK
+            </a>
+        </div>
+
+        <div class="unity-preview" style="text-align: center;">
+            <h3 class="uppercase" style="margin-bottom: 1rem;">Flash pour mobile</h3>
+            <div id="qrcode-container" style="background: white; padding: 20px; display: inline-block; border: 4px solid var(--black);">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://51.38.222.173/builds/mission_h_v1.apk" alt="QR Code">
+            </div>
+            <p style="margin-top: 10px; font-size: 10px;" class="uppercase espace-letter">Scanner avec votre téléphone</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

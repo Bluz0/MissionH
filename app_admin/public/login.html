@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Accès Restreint - Mission H</title>
+    <link rel="stylesheet" href="style/style_main.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-box { border: 8px solid var(--black); padding: 4rem; background: var(--white); box-shadow: 15px 15px 0 var(--black); max-width: 500px; width: 90%; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1 class="giant-title uppercase rapprochement-letter">ACCÈS</h1>
+        <p class="nav-info uppercase espace-letter" style="margin-bottom: 2rem;">Espace Administration</p>
+        
+        <div class="input-group">
+            <label class="uppercase">Clé d'accès</label>
+            <input type="password" id="admin-pass" placeholder="••••••••">
+        </div>
+
+        <button class="btn btn-black press-effect" style="width: 100%; justify-content: center;" onclick="tryLogin()">
+            ENTRER
+        </button>
+        <p id="error-msg" style="color: var(--swiss-red); font-weight: 700; margin-top: 1rem; display: none;" class="uppercase">Échec de l'authentification</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function tryLogin() {
+            const password = document.getElementById('admin-pass').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            try {
+                const res = await axios.post('/api/login', { password });
+                if (res.data.success) {
+                    // On stocke le fait qu'on est connecté
+                    localStorage.setItem('admin_session', res.data.token);
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                errorMsg.style.display = 'block';
+                document.getElementById('admin-pass').value = '';
+            }
+        }
+    </script>
+</body>
+</html>

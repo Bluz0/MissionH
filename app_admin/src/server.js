@@ -57,7 +57,16 @@ mongoose.connect(uri)
   .then(() => console.log('✅ Connecté à MongoDB avec succès'))
   .catch(err => console.error('Erreur de connexion MongoDB :', err));
 
-
+// Route de login simple
+app.post('/api/login', (req, res) => {
+    const { password } = req.body;
+    if (password === process.env.ADMIN_PASSWORD) {
+        
+        res.json({ success: true, token: "authorized_access_key" });
+    } else {
+        res.status(401).json({ success: false, message: "Mot de passe incorrect" });
+    }
+});
 
 /**
  * @swagger
