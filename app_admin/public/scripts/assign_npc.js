@@ -29,7 +29,6 @@ function renderNpcTable() {
     body.innerHTML = allNpcs.map(npc => `
         <tr class="dialogue-row">
             <td class="font-black">
-                <span style="color: var(--gray-text); font-size: 0.8em;">#${npc.npcId}</span> 
                 ${npc.npcName} 
             </td>
             <td>

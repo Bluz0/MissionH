@@ -131,6 +131,12 @@ public class NPC : MonoBehaviour, IInteractable
         }
     }
 
+    private void Awake()
+    {
+        // Hash stable sur le nom pour générer un ID int positif.
+        npcId = name.GetHashCode() & 0x7FFFFFFF;
+    }
+
     public void Start()
     {
         dialogueUI = DialogueController.Instance;

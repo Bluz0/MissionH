@@ -121753,7 +121753,7 @@ Transform:
   m_GameObject: {fileID: 1282816971}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 116.008514, y: -100.01846, z: -10}
+  m_LocalPosition: {x: 113.859406, y: -100.01908, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -490946,7 +490946,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
       propertyPath: npcName
-      value: Ayouv
+      value: Ayoub
       objectReference: {fileID: 0}
     - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
       propertyPath: nameText
