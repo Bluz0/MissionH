@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 
 import Dialogue from './models/dialogueTree.js';
 import Scenario from './models/scenario.js';
+import NPCConfig from './models/npcConfig.js';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -65,6 +66,8 @@ mongoose.connect(uri)
  *     description: Opérations CRUD sur les scénarios
  *   - name: Dialogues
  *     description: Opérations CRUD sur les dialogues
+ *   - name: NPCs
+ *     description: Association entre un NPC Unity et un scénario
  */
 
 /**
@@ -959,8 +962,129 @@ app.delete('/api/dialogues/:id', async (req, res) => {
     );
     res.json({ message: "Dialogue et liens supprimés" });
   } catch (err) {
+  
+  
+    /**
+   * @swagger
+   * /api/npc:
+   *   get:
+   *     summary: Récupérer toutes les associations NPC -> scénario
+   *     tags: [NPCs]
+   *     description: Retourne la liste de toutes les configurations NPC enregistrées (npcId défini manuellement, non auto-incrémenté).
+   *     responses:
+   *       200:
+   *         description: Liste des configurations NPC
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/NPCConfig'
+   *             example:
+   *               - npcId: "12"
+   *                 scenarioName: "Mission Alpha"
+   *               - npcId: "13"
+   *                 scenarioName: "Mission Beta"
+   *       500:
+   *         description: Erreur serveur
+   */
     res.status(500).json({ error: err.message });
   }
+});
+
+
+app.get('/api/npc', async (req, res) => {
+  try {
+    const configs = await NPCConfig.find(); // Récupère tous les NPCs en base
+    res.json(configs);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+/**
+ * @swagger
+ * /api/npc/{npcId}/config:
+ *   get:
+ *     summary: Récupérer la configuration d'un NPC par son ID
+ *     tags: [NPCs]
+ *     parameters:
+ *       - in: path
+ *         name: npcId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du NPC côté Unity (champ npcId). Cet ID n'est pas auto-incrémenté et doit être défini manuellement.
+ *         example: "12"
+ *     responses:
+ *       200:
+ *         description: Configuration trouvée, ou objet avec scenarioName = null si aucune association n'existe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/NPCConfig'
+ *                 - type: object
+ *                   properties:
+ *                     scenarioName:
+ *                       type: string
+ *                       nullable: true
+ *                       example: null
+ *       500:
+ *         description: Erreur serveur
+ */
+app.get('/api/npc/:npcId/config', async (req, res) => {
+  const config = await NPCConfig.findOne({ npcId: req.params.npcId });
+  res.json(config || { scenarioName: null });
+});
+
+/**
+ * @swagger
+ * /api/npc/{npcId}/scenario:
+ *   put:
+ *     summary: Associer (ou mettre à jour) le scénario d'un NPC
+ *     tags: [NPCs]
+ *     parameters:
+ *       - in: path
+ *         name: npcId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du NPC côté Unity (champ npcId). Cet ID n'est pas auto-incrémenté et doit être défini manuellement.
+ *         example: "12"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - scenarioName
+ *             properties:
+ *               scenarioName:
+ *                 type: string
+ *                 description: Nom du scénario à associer à ce NPC
+ *                 example: "Mission Alpha"
+ *     responses:
+ *       200:
+ *         description: Association NPC -> scénario créée ou mise à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/NPCConfig'
+ *       400:
+ *         description: Données invalides
+ *       500:
+ *         description: Erreur serveur
+ */
+app.put('/api/npc/:npcId/scenario', async (req, res) => {
+  const { scenarioName } = req.body;
+  const config = await NPCConfig.findOneAndUpdate(
+    { npcId: req.params.npcId },
+    { scenarioName },
+    { upsert: true, new: true }
+  );
+  res.json(config);
 });
 
 
@@ -969,6 +1093,28 @@ app.delete('/api/dialogues/:id', async (req, res) => {
  * @swagger
  * components:
  *   schemas:
+ *     NPCConfig:
+ *       type: object
+ *       required:
+ *         - npcId
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: ID MongoDB auto-généré
+ *           example: "6650ab12c3d4e5f678901234"
+ *         npcId:
+ *           type: string
+ *           description: ID du NPC côté Unity (champ npcId), défini manuellement dans l'Inspector (non auto-incrémenté)
+ *           example: "12"
+ *         scenarioName:
+ *           type: string
+ *           nullable: true
+ *           description: Nom du scénario associé au NPC, ou null si non assigné
+ *           example: "Mission Alpha"
+ *         __v:
+ *           type: integer
+ *           description: Version interne MongoDB
+ *           example: 0
  *     Scenario:
  *       type: object
  *       required:

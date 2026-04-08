@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignation NPC - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style/style_main.css">
+</head>
+<body>
+
+    <div id="app">
+        <nav>
+            <div style="display: flex; align-items: center; gap: 40px;">
+                <div class="logo espace-letter uppercase">
+                    <a class="remove-blue-link" href="../../index.html">Espace Admin</a>
+                </div>
+                <div class="flex" style="gap: 20px;">
+                    <a href="../../index.html" class="nav-info uppercase espace-letter remove-blue-link">Scénarios</a>
+                    <a href="assign_pnj.html" class="nav-info uppercase espace-letter remove-blue-link" style="color: var(--black); border-bottom: 2px solid var(--black);">PNJ & Assignation</a>
+                </div>
+            </div>
+            <div class="nav-info uppercase espace-letter" id="nb-chap"></div>
+        </nav>
+
+        <main class="container">
+            <button class="btn btn-outline press-effect" onclick="window.history.back()">
+                < Retour</button>
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title uppercase">Gestion des PNJ</h2>
+                    <p style="margin-top: 10px; color: var(--gray-text); font-weight: 700;">Associer les scénarios aux professeurs</p>
+                </div>
+            </div>
+
+            <table class="dialogue-table">
+                <thead>
+                    <tr>
+                        <th class="uppercase">Nom du PNJ</th>
+                        <th class="uppercase">Scénario Actuel</th>
+                        <th class="uppercase" style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="npc-list-body">
+                    </tbody>
+            </table>
+        </main>
+
+        <div id="modal-assign" class="confirm-overlay">
+            <div class="confirm-box">
+                <div class="confirm-title">Assigner un scénario</div>
+                <div class="confirm-message">Choisissez le scénario pour le PNJ <span id="target-npc-id" class="font-black"></span> :</div>
+                
+                <div class="input-group">
+                    <select id="scenario-select" style="width: 100%; padding: 10px; border: 2px solid black; font-weight: 700;">
+                        </select>
+                </div>
+
+                <div class="confirm-actions">
+                    <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+                    <button class="btn btn-black" id="confirm-assign-btn">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../../scripts/assign_npc.js" defer></script>
+</body>
+</html>
