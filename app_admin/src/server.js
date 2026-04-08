@@ -13,7 +13,7 @@ import NPCConfig from './models/npcConfig.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // --- CONFIGURATION EXPRESS ---
 const app = express();
