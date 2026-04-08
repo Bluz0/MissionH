@@ -137,16 +137,24 @@ public class NPC : MonoBehaviour, IInteractable
         loader = GetComponent<DialogueLoader>();
         if (loader == null) loader = gameObject.AddComponent<DialogueLoader>();
 
-        // Précharge le dialogue au démarrage
-        StartCoroutine(loader.LoadDialogue(scenarioName, (data) =>
+        // Récupère d'abord le scénario assigné depuis l'API admin
+        StartCoroutine(loader.FetchAssignedScenario(npcId, (assignedScenario) =>
         {
-            data.npcName = npcName;
-            data.npcPortrait = npcPortrait;
-            dialogueData = data;
-            isLoaded = true;
+            if (!string.IsNullOrWhiteSpace(assignedScenario))
+                scenarioName = assignedScenario;
+
+            // Charge le dialogue correspondant
+            StartCoroutine(loader.LoadDialogue(scenarioName, (data) =>
+            {
+                data.npcName = npcName;
+                data.npcPortrait = npcPortrait;
+                dialogueData = data;
+                isLoaded = true;
+            }));
         }));
 
-        
+        // Lance le polling pour les changements en temps réel
+        scenarioPollCoroutine = StartCoroutine(PollScenarioChange());
 
     }
     /// <summary>

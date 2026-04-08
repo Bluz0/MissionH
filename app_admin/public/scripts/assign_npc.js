@@ -14,9 +14,25 @@ async function loadScenarios() {
 }
 
 async function loadNpcs() {
-    const res = await axios.get('/api/npc');
-    allNpcs = res.data;
-    renderNpcTable();
+    const response = await axios.get('/api/npc');
+    const npcs = response.data;
+    const list = document.getElementById('npc-list');
+
+    list.innerHTML = npcs.map(npc => `
+        <tr>
+            <td class="font-black"># ${npc.npcId}</td>
+            <td>
+                <span class="tag ${npc.scenarioName ? 'green-bg' : 'red-bg'}">
+                    ${npc.scenarioName || 'NON ASSIGNÉ'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-outline" onclick="openAssignModal('${npc.npcId}')">
+                    Changer Scénario
+                </button>
+            </td>
+        </tr>
+    `).join('');
 }
 
 function renderNpcTable() {

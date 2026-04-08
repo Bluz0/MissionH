@@ -13,9 +13,10 @@ public class DialogueLoader : MonoBehaviour
 {
     private const string API_URL = "http://51.38.222.173/api/scenarios";
 
+    private const string NPC_API_URL = "http://51.38.222.173/api/npc";
     public IEnumerator FetchAssignedScenario(int npcId, System.Action<string> onLoaded)
     {
-        string url = $"{API_URL}/assigned/{npcId}";
+        string url = $"{NPC_API_URL}/{npcId}/config";
 
         using UnityWebRequest req = UnityWebRequest.Get(url);
         req.certificateHandler = new AcceptAllCertificates();
@@ -23,7 +24,7 @@ public class DialogueLoader : MonoBehaviour
 
         if (req.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogWarning($"Impossible de récupérer le scénario assigné pour le PNJ {npcId} : {req.error}");
+            Debug.LogWarning($"Impossible de récupérer le scénario du PNJ {npcId} : {req.error}");
             onLoaded?.Invoke(null);
             yield break;
         }

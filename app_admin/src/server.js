@@ -1031,8 +1031,25 @@ app.get('/api/npc', async (req, res) => {
  *         description: Erreur serveur
  */
 app.get('/api/npc/:npcId/config', async (req, res) => {
-  const config = await NPCConfig.findOne({ npcId: req.params.npcId });
-  res.json(config || { scenarioName: null });
+  try {
+    const { npcId } = req.params;
+
+    // On cherche si le PNJ existe déjà
+    let config = await NPCConfig.findOne({ npcId });
+
+    // S'il n'existe pas, on le crée à la volée
+    if (!config) {
+      console.log(`[Auto-Discovery] Nouveau PNJ détecté : ID ${npcId}. Création en base...`);
+      config = await NPCConfig.create({
+        npcId: npcId,
+        scenarioName: null // Par défaut, aucune mission
+      });
+    }
+
+    res.json(config);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /**
