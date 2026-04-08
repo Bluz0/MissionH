@@ -44,7 +44,8 @@ function renderNpcTable() {
 }
 
 function openAssignModal(npcId) {
-    document.getElementById('target-npc-id').innerText = npcId;
+    const npc = allNpcs.find(n => n.npcId === npcId);
+    document.getElementById('target-npc-id').innerText = npc.npcName;
     document.getElementById('modal-assign').classList.add('show');
     
     document.getElementById('confirm-assign-btn').onclick = async () => {
