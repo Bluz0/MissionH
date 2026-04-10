@@ -38033,8 +38033,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
-  npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
+  npcName: 
+  npcPortrait: {fileID: 0}
   rewardAmount: 0
 --- !u!50 &226347044
 Rigidbody2D:
@@ -39845,8 +39845,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 3
-  npcPortrait: {fileID: -5935188917897026707, guid: db9c44f39b3cfe64aaadd5ac5bbccfe2, type: 3}
+  npcName: 
+  npcPortrait: {fileID: 0}
   rewardAmount: 0
 --- !u!50 &340104378
 Rigidbody2D:
@@ -48637,8 +48637,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 6
-  npcPortrait: {fileID: -6478336861009418988, guid: 9fd5155101d18414584b1c3c7e15e347, type: 3}
+  npcName: 
+  npcPortrait: {fileID: 0}
   rewardAmount: 0
 --- !u!50 &785140151
 Rigidbody2D:
@@ -50050,8 +50050,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 1
-  npcPortrait: {fileID: 7314993261144778584, guid: 606be401aa8b51b4fad8908895036e38, type: 3}
+  npcName: 
+  npcPortrait: {fileID: 0}
   rewardAmount: 0
 --- !u!50 &941638564
 Rigidbody2D:
@@ -130769,8 +130769,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 4
-  npcPortrait: {fileID: 8485679160395290860, guid: 18a3a1b49a081f046a273aa61a309b38, type: 3}
+  npcName: 
+  npcPortrait: {fileID: 0}
   rewardAmount: 0
 --- !u!50 &1192432289
 Rigidbody2D:
@@ -134142,8 +134142,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 2
-  npcPortrait: {fileID: 7813297715414455986, guid: 9537bdbfebaefe944aba462cea2534f5, type: 3}
+  npcName: 
+  npcPortrait: {fileID: 0}
   rewardAmount: 0
 --- !u!50 &1476970080
 Rigidbody2D:
