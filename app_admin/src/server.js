@@ -1110,6 +1110,58 @@ app.put('/api/npc/:npcId/scenario', async (req, res) => {
 
 /**
  * @swagger
+ * /api/npc/{npcId}/name:
+ *   put:
+ *     summary: Mettre à jour le nom d'un NPC
+ *     tags: [NPCs]
+ *     parameters:
+ *       - in: path
+ *         name: npcId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du NPC côté Unity (champ npcId)
+ *         example: "12"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - npcName
+ *             properties:
+ *               npcName:
+ *                 type: string
+ *                 description: Nouveau nom du NPC à enregistrer
+ *                 example: "Professeur Dupont"
+ *     responses:
+ *       200:
+ *         description: Nom du NPC mis à jour avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/NPCConfig'
+ *       500:
+ *         description: Erreur serveur
+ */
+app.put('/api/npc/:npcId/name', async (req, res) => {
+  try {
+    const { npcName } = req.body;
+    const config = await NPCConfig.findOneAndUpdate(
+      { npcId: req.params.npcId },
+      { npcName },
+      { new: true }
+    );
+    res.json(config);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     NPCConfig:
@@ -1125,6 +1177,10 @@ app.put('/api/npc/:npcId/scenario', async (req, res) => {
  *           type: string
  *           description: ID du NPC côté Unity (champ npcId), défini manuellement dans l'Inspector (non auto-incrémenté)
  *           example: "12"
+ *         npcName:
+ *           type: string
+ *           description: Nom du NPC
+ *           example: "Professeur Dupont"
  *         scenarioName:
  *           type: string
  *           nullable: true

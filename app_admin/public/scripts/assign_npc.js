@@ -35,6 +35,8 @@ function renderNpcTable() {
         <tr class="dialogue-row">
             <td class="font-black">
                 ${npc.npcName} 
+                <button class="btn-outline" style="padding: 2px 8px; font-size: 9px; margin-left: 10px; cursor: pointer;" 
+                        onclick="openEditNameModal('${npc.npcId}')">Modifier le nom</button>
             </td>
             <td>
                 <span class="tag" style="background: ${npc.scenarioName ? 'var(--swiss-green)' : 'var(--swiss-red)'}; color: white; padding: 5px 10px; font-size: 10px; font-weight: 900; text-transform: uppercase;">
@@ -42,10 +44,32 @@ function renderNpcTable() {
                 </span>
             </td>
             <td style="text-align: right;">
-                <button class="btn btn-outline green" onclick="openAssignModal('${npc.npcId}')">Assigner</button>
+                <button class="btn btn-outline green" onclick="openAssignModal('${npc.npcId}')">Assigner Scénario</button>
             </td>
         </tr>
     `).join('');
+}
+
+function openEditNameModal(npcId) {
+    const npc = allNpcs.find(n => n.npcId === npcId);
+    document.getElementById('current-npc-name').innerText = npc.npcName;
+    document.getElementById('new-npc-name-input').value = npc.npcName;
+    document.getElementById('modal-edit-name').classList.add('show');
+    
+    document.getElementById('confirm-name-btn').onclick = async () => {
+        const newName = document.getElementById('new-npc-name-input').value;
+        if(!newName) return;
+
+        try {
+            await axios.put(`/api/npc/${npcId}/name`, { npcName: newName });
+            closeNameModal();
+            await loadNpcs(); // Rafraîchir la liste
+        } catch (e) { console.error(e); }
+    };
+}
+
+function closeNameModal() {
+    document.getElementById('modal-edit-name').classList.remove('show');
 }
 
 function openAssignModal(npcId) {
