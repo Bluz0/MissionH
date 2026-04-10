@@ -1042,15 +1042,22 @@ app.get('/api/npc', async (req, res) => {
 app.get('/api/npc/:npcId/config', async (req, res) => {
   try {
     const { npcId } = req.params;
-    const { name } = req.query; // On récupère le nom envoyé par Unity (?name=Ayouv)
+    const { name } = req.query; 
 
-    // On cherche et on met à jour (ou crée) le nom en même temps
-    let config = await NPCConfig.findOneAndUpdate(
-      { npcId },
-      { $set: { npcName: name || "PNJ Inconnu" } }, 
-      { upsert: true, new: true }
-    );
+    // On cherche si le PNJ existe déjà
+    let config = await NPCConfig.findOne({ npcId });
 
+    // S'il n'existe pas, on le crée
+    if (!config) {
+      config = await NPCConfig.create({ 
+        npcId, 
+        npcName: name || "Nouveau PNJ", 
+        scenarioName: null 
+      });
+      console.log(`Nouveau PNJ enregistré : ${config.npcName}`);
+    }
+
+    // On renvoie la config
     res.json(config);
   } catch (err) {
     res.status(500).json({ error: err.message });

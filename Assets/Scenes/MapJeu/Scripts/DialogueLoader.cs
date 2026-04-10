@@ -226,6 +226,9 @@ public class DialogueLoader : MonoBehaviour
 
 [System.Serializable] public class AssignedScenarioResponse
 {
+    public string npcId;
+
+    public string npcName;
     public string scenarioName;
     public string scenario;
     public string name;
