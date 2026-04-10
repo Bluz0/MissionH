@@ -5,19 +5,27 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 /// <summary>
-/// Gère la sélection d'avatar et le nom du joueur.
+/// Gère la sélection d'avatar, le portrait et le nom du joueur.
 /// </summary>
 public class AvatarSelector : MonoBehaviour
 {
-    public SpriteLibraryAsset[] skins;      // Liste des skins disponibles
-    public SpriteResolver previewResolver;  // Aperçu du skin sélectionné
-    public TMP_InputField nameInput;        // Champ du nom du joueur
+    [Header("Skins complets (SpriteLibraryAsset)")]
+    public SpriteLibraryAsset[] skins;
 
-    private int index = 0;                  // Index du skin sélectionné
+    [Header("Portraits associés (UI Sprite)")]
+    public Sprite[] portraits;
 
-    /// <summary>
-    /// Initialise l’aperçu et recharge le nom sauvegardé.
-    /// </summary>
+    [Header("Aperçu du skin dans la scène")]
+    public SpriteResolver previewResolver;
+
+    [Header("Portrait affiché dans le HUD de sélection")]
+    public Image portraitPreview;
+
+    [Header("Nom du joueur")]
+    public TMP_InputField nameInput;
+
+    private int index = 0;
+
     void Start()
     {
         UpdatePreview();
@@ -26,18 +34,12 @@ public class AvatarSelector : MonoBehaviour
             nameInput.text = PlayerPrefs.GetString("PlayerName");
     }
 
-    /// <summary>
-    /// Passe au skin suivant.
-    /// </summary>
     public void Next()
     {
         index = (index + 1) % skins.Length;
         UpdatePreview();
     }
 
-    /// <summary>
-    /// Passe au skin précédent.
-    /// </summary>
     public void Previous()
     {
         index = (index - 1 + skins.Length) % skins.Length;
@@ -45,19 +47,22 @@ public class AvatarSelector : MonoBehaviour
     }
 
     /// <summary>
-    /// Met à jour l’aperçu visuel du skin sélectionné.
+    /// Met à jour l’aperçu du skin ET du portrait.
     /// </summary>
     void UpdatePreview()
     {
+        // Skin complet (SpriteLibrary)
         previewResolver.spriteLibrary.spriteLibraryAsset = skins[index];
+
+        // Portrait UI
+        if (portraitPreview != null && portraits.Length > index)
+            portraitPreview.sprite = portraits[index];
     }
 
-    /// <summary>
-    /// Sauvegarde le skin et le nom, puis lance la scène du jeu.
-    /// </summary>
     public void PlayGame()
     {
         PlayerPrefs.SetString("SelectedSkin", skins[index].name);
+        PlayerPrefs.SetInt("SelectedPortraitIndex", index);
         PlayerPrefs.SetString("PlayerName", nameInput.text);
         PlayerPrefs.Save();
 

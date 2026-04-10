@@ -1,28 +1,24 @@
 using UnityEngine;
 using UnityEngine.U2D.Animation;
+using UnityEngine.UI;
 
-/// <summary>
-/// Applique automatiquement le skin sélectionné par le joueur
-/// (stocké dans les PlayerPrefs) au SpriteLibrary du personnage.
-/// </summary>
 public class ApplySelectedSkin : MonoBehaviour
 {
-    /// <summary>
-    /// SpriteLibrary du personnage sur laquelle appliquer le skin choisi.
-    /// </summary>
+    [Header("SpriteLibrary du personnage")]
     public SpriteLibrary spriteLibrary;
 
-    /// <summary>
-    /// Liste de tous les skins disponibles dans le jeu.
-    /// </summary>
+    [Header("Tous les skins disponibles")]
     public SpriteLibraryAsset[] allSkins;
 
-    /// <summary>
-    /// Au démarrage, récupère le skin choisi dans les PlayerPrefs
-    /// et l'applique si trouvé dans la liste des skins disponibles.
-    /// </summary>
+    [Header("Portraits associés (UI Sprite)")]
+    public Sprite[] portraits;
+
+    [Header("Image du portrait dans le HUD")]
+    public Image hudPortraitImage;
+
     void Start()
     {
+        // 1) Charger le skin sélectionné
         string selectedSkin = PlayerPrefs.GetString("SelectedSkin", "");
 
         foreach (var skin in allSkins)
@@ -32,6 +28,14 @@ public class ApplySelectedSkin : MonoBehaviour
                 spriteLibrary.spriteLibraryAsset = skin;
                 break;
             }
+        }
+
+        // 2) Charger le portrait sélectionné
+        int portraitIndex = PlayerPrefs.GetInt("SelectedPortraitIndex", 0);
+
+        if (hudPortraitImage != null && portraitIndex >= 0 && portraitIndex < portraits.Length)
+        {
+            hudPortraitImage.sprite = portraits[portraitIndex];
         }
     }
 }

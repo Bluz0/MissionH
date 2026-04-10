@@ -33,7 +33,7 @@ public class GlobalSizeController : MonoBehaviour
         PlayerPrefs.Save();
 
         // Mise à jour de TOUS les textes avec le script Follower
-        GlobalTextFollower[] followers = Object.FindObjectsByType<GlobalTextFollower>(FindObjectsSortMode.None);
+        GlobalTextFollower[] followers = Object.FindObjectsByType<GlobalTextFollower>();
         foreach (GlobalTextFollower f in followers)
         {
             f.ApplyScale(currentScale);
