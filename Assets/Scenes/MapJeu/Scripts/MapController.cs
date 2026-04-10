@@ -57,7 +57,7 @@ public class MapController : MonoBehaviour
         foreach (Transform child in markersParent)
             Destroy(child.gameObject);
 
-        foreach (MapMarker marker in FindObjectsOfType<MapMarker>())
+        foreach (MapMarker marker in FindObjectsByType<MapMarker>())
         {
             GameObject label = Instantiate(labelPrefab, markersParent);
 

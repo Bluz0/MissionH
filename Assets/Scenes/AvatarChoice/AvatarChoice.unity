@@ -196,6 +196,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1123,6 +1124,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1673,13 +1675,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   skins:
-  - {fileID: 7108339969198208228, guid: 24c7efa8be1011c428c09a29eefce3f6, type: 3}
   - {fileID: 7108339969198208228, guid: 16978ce56aa1357438eac3d5cff206c5, type: 3}
   - {fileID: 7108339969198208228, guid: b85609f2bd4eba246ac7979c93e00706, type: 3}
   - {fileID: 7108339969198208228, guid: a2de7a7063976a347b3b0deaf722860e, type: 3}
   - {fileID: 7108339969198208228, guid: 2bcf2321c820e9c4f8ac131373f69d1c, type: 3}
   - {fileID: 7108339969198208228, guid: eb1c14e500a98d24fa815997113df9f2, type: 3}
+  - {fileID: 7108339969198208228, guid: 24c7efa8be1011c428c09a29eefce3f6, type: 3}
+  portraits:
+  - {fileID: -888382069139387450, guid: 19e4dba471af0b344b5601fdc6b0efc1, type: 3}
+  - {fileID: 4594549817603852458, guid: 816c58f300717e7408064af380725ab3, type: 3}
+  - {fileID: 5683779737053249915, guid: 5aa18518f2d79c54eb979016caa704cb, type: 3}
+  - {fileID: -2306796029723506514, guid: 89f7753ff69997e4fa1788cba029df64, type: 3}
+  - {fileID: -580713418565425412, guid: 624b04ec990a41240b6a8754b0e16bf3, type: 3}
+  - {fileID: -5782521184205631276, guid: 97e469fc5c0734741b31a08156648b53, type: 3}
   previewResolver: {fileID: 895555371}
+  portraitPreview: {fileID: 0}
   nameInput: {fileID: 1533171033}
 --- !u!1 &1435243650
 GameObject:
