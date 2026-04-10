@@ -14,7 +14,7 @@ public class DialogueLoader : MonoBehaviour
     private const string API_URL = "http://51.38.222.173/api/scenarios";
 
     private const string NPC_API_URL = "http://51.38.222.173/api/npc";
-    public IEnumerator FetchAssignedScenario(int npcId, string npcName, System.Action<string> onLoaded)
+    public IEnumerator FetchAssignedScenario(int npcId, string npcName, System.Action<string, string> onLoaded)
     {
         string url = $"{NPC_API_URL}/{npcId}/config?name={UnityWebRequest.EscapeURL(npcName)}";
 
@@ -22,15 +22,17 @@ public class DialogueLoader : MonoBehaviour
         req.certificateHandler = new AcceptAllCertificates();
         yield return req.SendWebRequest();
 
-        if (req.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogWarning($"Impossible de récupérer le scénario du PNJ {npcId} : {req.error}");
-            onLoaded?.Invoke(null);
+        if (req.result != UnityWebRequest.Result.Success) {
+            onLoaded?.Invoke(null, null);
             yield break;
         }
 
-        string scenario = TryExtractAssignedScenario(req.downloadHandler.text);
-        onLoaded?.Invoke(scenario);
+        // analyse le JSON complet
+        string rawJson = req.downloadHandler.text;
+        AssignedScenarioResponse res = JsonUtility.FromJson<AssignedScenarioResponse>(rawJson);
+        
+        // On renvoie le scénario ET le nom du PNJ
+        onLoaded?.Invoke(res.scenarioName, res.npcName);
     }
 
     public IEnumerator LoadDialogue(string scenarioName, System.Action<NPCDialogue> onLoaded)
