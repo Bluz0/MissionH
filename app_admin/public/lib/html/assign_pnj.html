@@ -50,8 +50,23 @@
         </main>
 
         <div id="modal-assign" class="confirm-overlay">
-            
-            <div id="modal-edit-name" class="confirm-overlay">
+            <div class="confirm-box">
+                <div class="confirm-title">Assigner un scénario</div>
+                <div class="confirm-message">Choisissez le scénario pour le PNJ <span id="target-npc-id-display" class="font-black"></span> :</div>
+                
+                <div class="input-group">
+                    <select id="scenario-select" style="width: 100%; padding: 10px; border: 2px solid black; font-weight: 700;">
+                        </select>
+                </div>
+
+                <div class="confirm-actions">
+                    <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+                    <button class="btn btn-black" id="confirm-assign-btn">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-edit-name" class="confirm-overlay">
             <div class="confirm-box">
                 <div class="confirm-title">Modifier le nom</div>
                 <div class="confirm-message">Nouveau nom pour <span id="current-npc-name" class="font-black"></span> :</div>
@@ -66,8 +81,9 @@
                     <button class="btn btn-black" id="confirm-name-btn">Enregistrer</button>
                 </div>
             </div>
-
         </div>
+
+    </div>
 
     <div id="toast-container"></div>
 

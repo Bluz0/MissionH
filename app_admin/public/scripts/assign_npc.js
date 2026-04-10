@@ -74,7 +74,8 @@ function closeNameModal() {
 
 function openAssignModal(npcId) {
     const npc = allNpcs.find(n => n.npcId === npcId);
-    document.getElementById('target-npc-id').innerText = npc.npcName;
+    // On met à jour le texte de la modale avec le nom du PNJ
+    document.getElementById('target-npc-id-display').innerText = npc.npcName; 
     document.getElementById('modal-assign').classList.add('show');
     
     document.getElementById('confirm-assign-btn').onclick = async () => {
@@ -82,7 +83,7 @@ function openAssignModal(npcId) {
         try {
             await axios.put(`/api/npc/${npcId}/scenario`, { scenarioName });
             closeModal();
-            await loadNpcs(); // On recharge proprement la liste
+            await loadNpcs(); 
         } catch (e) { console.error(e); }
     };
 }
