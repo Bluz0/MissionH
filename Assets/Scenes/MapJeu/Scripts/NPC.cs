@@ -203,7 +203,8 @@ public class NPC : MonoBehaviour, IInteractable
         isDialogueActive = true;
         dialogueIndex = 0;
 
-        dialogueUI.SetNPCInfo(dialogueData.npcName, dialogueData.npcPortrait);
+        dialogueUI.SetNPCInfo(this.npcName, npcPortrait);
+        
         dialogueUI.ShowDialogueUI(true);
         PauseController.SetPause(true);
 
