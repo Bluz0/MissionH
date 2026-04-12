@@ -502174,6 +502174,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 554936662}
     - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
+      propertyPath: npcPortrait
+      value: 
+      objectReference: {fileID: -2306796029723506514, guid: 89f7753ff69997e4fa1788cba029df64, type: 3}
+    - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
       propertyPath: dialogueText
       value: 
       objectReference: {fileID: 2046038478}
