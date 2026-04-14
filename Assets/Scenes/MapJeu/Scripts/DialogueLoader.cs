@@ -37,10 +37,15 @@ public class DialogueLoader : MonoBehaviour
 
     public IEnumerator LoadDialogue(string scenarioName, System.Action<NPCDialogue> onLoaded)
     {
-        string url = $"{API_URL}/{scenarioName}/tree";
+        string encodedScenario = UnityWebRequest.EscapeURL(scenarioName);
+        string url = $"{API_URL}/{encodedScenario}/tree";
+
+        Debug.Log($"Tentative de chargement : {url}");
 
         using UnityWebRequest req = UnityWebRequest.Get(url);
-        req.certificateHandler = new AcceptAllCertificates(); // ← ajout
+        
+        req.certificateHandler = new AcceptAllCertificates();
+
         yield return req.SendWebRequest();
 
         if (req.result != UnityWebRequest.Result.Success)
