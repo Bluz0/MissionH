@@ -37,7 +37,7 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Documentation Swagger interactive des scenarios et dialogues du jeu',
     },
-    servers: [{ url: 'http://82.165.32.184:3001' }],
+    servers: [{ url: 'http://82.165.32.184:3001' }], // Notre serveur
   },
   apis: ['./src/server.js'],
 };
