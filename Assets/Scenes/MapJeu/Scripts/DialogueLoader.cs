@@ -37,7 +37,7 @@ public class DialogueLoader : MonoBehaviour
 
     public IEnumerator LoadDialogue(string scenarioName, System.Action<NPCDialogue> onLoaded)
     {
-        string encodedScenario = UnityWebRequest.EscapeURL(scenarioName);
+        string encodedScenario = UnityWebRequest.EscapeURL(scenarioName).Replace("+", "%20");
         string url = $"{API_URL}/{encodedScenario}/tree";
 
         Debug.Log($"Tentative de chargement : {url}");
