@@ -4,7 +4,7 @@ if (localStorage.getItem('admin_session') !== 'authorized_access_key') {
 }
 
 
-const serveur = "http://51.38.222.173";
+const serveur = "http://82.165.32.184:3001";
 let gridScenarios = document.querySelector(".grid-scenarios");
 let cardId = 1;
 let nbChapitresElement = document.getElementById("nb-chap");
