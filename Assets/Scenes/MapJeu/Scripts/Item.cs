@@ -13,6 +13,11 @@ public class Item : MonoBehaviour
     public int ID;
 
     /// <summary>
+    /// Icône affichée dans l'inventaire.
+    /// </summary>
+    public Sprite icon;
+
+    /// <summary>
     /// Action par défaut exécutée lorsqu'un item est utilisé.
     /// Peut être redéfinie dans les classes héritées.
     /// </summary>
