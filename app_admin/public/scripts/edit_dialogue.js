@@ -14,23 +14,23 @@ let firstNodeSelected = null;
 
 let scenarioRecap = "";
 
-const modal         = document.getElementById('modal-edit-dialogue');
+const modal = document.getElementById('modal-edit-dialogue');
 const listContainer = document.getElementById('dialogue-list-container');
-const btnAdd        = document.getElementById('btn-add-dialogue');
-const btnClose      = document.getElementById('btn-close-edit');
-const btnValidate   = document.getElementById('btn-validate-line');
-const btnLink       = document.getElementById('btn-link');
-const btnUnlink     = document.getElementById('btn-unlink');
-const btnSaveAll    = document.getElementById('btn-save-all');
-const canvasArea    = document.getElementById('canvas-area');
-const whiteboard    = document.getElementById('whiteboard');
-const svgCanvas     = document.getElementById('lines-svg');
+const btnAdd = document.getElementById('btn-add-dialogue');
+const btnClose = document.getElementById('btn-close-edit');
+const btnValidate = document.getElementById('btn-validate-line');
+const btnLink = document.getElementById('btn-link');
+const btnUnlink = document.getElementById('btn-unlink');
+const btnSaveAll = document.getElementById('btn-save-all');
+const canvasArea = document.getElementById('canvas-area');
+const whiteboard = document.getElementById('whiteboard');
+const svgCanvas = document.getElementById('lines-svg');
 
-const editText      = document.getElementById('edit-text');
-const editLocuteur  = document.getElementById('edit-locuteur');
-const editType      = document.getElementById('edit-type');
-const previewName   = document.getElementById('preview-name');
-const previewText   = document.getElementById('preview-text');
+const editText = document.getElementById('edit-text');
+const editLocuteur = document.getElementById('edit-locuteur');
+const editType = document.getElementById('edit-type');
+const previewName = document.getElementById('preview-name');
+const previewText = document.getElementById('preview-text');
 
 const toastContainer = document.createElement('div');
 toastContainer.id = 'toast-container';
@@ -102,35 +102,35 @@ document.body.appendChild(confirmOverlay);
  */
 function showConfirm(message, { title = 'Confirmer', icon = '🗑️', okLabel = 'Confirmer', okClass = 'btn-black' } = {}) {
     return new Promise((resolve) => {
-        document.getElementById('confirm-icon').textContent    = icon;
-        document.getElementById('confirm-title').textContent   = title;
+        document.getElementById('confirm-icon').textContent = icon;
+        document.getElementById('confirm-title').textContent = title;
         document.getElementById('confirm-message').textContent = message;
 
-        const btnOk     = document.getElementById('confirm-ok');
+        const btnOk = document.getElementById('confirm-ok');
         const btnCancel = document.getElementById('confirm-cancel');
 
         // Clone pour retirer les anciens listeners
-        const newOk     = btnOk.cloneNode(true);
+        const newOk = btnOk.cloneNode(true);
         const newCancel = btnCancel.cloneNode(true);
         btnOk.replaceWith(newOk);
         btnCancel.replaceWith(newCancel);
 
         newOk.textContent = okLabel;
-        newOk.className   = `btn ${okClass} press-effect`;
+        newOk.className = `btn ${okClass} press-effect`;
 
         function close(result) {
             confirmOverlay.classList.remove('show');
             resolve(result);
         }
 
-        document.getElementById('confirm-ok').addEventListener('click',     () => close(true));
+        document.getElementById('confirm-ok').addEventListener('click', () => close(true));
         document.getElementById('confirm-cancel').addEventListener('click', () => close(false));
 
         confirmOverlay.classList.add('show');
     });
 }
 
-const urlParams     = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
 const scenarioTitle = urlParams.get('scenario');
 
 if (scenarioTitle) {
@@ -149,7 +149,7 @@ function loadScenarioData(title) {
     axios.get(`${serveur}/api/scenarios/${title}/tree`)
         .then(response => {
             if (response.data) {
-                dialogues   = response.data.dialogues   || [];
+                dialogues = response.data.dialogues || [];
                 connections = response.data.connections || [];
                 scenarioRecap = response.data.recap || "";
                 renderList();
@@ -171,8 +171,8 @@ function loadScenarioData(title) {
 let scale = 1, offsetX = 0, offsetY = 0;
 let isPanning = false, startX, startY;
 
-const zoomIn   = document.getElementById('btn-zoom-in');
-const zoomOut  = document.getElementById('btn-zoom-out');
+const zoomIn = document.getElementById('btn-zoom-in');
+const zoomOut = document.getElementById('btn-zoom-out');
 const recenter = document.getElementById('btn-recenter');
 
 /**
@@ -184,8 +184,8 @@ function applyTransform() {
     whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
 }
 
-zoomIn.addEventListener('click',   () => { scale += 0.1; applyTransform(); });
-zoomOut.addEventListener('click',  () => { if (scale > 0.3) scale -= 0.1; applyTransform(); });
+zoomIn.addEventListener('click', () => { scale += 0.1; applyTransform(); });
+zoomOut.addEventListener('click', () => { if (scale > 0.3) scale -= 0.1; applyTransform(); });
 recenter.addEventListener('click', () => { scale = 1; offsetX = 0; offsetY = 0; applyTransform(); });
 
 canvasArea.addEventListener('wheel', (e) => {
@@ -246,8 +246,8 @@ btnClose.addEventListener('click', () => modal.classList.add('hidden'));
 function updatePreview() {
     previewText.innerText = editText.value || "Aperçu du texte...";
     const locuteurVal = editLocuteur ? editLocuteur.value : '';
-    const isNPC       = editType.value === "npc";
-    previewName.innerText   = locuteurVal || (isNPC ? "PROFESSEUR" : "JOUEUR");
+    const isNPC = editType.value === "npc";
+    previewName.innerText = locuteurVal || (isNPC ? "PROFESSEUR" : "JOUEUR");
     previewName.style.color = isNPC ? "var(--swiss-green)" : "#007bff";
 }
 
@@ -262,25 +262,25 @@ btnValidate.addEventListener('click', () => {
     }
 
     const locuteurVal = editLocuteur ? editLocuteur.value.trim() : '';
-    const typeVal     = editType.value;
-    const defaultLoc  = typeVal === 'npc' ? 'NPC' : 'Joueur';
+    const typeVal = editType.value;
+    const defaultLoc = typeVal === 'npc' ? 'NPC' : 'Joueur';
 
     if (currentEditId !== null) {
-        const d    = dialogues.find(d => d.id === currentEditId);
-        d.text     = editText.value;
-        d.type     = typeVal;
+        const d = dialogues.find(d => d.id === currentEditId);
+        d.text = editText.value;
+        d.type = typeVal;
         d.locuteur = locuteurVal || defaultLoc;
 
         const node = document.getElementById(`node-${currentEditId}`);
         if (node) node.className = `node-circle node-${d.type}`;
     } else {
         dialogues.push({
-            id:       `tmp_${Date.now()}`,
-            text:     editText.value,
-            type:     typeVal,
+            id: `tmp_${Date.now()}`,
+            text: editText.value,
+            type: typeVal,
             locuteur: locuteurVal || defaultLoc,
-            x:        undefined,
-            y:        undefined
+            x: undefined,
+            y: undefined
         });
     }
 
@@ -299,11 +299,11 @@ btnAdd.addEventListener('click', () => openEditor());
 function renderList() {
     listContainer.innerHTML = "";
     dialogues.forEach((d, index) => {
-        const item     = document.createElement('div');
+        const item = document.createElement('div');
         item.className = `draggable-dialogue ${d.type}`;
         item.draggable = true;
 
-        const maxLength   = 35;
+        const maxLength = 35;
         const displayText = d.text.length > maxLength
             ? d.text.substring(0, maxLength) + "..."
             : d.text;
@@ -351,7 +351,7 @@ async function deleteLine(id) {
     );
     if (!confirmed) return;
 
-    dialogues   = dialogues.filter(d => d.id !== id);
+    dialogues = dialogues.filter(d => d.id !== id);
     connections = connections.filter(c => c.fromId !== id && c.toId !== id);
 
     const node = document.getElementById(`node-${id}`);
@@ -369,14 +369,14 @@ whiteboard.addEventListener('dragover', (e) => e.preventDefault());
 
 whiteboard.addEventListener('drop', (e) => {
     e.preventDefault();
-    const id       = e.dataTransfer.getData("dialogueId");
+    const id = e.dataTransfer.getData("dialogueId");
     const dialogue = dialogues.find(d => d.id == id);
 
     if (dialogue) {
         const rect = whiteboard.getBoundingClientRect();
         const x = (e.clientX - rect.left - offsetX) / scale - 30;
-        const y = (e.clientY - rect.top - offsetY)  / scale - 30;
-        
+        const y = (e.clientY - rect.top - offsetY) / scale - 30;
+
         createNodeOnBoard(dialogue, x, y);
     }
 });
@@ -394,23 +394,23 @@ function createNodeOnBoard(dialogue, x, y) {
     let node = document.getElementById(`node-${dialogue.id}`);
 
     if (!node) {
-        node           = document.createElement('div');
-        node.id        = `node-${dialogue.id}`;
+        node = document.createElement('div');
+        node.id = `node-${dialogue.id}`;
         node.className = `node-circle node-${dialogue.type}`;
 
-        const index    = dialogues.findIndex(d => d.id === dialogue.id) + 1;
+        const index = dialogues.findIndex(d => d.id === dialogue.id) + 1;
         node.innerText = index;
 
         node.addEventListener('click', (e) => {
             if (isUnlinking) {
                 if (!firstNodeSelected) {
-                    firstNodeSelected  = dialogue.id;
-                    node.style.border  = "5px solid red";
+                    firstNodeSelected = dialogue.id;
+                    node.style.border = "5px solid red";
                 } else {
                     removeConnection(firstNodeSelected, dialogue.id);
                     resetBorder(firstNodeSelected);
-                    firstNodeSelected  = null;
-                    isUnlinking        = false;
+                    firstNodeSelected = null;
+                    isUnlinking = false;
                     btnUnlink.innerText = "Supprimer lien";
                     btnUnlink.classList.remove('active-delete');
                 }
@@ -427,7 +427,7 @@ function createNodeOnBoard(dialogue, x, y) {
                     }
                     resetBorder(firstNodeSelected);
                     firstNodeSelected = null;
-                    isLinking         = false;
+                    isLinking = false;
                     btnLink.innerText = "Relier deux dialogues";
                     btnLink.classList.remove('green');
                 }
@@ -439,9 +439,9 @@ function createNodeOnBoard(dialogue, x, y) {
     }
 
     node.style.left = `${x}px`;
-    node.style.top  = `${y}px`;
-    dialogue.x      = x;
-    dialogue.y      = y;
+    node.style.top = `${y}px`;
+    dialogue.x = x;
+    dialogue.y = y;
     updateLines();
 }
 
@@ -470,28 +470,28 @@ function makeNodeDraggable(node, dialogue) {
 
     node.addEventListener('mousedown', (e) => {
         e.stopPropagation();
-        isDragging        = true;
+        isDragging = true;
         node.style.cursor = 'grabbing';
         startMouseX = e.clientX;
         startMouseY = e.clientY;
-        startNodeX  = dialogue.x;
-        startNodeY  = dialogue.y;
+        startNodeX = dialogue.x;
+        startNodeY = dialogue.y;
     });
 
     document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        const dx   = (e.clientX - startMouseX) / scale;
-        const dy   = (e.clientY - startMouseY) / scale;
+        const dx = (e.clientX - startMouseX) / scale;
+        const dy = (e.clientY - startMouseY) / scale;
         dialogue.x = startNodeX + dx;
         dialogue.y = startNodeY + dy;
         node.style.left = `${dialogue.x}px`;
-        node.style.top  = `${dialogue.y}px`;
+        node.style.top = `${dialogue.y}px`;
         updateLines();
     });
 
     document.addEventListener('mouseup', () => {
         if (isDragging) {
-            isDragging        = false;
+            isDragging = false;
             node.style.cursor = 'move';
         }
     });
@@ -551,7 +551,7 @@ function addConnection(fromId, toId) {
  */
 function removeConnection(fromId, toId) {
     const before = connections.length;
-    connections  = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
+    connections = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
     if (connections.length < before) {
         updateLines();
         showToast("Lien supprimé.", 'info', 2000);
@@ -575,14 +575,14 @@ function updateLines() {
 
     connections.forEach((conn) => {
         const from = dialogues.find(d => d.id === conn.fromId);
-        const to   = dialogues.find(d => d.id === conn.toId);
+        const to = dialogues.find(d => d.id === conn.toId);
 
         if (from && to && from.x !== undefined && to.x !== undefined) {
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
             line.setAttribute("x1", from.x + 30);
             line.setAttribute("y1", from.y + 30);
-            line.setAttribute("x2", to.x   + 30);
-            line.setAttribute("y2", to.y   + 30);
+            line.setAttribute("x2", to.x + 30);
+            line.setAttribute("y2", to.y + 30);
             line.setAttribute("stroke", "black");
             line.setAttribute("stroke-width", "2");
             line.setAttribute("marker-end", "url(#arrowhead)");
@@ -607,30 +607,28 @@ btnSaveAll.addEventListener('click', async () => {
         const { idMap } = response.data;
 
         if (idMap) {
+            connections = connections.map(c => ({
+                fromId: idMap[c.fromId] || c.fromId,
+                toId:   idMap[c.toId]   || c.toId
+            }));
+
             dialogues = dialogues.map(d => {
                 if (idMap[d.id]) {
-                    const oldNode = document.getElementById(`node-${d.id}`);
-                    if (oldNode) oldNode.id = `node-${idMap[d.id]}`;
-
-                    connections = connections.map(c => ({
-                        fromId: c.fromId === d.id ? idMap[d.id] : c.fromId,
-                        toId:   c.toId   === d.id ? idMap[d.id] : c.toId
-                    }));
                     return { ...d, id: idMap[d.id] };
                 }
                 return d;
             });
+            renderList();
+            initWhiteboard(); 
+            if (typeof updateLines === "function") updateLines();
         }
 
-        renderList();
-        refreshNodeNumbers();
-
-        loadingToast.remove();
+        loadingToast.remove(); 
         showToast("Scénario sauvegardé avec succès !", 'success', 3500);
 
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
-        loadingToast.remove();
+        if (loadingToast) loadingToast.remove();
         showToast("Erreur de connexion au serveur.", 'error', 5000);
     }
 });
