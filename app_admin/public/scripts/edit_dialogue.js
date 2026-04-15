@@ -374,8 +374,9 @@ whiteboard.addEventListener('drop', (e) => {
 
     if (dialogue) {
         const rect = whiteboard.getBoundingClientRect();
-        const x    = (e.clientX - rect.left) / scale - 30;
-        const y    = (e.clientY - rect.top)  / scale - 30;
+        const x = (e.clientX - rect.left - offsetX) / scale - 30;
+        const y = (e.clientY - rect.top - offsetY)  / scale - 30;
+        
         createNodeOnBoard(dialogue, x, y);
     }
 });
