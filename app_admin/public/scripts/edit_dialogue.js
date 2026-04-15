@@ -156,15 +156,12 @@ function loadScenarioData(title) {
 
                 dialogues.forEach(d => {
                     if (d.x !== undefined && d.y !== undefined) {
-                        // --- LOGIQUE DE SAUVETAGE ---
-                        // Si les coordonnées sont inférieures à 1500, 
-                        // c'est qu'elles appartiennent à l'ancien système.
-                        // On leur ajoute 2500 pour les ramener au milieu du nouveau whiteboard.
                         let newX = d.x;
                         let newY = d.y;
-
-                        if (newX < 1500) newX += 2500;
-                        if (newY < 1500) newY += 2500;
+                        // Si le cercle est dans la zone de l'ancien système (autour de 2500)
+                        // on le décale pour le nouveau système (autour de 7500)
+                        if (newX < 5000) newX += 5000;
+                        if (newY < 5000) newY += 5000;
 
                         createNodeOnBoard(d, newX, newY);
                     }
@@ -204,11 +201,11 @@ function applyTransform() {
 function handleZoom(delta, focalX = null, focalY = null) {
     const oldScale = scale;
     const newScale = Math.min(Math.max(scale + delta, 0.2), 3);
-    
+
     if (newScale === oldScale) return;
 
     const rect = canvasArea.getBoundingClientRect();
-    
+
     // Si boutons : centre du cadre. Si molette : position souris.
     const targetX = (focalX !== null) ? (focalX - rect.left) : (rect.width / 2);
     const targetY = (focalY !== null) ? (focalY - rect.top) : (rect.height / 2);
@@ -216,7 +213,7 @@ function handleZoom(delta, focalX = null, focalY = null) {
     // Recalcul de l'offset pour garder le point focal stable
     offsetX = targetX - (targetX - offsetX) * (newScale / oldScale);
     offsetY = targetY - (targetY - offsetY) * (newScale / oldScale);
-    
+
     scale = newScale;
     applyTransform();
 }
@@ -227,8 +224,8 @@ if (zoomIn) zoomIn.addEventListener('click', () => handleZoom(0.1));
 if (zoomOut) zoomOut.addEventListener('click', () => handleZoom(-0.1));
 if (recenter) recenter.addEventListener('click', () => {
     scale = 1;
-    offsetX = 0; 
-    offsetY = 0; 
+    offsetX = 0;
+    offsetY = 0;
     applyTransform();
 });
 
@@ -422,8 +419,8 @@ canvasArea.addEventListener('drop', (e) => {
 
     if (dialogue) {
         const rect = canvasArea.getBoundingClientRect();
-        const x = (e.clientX - rect.left - offsetX) / scale + 2500 - 30;
-        const y = (e.clientY - rect.top - offsetY) / scale + 2500 - 30;
+        const x = (e.clientX - rect.left - offsetX) / scale + 7500 - 30;
+        const y = (e.clientY - rect.top - offsetY) / scale + 7500 - 30;
 
         createNodeOnBoard(dialogue, x, y);
     }
@@ -643,15 +640,15 @@ function updateLines() {
 btnSaveAll.addEventListener('click', async () => {
     const payload = {
         scenarioName: scenarioTitle,
-        nodes:        dialogues,
-        connections:  connections,
-        recap:        scenarioRecap
+        nodes: dialogues,
+        connections: connections,
+        recap: scenarioRecap
     };
 
     const loadingToast = showToast("Sauvegarde en cours...", 'info', 0);
 
     try {
-        const response  = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
+        const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         const { idMap } = response.data;
 
         if (idMap) {
@@ -662,7 +659,7 @@ btnSaveAll.addEventListener('click', async () => {
 
                     connections = connections.map(c => ({
                         fromId: c.fromId === d.id ? idMap[d.id] : c.fromId,
-                        toId:   c.toId   === d.id ? idMap[d.id] : c.toId
+                        toId: c.toId === d.id ? idMap[d.id] : c.toId
                     }));
                     return { ...d, id: idMap[d.id] };
                 }
