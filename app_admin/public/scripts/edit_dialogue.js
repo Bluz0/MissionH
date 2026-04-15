@@ -179,56 +179,59 @@ function loadScenarioData(title) {
 }
 
 let scale = 1, offsetX = 0, offsetY = 0;
-let isPanning = false, startX, startY;
-
-const zoomIn = document.getElementById('btn-zoom-in');
-const zoomOut = document.getElementById('btn-zoom-out');
-const recenter = document.getElementById('btn-recenter');
 
 /**
- * Applique la translation et le zoom courant sur le tableau blanc.
- *
- * @returns {void}
+ * Applique la translation et le zoom courant.
  */
 function applyTransform() {
     whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
 }
 
-// Fonction utilitaire pour zoomer vers le centre du cadre
-function zoom(direction) {
-    const zoomFactor = 0.1;
+/**
+ * Fonction de zoom universelle (Boutons + Molette)
+ * @param {number} delta - La valeur de changement de scale (ex: 0.1 ou -0.1)
+ * @param {number} clientX - Point X focal (optionnel, défaut au centre)
+ * @param {number} clientY - Point Y focal (optionnel, défaut au centre)
+ */
+function handleZoom(delta, focalX = null, focalY = null) {
     const oldScale = scale;
+    const newScale = Math.min(Math.max(scale + delta, 0.2), 3); // Limites entre 0.2 et 3
     
-    if (direction === 'in') {
-        scale += zoomFactor;
-    } else {
-        if (scale > 0.3) scale -= zoomFactor;
-    }
-    const rect = canvasArea.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    offsetX = centerX - (centerX - offsetX) * (scale / oldScale);
-    offsetY = centerY - (centerY - offsetY) * (scale / oldScale);
+    if (newScale === oldScale) return; // Pas de changement
 
+    const rect = canvasArea.getBoundingClientRect();
+    
+    // Si on ne précise pas de point (boutons), on zoome vers le centre du cadre
+    // Sinon (molette), on zoome vers la position de la souris
+    const targetX = (focalX !== null) ? (focalX - rect.left) : (rect.width / 2);
+    const targetY = (focalY !== null) ? (focalY - rect.top) : (rect.height / 2);
+
+    // Formule mathématique pour zoomer vers un point précis
+    offsetX = targetX - (targetX - offsetX) * (newScale / oldScale);
+    offsetY = targetY - (targetY - offsetY) * (newScale / oldScale);
+    
+    scale = newScale;
     applyTransform();
 }
 
-zoomIn.addEventListener('click', () => zoom('in'));
-zoomOut.addEventListener('click', () => zoom('out'));
+// Événements Boutons
+zoomIn.addEventListener('click', () => handleZoom(0.1));
+zoomOut.addEventListener('click', () => handleZoom(-0.1));
 
+// Événement Molette (Zoom vers la souris !)
+canvasArea.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    handleZoom(delta, e.clientX, e.clientY);
+}, { passive: false });
+
+// Recenter
 recenter.addEventListener('click', () => {
     scale = 1;
     offsetX = 0; 
     offsetY = 0; 
     applyTransform();
 });
-
-canvasArea.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    const newScale = scale + delta;
-    if (newScale > 0.2 && newScale < 3) { scale = newScale; applyTransform(); }
-}, { passive: false });
 
 canvasArea.addEventListener('mousedown', (e) => {
     if (e.target === canvasArea || e.target === whiteboard || e.target.id === 'lines-svg') {
