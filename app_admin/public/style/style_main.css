@@ -450,12 +450,13 @@ textarea {
 }
 
 #whiteboard {
-    transform-origin: 0 0; /* Important pour que le zoom parte du coin haut-gauche */
-    width: 5000px; /* Espace immense pour travailler */
+    transform-origin: 0 0; 
+    width: 5000px; 
     height: 5000px;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -2500px; 
+    left: -2500px;
+    overflow: visible;
 }
 
 .canvas-controls {
