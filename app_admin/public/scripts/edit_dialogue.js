@@ -643,40 +643,41 @@ function updateLines() {
 btnSaveAll.addEventListener('click', async () => {
     const payload = {
         scenarioName: scenarioTitle,
-        nodes: dialogues,
-        connections: connections,
-        recap: scenarioRecap
+        nodes:        dialogues,
+        connections:  connections,
+        recap:        scenarioRecap
     };
 
     const loadingToast = showToast("Sauvegarde en cours...", 'info', 0);
 
     try {
-        const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
+        const response  = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         const { idMap } = response.data;
 
         if (idMap) {
-            connections = connections.map(c => ({
-                fromId: idMap[c.fromId] || c.fromId,
-                toId: idMap[c.toId] || c.toId
-            }));
-
             dialogues = dialogues.map(d => {
                 if (idMap[d.id]) {
+                    const oldNode = document.getElementById(`node-${d.id}`);
+                    if (oldNode) oldNode.id = `node-${idMap[d.id]}`;
+
+                    connections = connections.map(c => ({
+                        fromId: c.fromId === d.id ? idMap[d.id] : c.fromId,
+                        toId:   c.toId   === d.id ? idMap[d.id] : c.toId
+                    }));
                     return { ...d, id: idMap[d.id] };
                 }
                 return d;
             });
-            renderList();
-            initWhiteboard();
-            if (typeof updateLines === "function") updateLines();
         }
+        renderList();
+        refreshNodeNumbers();
 
         loadingToast.remove();
         showToast("Scénario sauvegardé avec succès !", 'success', 3500);
 
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
-        if (loadingToast) loadingToast.remove();
+        loadingToast.remove();
         showToast("Erreur de connexion au serveur.", 'error', 5000);
     }
 });
