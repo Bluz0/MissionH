@@ -365,15 +365,15 @@ async function deleteLine(id) {
 }
 
 
-whiteboard.addEventListener('dragover', (e) => e.preventDefault());
+canvasArea.addEventListener('dragover', (e) => e.preventDefault());
 
-whiteboard.addEventListener('drop', (e) => {
+canvasArea.addEventListener('drop', (e) => {
     e.preventDefault();
     const id = e.dataTransfer.getData("dialogueId");
     const dialogue = dialogues.find(d => d.id == id);
 
     if (dialogue) {
-        const rect = whiteboard.getBoundingClientRect();
+        const rect = canvasArea.getBoundingClientRect();
         const x = (e.clientX - rect.left - offsetX) / scale - 30;
         const y = (e.clientY - rect.top - offsetY) / scale - 30;
 
