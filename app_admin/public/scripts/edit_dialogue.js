@@ -178,35 +178,42 @@ function loadScenarioData(title) {
         });
 }
 
-let scale = 1, offsetX = 0, offsetY = 0;
+// 1. Déclaration des variables d'état (Indispensables pour le déplacement)
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let isPanning = false;
+let startX = 0;
+let startY = 0;
+
+// 2. Sélection des éléments (Assure-toi que ces IDs existent bien dans ton HTML)
+const zoomIn = document.getElementById('btn-zoom-in');
+const zoomOut = document.getElementById('btn-zoom-out');
+const recenter = document.getElementById('btn-recenter');
 
 /**
- * Applique la translation et le zoom courant.
+ * Applique la translation et le zoom courant sur le style CSS.
  */
 function applyTransform() {
     whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
 }
 
 /**
- * Fonction de zoom universelle (Boutons + Molette)
- * @param {number} delta - La valeur de changement de scale (ex: 0.1 ou -0.1)
- * @param {number} clientX - Point X focal (optionnel, défaut au centre)
- * @param {number} clientY - Point Y focal (optionnel, défaut au centre)
+ * Fonction de zoom universelle
  */
 function handleZoom(delta, focalX = null, focalY = null) {
     const oldScale = scale;
-    const newScale = Math.min(Math.max(scale + delta, 0.2), 3); // Limites entre 0.2 et 3
+    const newScale = Math.min(Math.max(scale + delta, 0.2), 3);
     
-    if (newScale === oldScale) return; // Pas de changement
+    if (newScale === oldScale) return;
 
     const rect = canvasArea.getBoundingClientRect();
     
-    // Si on ne précise pas de point (boutons), on zoome vers le centre du cadre
-    // Sinon (molette), on zoome vers la position de la souris
+    // Si boutons : centre du cadre. Si molette : position souris.
     const targetX = (focalX !== null) ? (focalX - rect.left) : (rect.width / 2);
     const targetY = (focalY !== null) ? (focalY - rect.top) : (rect.height / 2);
 
-    // Formule mathématique pour zoomer vers un point précis
+    // Recalcul de l'offset pour garder le point focal stable
     offsetX = targetX - (targetX - offsetX) * (newScale / oldScale);
     offsetY = targetY - (targetY - offsetY) * (newScale / oldScale);
     
@@ -214,26 +221,27 @@ function handleZoom(delta, focalX = null, focalY = null) {
     applyTransform();
 }
 
-// Événements Boutons
-zoomIn.addEventListener('click', () => handleZoom(0.1));
-zoomOut.addEventListener('click', () => handleZoom(-0.1));
+// --- ÉVÉNEMENTS ZOOM ---
 
-// Événement Molette (Zoom vers la souris !)
-canvasArea.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    handleZoom(delta, e.clientX, e.clientY);
-}, { passive: false });
-
-// Recenter
-recenter.addEventListener('click', () => {
+if (zoomIn) zoomIn.addEventListener('click', () => handleZoom(0.1));
+if (zoomOut) zoomOut.addEventListener('click', () => handleZoom(-0.1));
+if (recenter) recenter.addEventListener('click', () => {
     scale = 1;
     offsetX = 0; 
     offsetY = 0; 
     applyTransform();
 });
 
+canvasArea.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    handleZoom(delta, e.clientX, e.clientY);
+}, { passive: false });
+
+// --- ÉVÉNEMENTS DÉPLACEMENT (PAN) ---
+
 canvasArea.addEventListener('mousedown', (e) => {
+    // On autorise le déplacement si on clique sur le fond, le whiteboard ou le SVG
     if (e.target === canvasArea || e.target === whiteboard || e.target.id === 'lines-svg') {
         isPanning = true;
         canvasArea.style.cursor = 'grabbing';
@@ -241,12 +249,14 @@ canvasArea.addEventListener('mousedown', (e) => {
         startY = e.clientY - offsetY;
     }
 });
+
 document.addEventListener('mousemove', (e) => {
     if (!isPanning) return;
     offsetX = e.clientX - startX;
     offsetY = e.clientY - startY;
     applyTransform();
 });
+
 document.addEventListener('mouseup', () => {
     isPanning = false;
     canvasArea.style.cursor = 'grab';
