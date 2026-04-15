@@ -186,8 +186,14 @@ function applyTransform() {
 
 zoomIn.addEventListener('click', () => { scale += 0.1; applyTransform(); });
 zoomOut.addEventListener('click', () => { if (scale > 0.3) scale -= 0.1; applyTransform(); });
-recenter.addEventListener('click', () => { scale = 1; offsetX = 0; offsetY = 0; applyTransform(); });
-
+recenter.addEventListener('click', () => {
+    scale = 1;
+    // On déplace la vue pour compenser le -2500 du CSS
+    // offsetX = 2500 placera le milieu du tableau au centre de ton cadre
+    offsetX = 2500 - (canvasArea.clientWidth / 2);
+    offsetY = 2500 - (canvasArea.clientHeight / 2);
+    applyTransform();
+});
 canvasArea.addEventListener('wheel', (e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
