@@ -216,23 +216,34 @@ public class NPC : MonoBehaviour, IInteractable
     /// </summary>
     void NextLine()
     {
+        // 1. Si le texte est en train de s'écrire, on l'affiche instantanément (Skip)
         if (isTyping)
         {
             StopTypingCoroutine();
-            dialogueUI.SetDialogueText(dialogueData.dialogueLines[dialogueIndex]);
+            // On récupère le texte complet du morceau actuel via le contrôleur
+            // (Note: Assure-tu que la variable actuelle est bien affichée)
             isTyping = false;
+            return; 
         }
 
+        // 2. Nettoyer les anciens choix UI
         dialogueUI.ClearChoices();
 
-        // Vérifie si cette ligne doit mettre fin au dialogue
+        // 3. PRIORITÉ : Est-ce qu'il reste des morceaux (chunks) de la phrase actuelle ?
+        if (dialogueUI.HasMoreChunks())
+        {
+            DisplayNextChunk(); // Affiche la suite du long texte
+            return; // On s'arrête ici pour ne pas passer à la suite du scénario
+        }
+
+        // 4. Si plus de morceaux, on regarde si la ligne actuelle marquait la FIN du dialogue
         if (dialogueData.endDialogueLines.Length > dialogueIndex && dialogueData.endDialogueLines[dialogueIndex])
         {
             EndDialogue();
             return;
         }
 
-        // Vérifie si cette ligne propose des choix
+        // 5. On regarde si la ligne actuelle doit afficher des CHOIX
         foreach (DialogueChoice dialogueChoice in dialogueData.choices)
         {
             if (dialogueChoice.dialogueIndex == dialogueIndex)
@@ -242,7 +253,7 @@ public class NPC : MonoBehaviour, IInteractable
             }
         }
 
-        // Passe à la ligne suivante
+        // 6. Sinon, on passe à l'INDEX de dialogue suivant dans le scénario
         if (++dialogueIndex < dialogueData.dialogueLines.Length)
         {
             DisplayCurrentLine();
@@ -256,25 +267,28 @@ public class NPC : MonoBehaviour, IInteractable
     /// <summary>
     /// Effet "machine à écrire" pour afficher le texte progressivement.
     /// </summary>
-    IEnumerator TypeLine()
+    IEnumerator TypeLine(string textToType)
     {
         isTyping = true;
         dialogueUI.SetDialogueText("");
 
-        foreach (char letter in dialogueData.dialogueLines[dialogueIndex])
+        foreach (char letter in textToType)
         {
-            dialogueUI.SetDialogueText(dialogueUI.dialogueText.text += letter);
-            SoundEffectManager.PlayVoice(dialogueData.voiceSound, dialogueData.voicePitch);
+            dialogueUI.dialogueText.text += letter;
             yield return new WaitForSeconds(dialogueData.typingSpeed);
         }
 
         isTyping = false;
-
-        // Progression automatique si activée pour cette ligne
-        if (dialogueData.autoProgressLines.Length > dialogueIndex && dialogueData.autoProgressLines[dialogueIndex])
+        // --- LOGIQUE DE PROGRESSION AUTOMATIQUE ---
+        // On ne lance la progression automatique QUE s'il n'y a plus de morceaux de texte à lire
+        // pour éviter de "sauter" des morceaux si le PNJ est en mode autoProgress.
+        if (!dialogueUI.HasMoreChunks())
         {
-            yield return new WaitForSeconds(dialogueData.autoProgressDelay);
-            NextLine();
+            if (dialogueData.autoProgressLines.Length > dialogueIndex && dialogueData.autoProgressLines[dialogueIndex])
+            {
+                yield return new WaitForSeconds(dialogueData.autoProgressDelay);
+                NextLine();
+            }
         }
     }
 
@@ -305,7 +319,19 @@ public class NPC : MonoBehaviour, IInteractable
     void DisplayCurrentLine()
     {
         StopTypingCoroutine();
-        typeLineCoroutine = StartCoroutine(TypeLine());
+        // On découpe la nouvelle ligne en morceaux
+        dialogueUI.PrepareTextChunks(dialogueData.dialogueLines[dialogueIndex]);
+        DisplayNextChunk();
+    }
+
+    void DisplayNextChunk()
+    {
+        string chunk = dialogueUI.GetNextChunk();
+        if (chunk != null)
+        {
+            StopTypingCoroutine();
+            typeLineCoroutine = StartCoroutine(TypeLine(chunk));
+        }
     }
 
     /// <summary>
