@@ -156,7 +156,17 @@ function loadScenarioData(title) {
 
                 dialogues.forEach(d => {
                     if (d.x !== undefined && d.y !== undefined) {
-                        createNodeOnBoard(d, d.x, d.y);
+                        // --- LOGIQUE DE SAUVETAGE ---
+                        // Si les coordonnées sont inférieures à 1500, 
+                        // c'est qu'elles appartiennent à l'ancien système.
+                        // On leur ajoute 2500 pour les ramener au milieu du nouveau whiteboard.
+                        let newX = d.x;
+                        let newY = d.y;
+
+                        if (newX < 1500) newX += 2500;
+                        if (newY < 1500) newY += 2500;
+
+                        createNodeOnBoard(d, newX, newY);
                     }
                 });
 
@@ -188,12 +198,11 @@ zoomIn.addEventListener('click', () => { scale += 0.1; applyTransform(); });
 zoomOut.addEventListener('click', () => { if (scale > 0.3) scale -= 0.1; applyTransform(); });
 recenter.addEventListener('click', () => {
     scale = 1;
-    // On déplace la vue pour compenser le -2500 du CSS
-    // offsetX = 2500 placera le milieu du tableau au centre de ton cadre
-    offsetX = 2500 - (canvasArea.clientWidth / 2);
-    offsetY = 2500 - (canvasArea.clientHeight / 2);
+    offsetX = 0; 
+    offsetY = 0; 
     applyTransform();
 });
+
 canvasArea.addEventListener('wheel', (e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -601,21 +610,21 @@ function updateLines() {
 btnSaveAll.addEventListener('click', async () => {
     const payload = {
         scenarioName: scenarioTitle,
-        nodes:        dialogues,
-        connections:  connections,
-        recap:        scenarioRecap
+        nodes: dialogues,
+        connections: connections,
+        recap: scenarioRecap
     };
 
     const loadingToast = showToast("Sauvegarde en cours...", 'info', 0);
 
     try {
-        const response  = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
+        const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         const { idMap } = response.data;
 
         if (idMap) {
             connections = connections.map(c => ({
                 fromId: idMap[c.fromId] || c.fromId,
-                toId:   idMap[c.toId]   || c.toId
+                toId: idMap[c.toId] || c.toId
             }));
 
             dialogues = dialogues.map(d => {
@@ -625,11 +634,11 @@ btnSaveAll.addEventListener('click', async () => {
                 return d;
             });
             renderList();
-            initWhiteboard(); 
+            initWhiteboard();
             if (typeof updateLines === "function") updateLines();
         }
 
-        loadingToast.remove(); 
+        loadingToast.remove();
         showToast("Scénario sauvegardé avec succès !", 'success', 3500);
 
     } catch (err) {
