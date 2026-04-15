@@ -194,8 +194,28 @@ function applyTransform() {
     whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
 }
 
-zoomIn.addEventListener('click', () => { scale += 0.1; applyTransform(); });
-zoomOut.addEventListener('click', () => { if (scale > 0.3) scale -= 0.1; applyTransform(); });
+// Fonction utilitaire pour zoomer vers le centre du cadre
+function zoom(direction) {
+    const zoomFactor = 0.1;
+    const oldScale = scale;
+    
+    if (direction === 'in') {
+        scale += zoomFactor;
+    } else {
+        if (scale > 0.3) scale -= zoomFactor;
+    }
+    const rect = canvasArea.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    offsetX = centerX - (centerX - offsetX) * (scale / oldScale);
+    offsetY = centerY - (centerY - offsetY) * (scale / oldScale);
+
+    applyTransform();
+}
+
+zoomIn.addEventListener('click', () => zoom('in'));
+zoomOut.addEventListener('click', () => zoom('out'));
+
 recenter.addEventListener('click', () => {
     scale = 1;
     offsetX = 0; 
