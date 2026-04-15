@@ -160,8 +160,8 @@ function loadScenarioData(title) {
                         let newY = d.y;
                         // Si le cercle est dans la zone de l'ancien système (autour de 2500)
                         // on le décale pour le nouveau système (autour de 7500)
-                        if (newX < 5000) newX += 5000;
-                        if (newY < 5000) newY += 5000;
+                        if (newX < 7500) newX += 7500;
+                        if (newY < 7500) newY += 7500;
 
                         createNodeOnBoard(d, newX, newY);
                     }
