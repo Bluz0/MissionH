@@ -450,12 +450,25 @@ textarea {
 }
 
 #whiteboard {
-    transform-origin: 0 0; /* Important pour que le zoom parte du coin haut-gauche */
-    width: 5000px; /* Espace immense pour travailler */
-    height: 5000px;
+    transform-origin: 0 0; 
+    width: 15000px; 
+    height: 15000px; 
+    position: absolute;
+    top: -7500px; 
+    left: -7500px;   
+    background-color: white;
+    overflow: visible;
+}
+
+#lines-svg {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible !important;
 }
 
 .canvas-controls {
@@ -489,6 +502,9 @@ textarea {
     width: 100%;
     height: 100%;
     pointer-events: none; /* Pour pouvoir cliquer sur les cercles sous le SVG */
+    z-index: 1; 
+    border: 5px solid red !important;
+    background-color: rgba(255, 0, 0, 0.05);
 }
 
 .dialogue-sidebar {

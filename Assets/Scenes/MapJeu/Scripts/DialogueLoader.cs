@@ -11,9 +11,9 @@ public class AcceptAllCertificates : CertificateHandler
 
 public class DialogueLoader : MonoBehaviour
 {
-    private const string API_URL = "http://82.165.32.184:3001/api/scenarios";
+    private const string API_URL = "http://82.165.32.184/api/scenarios";
 
-    private const string NPC_API_URL = "http://82.165.32.184:3001/api/npc";
+    private const string NPC_API_URL = "http://82.165.32.184/api/npc";
     public IEnumerator FetchAssignedScenario(int npcId, string npcName, System.Action<string, string> onLoaded)
     {
         string url = $"{NPC_API_URL}/{npcId}/config?name={UnityWebRequest.EscapeURL(npcName)}";
