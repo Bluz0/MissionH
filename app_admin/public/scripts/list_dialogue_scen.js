@@ -1,4 +1,4 @@
-const serveur = "http://82.165.32.184:3001";
+const serveur = "http://82.165.32.184";
 const urlParams = new URLSearchParams(window.location.search);
 const title = urlParams.get('title');
 

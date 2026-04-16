@@ -2,7 +2,7 @@
 if (localStorage.getItem('admin_session') !== 'authorized_access_key') {
     window.location.href = 'login.html';
 }
-const serveur = "http://82.165.32.184:3001";
+const serveur = "http://82.165.32.184";
 
 let dialogues = [];
 let connections = [];
