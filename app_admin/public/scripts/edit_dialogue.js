@@ -184,56 +184,23 @@ let startX = 0;
 let startY = 0;
 
 // 2. Sélection des éléments (Assure-toi que ces IDs existent bien dans ton HTML)
-const zoomIn = document.getElementById('btn-zoom-in');
-const zoomOut = document.getElementById('btn-zoom-out');
 const recenter = document.getElementById('btn-recenter');
 
 /**
  * Applique la translation et le zoom courant sur le style CSS.
  */
 function applyTransform() {
-    whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-}
-
-/**
- * Fonction de zoom universelle
- */
-function handleZoom(delta, focalX = null, focalY = null) {
-    const oldScale = scale;
-    const newScale = Math.min(Math.max(scale + delta, 0.2), 3);
-
-    if (newScale === oldScale) return;
-
-    const rect = canvasArea.getBoundingClientRect();
-
-    // Si boutons : centre du cadre. Si molette : position souris.
-    const targetX = (focalX !== null) ? (focalX - rect.left) : (rect.width / 2);
-    const targetY = (focalY !== null) ? (focalY - rect.top) : (rect.height / 2);
-
-    // Recalcul de l'offset pour garder le point focal stable
-    offsetX = targetX - (targetX - offsetX) * (newScale / oldScale);
-    offsetY = targetY - (targetY - offsetY) * (newScale / oldScale);
-
-    scale = newScale;
-    applyTransform();
+    whiteboard.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 }
 
 // --- ÉVÉNEMENTS ZOOM ---
 
-if (zoomIn) zoomIn.addEventListener('click', () => handleZoom(0.1));
-if (zoomOut) zoomOut.addEventListener('click', () => handleZoom(-0.1));
 if (recenter) recenter.addEventListener('click', () => {
     scale = 1;
     offsetX = 0;
     offsetY = 0;
     applyTransform();
 });
-
-canvasArea.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    handleZoom(delta, e.clientX, e.clientY);
-}, { passive: false });
 
 // --- ÉVÉNEMENTS DÉPLACEMENT (PAN) ---
 
