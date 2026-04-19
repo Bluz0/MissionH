@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Contrôle toute l’interface de dialogue :
@@ -105,5 +106,43 @@ public class DialogueController : MonoBehaviour
     public void CloseRecap()
     {
         recapPanel.SetActive(false);
+    }
+
+    private Queue<string> textChunks = new Queue<string>();
+    public int maxCharacters = 140; 
+
+    public void PrepareTextChunks(string fullText)
+    {
+        textChunks.Clear();
+    
+        // Découpage intelligent par mots
+        string[] words = fullText.Split(' ');
+        string currentChunk = "";
+
+        foreach (string word in words)
+        {
+            // Si le mot est trop long pour tenir, on crée un nouveau morceau
+            if ((currentChunk.Length + word.Length + 1) > maxCharacters)
+            {
+                textChunks.Enqueue(currentChunk.Trim() + "...");
+                currentChunk = word + " ";
+            }
+            else
+            {
+                currentChunk += word + " ";
+            }
+        }
+        textChunks.Enqueue(currentChunk.Trim());
+    }
+
+    public string GetNextChunk()
+    {
+        if (textChunks.Count > 0) return textChunks.Dequeue();
+        return null;
+    }
+
+    public bool HasMoreChunks()
+    {
+        return textChunks.Count > 0;
     }
 }
