@@ -14,6 +14,10 @@ let firstNodeSelected = null;
 
 let scenarioRecap = "";
 
+const recapTextarea = document.getElementById('recap-text');
+const recapCounter = document.getElementById('recap-counter');
+const MAX_RECAP_LENGTH = 350;
+
 const modal = document.getElementById('modal-edit-dialogue');
 const listContainer = document.getElementById('dialogue-list-container');
 const btnAdd = document.getElementById('btn-add-dialogue');
@@ -714,11 +718,33 @@ btnSaveAll.addEventListener('click', async () => {
     }
 });
 
+// On fixe la limite physique dès le départ
+recapTextarea.setAttribute('maxlength', MAX_RECAP_LENGTH);
+
+// Fonction pour mettre à jour le compteur
+function updateRecapCounter() {
+    const currentLength = recapTextarea.value.length;
+    recapCounter.textContent = `${currentLength} / ${MAX_RECAP_LENGTH}`;
+    
+    // Change la couleur si on atteint la limite
+    if (currentLength >= MAX_RECAP_LENGTH) {
+        recapCounter.style.color = 'red';
+        recapCounter.style.fontWeight = 'bold';
+    } else {
+        recapCounter.style.color = '#666';
+        recapCounter.style.fontWeight = 'normal';
+    }
+}
+
 // Ouvrir la modale
 btnRecap.addEventListener('click', () => {
-    document.getElementById('recap-text').value = scenarioRecap;
+    recapTextarea.value = scenarioRecap;
+    updateRecapCounter(); // Met à jour le compteur à l'ouverture
     modalRecap.classList.remove('hidden');
 });
+
+// Écouter la saisie pour mettre à jour le compteur en temps réel
+recapTextarea.addEventListener('input', updateRecapCounter);
 
 // Fermer la modale (Annuler)
 btnCloseRecap.addEventListener('click', () => {
@@ -727,8 +753,7 @@ btnCloseRecap.addEventListener('click', () => {
 
 // Valider (Fermer et garder en mémoire)
 btnSaveRecapLocal.addEventListener('click', () => {
-    const textVal = document.getElementById('recap-text').value;
-    scenarioRecap = textVal;
+    scenarioRecap = recapTextarea.value;
     modalRecap.classList.add('hidden');
     showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 3000);
 });
