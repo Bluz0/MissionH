@@ -603,46 +603,114 @@ function updateLines() {
     });
 }
 
+/**
+ * Découpe un texte long sans couper les mots.
+ */
+function chunkText(text, limit = 120) {
+    if (!text || text.length <= limit) return [text];
+    const words = text.split(' ');
+    const chunks = [];
+    let currentChunk = "";
+
+    words.forEach(word => {
+        if ((currentChunk.length + word.length + 1) > limit) {
+            chunks.push(currentChunk.trim());
+            currentChunk = word + " ";
+        } else {
+            currentChunk += word + " ";
+        }
+    });
+    if (currentChunk.trim().length > 0) chunks.push(currentChunk.trim());
+    return chunks;
+}
 
 btnSaveAll.addEventListener('click', async () => {
+    let finalNodes = [];
+    let finalConnections = [];
+
+    // 1. DÉCOUPAGE DES NŒUDS TROP LONGS
+    dialogues.forEach(node => {
+        // chunkText est appelée ici pour diviser le texte tous les 120 caractères
+        const chunks = chunkText(node.text || "", 120);
+
+        if (chunks.length <= 1) {
+            // Le texte est court, on garde le nœud tel quel
+            finalNodes.push(node);
+        } else {
+            // Le texte est long, on crée une chaîne de morceaux
+            let previousId = node.id;
+
+            chunks.forEach((chunk, index) => {
+                if (index === 0) {
+                    // Le premier morceau garde l'ID d'origine (Update)
+                    finalNodes.push({ ...node, text: chunk });
+                } else {
+                    // Les morceaux suivants sont de nouveaux nœuds (Create)
+                    const virtualId = `virtual-${node.id}-${index}`;
+                    
+                    finalNodes.push({
+                        ...node,
+                        id: virtualId,
+                        text: chunk,
+                        // Décalage visuel pour que les nouveaux cercles soient visibles
+                        x: (node.x || 0) + (index * 60),
+                        y: (node.y || 0) + (index * 60)
+                    });
+
+                    // On crée le lien automatique entre le morceau précédent et celui-ci
+                    finalConnections.push({
+                        fromId: previousId,
+                        toId: virtualId
+                    });
+                    
+                    previousId = virtualId;
+                }
+            });
+            // On mémorise l'ID du dernier morceau pour rediriger les flèches sortantes
+            node.lastChunkId = previousId;
+        }
+    });
+    // 2. REDIRECTION DES CONNEXIONS (VERS LE DERNIER MORCEAU)
+    connections.forEach(conn => {
+        const sourceNode = dialogues.find(d => d.id === conn.fromId);
+        
+        if (sourceNode && sourceNode.lastChunkId) {
+            // Si la source a été découpée, la flèche part du dernier bout de phrase
+            finalConnections.push({
+                fromId: sourceNode.lastChunkId,
+                toId: conn.toId
+            });
+        } else {
+            // Sinon, connexion normale
+            finalConnections.push(conn);
+        }
+    });
+    // Préparation du paquet final pour le serveur
     const payload = {
         scenarioName: scenarioTitle,
-        nodes: dialogues,
-        connections: connections,
+        nodes: finalNodes,
+        connections: finalConnections,
         recap: scenarioRecap
     };
 
-    const loadingToast = showToast("Sauvegarde en cours...", 'info', 0);
-
+    const loadingToast = showToast("Découpage et sauvegarde en cours...", 'info', 0);
+    // 3. ENVOI AU SERVEUR (TRY/CATCH)
     try {
         const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
-        const { idMap } = response.data;
-
-        if (idMap) {
-            dialogues = dialogues.map(d => {
-                if (idMap[d.id]) {
-                    const oldNode = document.getElementById(`node-${d.id}`);
-                    if (oldNode) oldNode.id = `node-${idMap[d.id]}`;
-
-                    connections = connections.map(c => ({
-                        fromId: c.fromId === d.id ? idMap[d.id] : c.fromId,
-                        toId: c.toId === d.id ? idMap[d.id] : c.toId
-                    }));
-                    return { ...d, id: idMap[d.id] };
-                }
-                return d;
-            });
-        }
-        renderList();
-        refreshNodeNumbers();
-
+        
         loadingToast.remove();
-        showToast("Scénario sauvegardé avec succès !", 'success', 3500);
+        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 3000);
+
+        // SOLUTION DOUBLONS : On recharge la page après 1.5s
+        // Cela permet de voir les nouveaux nœuds créés et d'avoir les vrais IDs MongoDB
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
 
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
-        loadingToast.remove();
-        showToast("Erreur de connexion au serveur.", 'error', 5000);
+        if (loadingToast) loadingToast.remove();
+        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 5000);
     }
 });
 
