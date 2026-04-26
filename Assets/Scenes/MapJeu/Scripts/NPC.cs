@@ -299,7 +299,6 @@ public class NPC : MonoBehaviour, IInteractable
     ///
     void DisplayChoices(DialogueChoice choice)
     {
-        // On mémorise l'index de la question avant d'afficher les boutons
         lastQuestionIndex = dialogueIndex; 
 
         for (int i = 0; i < choice.choices.Length; i++)
@@ -307,18 +306,15 @@ public class NPC : MonoBehaviour, IInteractable
             string text = choice.choices[i];
             int nextIdx = choice.nextDialogueIndexes[i];
             
-            // SECURITÉ : On vérifie si l'index existe
-            if (nextIdx < 0 || nextIdx >= dialogueData.isCorrectFlags.Length) continue;
-
-            // On vérifie si ce choix est marqué comme correct sur le serveur
+            // On récupère le drapeau isCorrect pour l'INDEX DU CHOIX (le nœud bleu)
             bool isCorrectChoice = dialogueData.isCorrectFlags[nextIdx];
 
             dialogueUI.CreateChoiceButton(text, () => {
                 if (!isCorrectChoice) {
-                    // MAUVAISE RÉPONSE : On lance la boucle de retour
+                    // MAUVAISE RÉPONSE : On lance le message d'erreur puis on revient à la question
                     StartCoroutine(WrongAnswerRoutine(nextIdx));
                 } else {
-                    // BONNE RÉPONSE : On continue normalement
+                    // BONNE RÉPONSE : On avance simplement vers la suite du scénario
                     ChooseOption(nextIdx);
                 }
             });

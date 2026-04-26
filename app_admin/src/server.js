@@ -357,7 +357,8 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
           locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
           type: node.type || 'npc',
           position: { x: node.x ?? 100, y: node.y ?? 100 },
-          nextDialogues: []
+          nextDialogues: [],
+          isCorrect : node.isCorrect || false
         });
         idMap[node.id] = created._id.toString();
       } else {
@@ -367,7 +368,8 @@ app.post('/api/scenarios/tree/save', async (req, res) => {
             type: node.type,
             locuteur: node.locuteur || (node.type === 'npc' ? 'NPC' : 'Joueur'),
             position: { x: node.x ?? 100, y: node.y ?? 100 },
-            nextDialogues: []
+            nextDialogues: [],
+            isCorrect : node.isCorrect || false
           }
         });
         idMap[node.id] = node.id;
