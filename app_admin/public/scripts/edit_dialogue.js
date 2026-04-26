@@ -53,7 +53,7 @@ const btnSaveRecapLocal = document.getElementById('save-recap-local');
  * @param {number} [duration=3500] - Durée d'affichage en millisecondes (0 pour persistant).
  * @returns {HTMLDivElement} Élément DOM du toast créé.
  */
-function showToast(message, type = 'info', duration = 100) {
+function showToast(message, type = 'info', duration = 2000) {
     const icons = { success: 'OK', error: 'X', info: 'ℹ', warning: '⚠︎' };
 
     const toast = document.createElement('div');
@@ -66,21 +66,24 @@ function showToast(message, type = 'info', duration = 100) {
 
     toastContainer.appendChild(toast);
 
-    // Le double rAF est nécessaire pour que le navigateur applique opacity:0 avant la transition
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => toast.classList.add('show'));
-    });
+    // Animation d'entrée
+    setTimeout(() => toast.classList.add('show'), 10);
 
     if (duration > 0) {
         setTimeout(() => {
             toast.classList.add('hide');
-            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+            
+            // SÉCURITÉ : On attend la fin de l'anim (500ms) puis on supprime le HTML
+            // même si l'événement transitionend ne répond pas.
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 500); 
+            
         }, duration);
     }
 
     return toast;
 }
-
 
 const confirmOverlay = document.createElement('div');
 confirmOverlay.id = 'confirm-overlay';
@@ -394,7 +397,7 @@ async function deleteLine(id) {
     refreshNodeNumbers();
     updateLines();
 
-    showToast("Dialogue supprimé.", 'info', 100);
+    showToast("Dialogue supprimé.", 'info', 800);
 }
 
 
@@ -569,9 +572,9 @@ function addConnection(fromId, toId) {
     if (!exists) {
         connections.push({ fromId, toId });
         updateLines();
-        showToast("Lien créé entre les deux dialogues.", 'success', 100);
+        showToast("Lien créé entre les deux dialogues.", 'success', 1000);
     } else {
-        showToast("Ce lien existe déjà.", 'warning', 100);
+        showToast("Ce lien existe déjà.", 'warning', 1500);
     }
 }
 
@@ -587,9 +590,9 @@ function removeConnection(fromId, toId) {
     connections = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
     if (connections.length < before) {
         updateLines();
-        showToast("Lien supprimé.", 'info', 100);
+        showToast("Lien supprimé.", 'info', 800);
     } else {
-        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 100);
+        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 1500);
     }
 }
 
@@ -726,13 +729,13 @@ btnSaveAll.addEventListener('click', async () => {
         recap: scenarioRecap
     };
 
-    const loadingToast = showToast("Découpage et sauvegarde en cours...", 'info', 0);
+    const loadingToast = showToast("Découpage et sauvegarde en cours...", 'info', 800);
     // 3. ENVOI AU SERVEUR (TRY/CATCH)
     try {
         const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         
         loadingToast.remove();
-        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 100);
+        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 1000);
 
         // SOLUTION DOUBLONS : On recharge la page après 1.5s
         // Cela permet de voir les nouveaux nœuds créés et d'avoir les vrais IDs MongoDB
@@ -743,7 +746,7 @@ btnSaveAll.addEventListener('click', async () => {
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
         if (loadingToast) loadingToast.remove();
-        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 200);
+        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 2000);
     }
 });
 
@@ -784,5 +787,5 @@ btnCloseRecap.addEventListener('click', () => {
 btnSaveRecapLocal.addEventListener('click', () => {
     scenarioRecap = recapTextarea.value;
     modalRecap.classList.add('hidden');
-    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 100);
+    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 1000);
 });
