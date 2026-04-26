@@ -489,6 +489,7 @@ app.get('/api/scenarios/:scenarioName/tree', async (req, res) => {
       scenarioName: d.scenarioName,
       x: d.position?.x ?? 100,
       y: d.position?.y ?? 100,
+      isCorrect: d.isCorrect || false
     }));
     res.json({ 
       dialogues: nodes, 
