@@ -238,15 +238,26 @@ document.addEventListener('mouseup', () => {
  */
 function openEditor(id = null) {
     currentEditId = id;
+    const playerOptions = document.getElementById('player-options');
+
     if (id !== null) {
         const d = dialogues.find(item => item.id === id);
         editText.value = d.text;
         editType.value = d.type;
         if (editLocuteur) editLocuteur.value = d.locuteur || '';
+
+        // Gestion de la visibilité et de la valeur de la case "Bonne réponse"
+        if (d.type === 'player') {
+            playerOptions.classList.remove('hidden');
+            document.getElementById('node-is-correct').checked = d.isCorrect || false;
+        } else {
+            playerOptions.classList.add('hidden');
+        }
     } else {
         editText.value = "";
         editType.value = "npc";
         if (editLocuteur) editLocuteur.value = "";
+        playerOptions.classList.add('hidden');
     }
     updatePreview();
     modal.classList.remove('hidden');
@@ -268,35 +279,41 @@ function updatePreview() {
 }
 
 editText.addEventListener('input', updatePreview);
-editType.addEventListener('change', updatePreview);
+editType.addEventListener('change', () => {
+    const playerOptions = document.getElementById('player-options');
+    if (editType.value === 'player') {
+        playerOptions.classList.remove('hidden');
+    } else {
+        playerOptions.classList.add('hidden');
+    }
+    updatePreview();
+});
+
 if (editLocuteur) editLocuteur.addEventListener('input', updatePreview);
 
 btnValidate.addEventListener('click', () => {
-    if (editText.value.trim() === "") {
-        showToast("Le texte du dialogue ne peut pas être vide.", 'warning');
-        return;
-    }
+    if (editText.value.trim() === "") return;
 
     const locuteurVal = editLocuteur ? editLocuteur.value.trim() : '';
     const typeVal = editType.value;
-    const defaultLoc = typeVal === 'npc' ? 'NPC' : 'Joueur';
+    // On récupère l'état de la case à cocher
+    const isCorrectVal = document.getElementById('node-is-correct').checked;
 
     if (currentEditId !== null) {
         const d = dialogues.find(d => d.id === currentEditId);
         d.text = editText.value;
         d.type = typeVal;
-        d.locuteur = locuteurVal || defaultLoc;
-
-        const node = document.getElementById(`node-${currentEditId}`);
-        if (node) node.className = `node-circle node-${d.type}`;
+        d.locuteur = locuteurVal;
+        // On ne garde isCorrect que si c'est un choix joueur
+        d.isCorrect = (typeVal === 'player') ? isCorrectVal : false; 
     } else {
         dialogues.push({
             id: `tmp_${Date.now()}`,
             text: editText.value,
             type: typeVal,
-            locuteur: locuteurVal || defaultLoc,
-            x: undefined,
-            y: undefined
+            locuteur: locuteurVal,
+            isCorrect: (typeVal === 'player') ? isCorrectVal : false,
+            x: undefined, y: undefined
         });
     }
 
@@ -627,6 +644,18 @@ function chunkText(text, limit = 120) {
     if (currentChunk.trim().length > 0) chunks.push(currentChunk.trim());
     return chunks;
 }
+
+// Au moment d'ouvrir les propriétés du nœud
+function openProperties(node) {
+    if (node.type === 'player') {
+        document.getElementById('player-options').classList.remove('hidden');
+        document.getElementById('node-is-correct').checked = node.isCorrect || false;
+    } else {
+        document.getElementById('player-options').classList.add('hidden');
+    }
+}
+
+
 
 btnSaveAll.addEventListener('click', async () => {
     let finalNodes = [];

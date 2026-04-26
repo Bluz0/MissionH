@@ -68,6 +68,9 @@ public class NPCDialogue : ScriptableObject
     /// Test récapitulatif en fin de dialogue.
     /// </summary>
     public string recapText;
+
+    /// <summary> Indique pour chaque choix si c'est la bonne réponse (pour les nœuds "player"). </summary>
+    public bool[] isCorrectFlags;
 }
 
 /// <summary>

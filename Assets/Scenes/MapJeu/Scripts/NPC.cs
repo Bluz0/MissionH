@@ -292,15 +292,54 @@ public class NPC : MonoBehaviour, IInteractable
         }
     }
 
+    private int lastQuestionIndex;
+
     /// <summary>
     /// Applique le choix sélectionné et passe /// </summary>
+    ///
     void DisplayChoices(DialogueChoice choice)
     {
+        // On mémorise l'index de la question avant d'afficher les boutons
+        lastQuestionIndex = dialogueIndex; 
+
         for (int i = 0; i < choice.choices.Length; i++)
         {
-            int nextIndex = choice.nextDialogueIndexes[i];
-            dialogueUI.CreateChoiceButton(choice.choices[i], () => ChooseOption(nextIndex));
+            string text = choice.choices[i];
+            int nextIdx = choice.nextDialogueIndexes[i];
+            
+            // SECURITÉ : On vérifie si l'index existe
+            if (nextIdx < 0 || nextIdx >= dialogueData.isCorrectFlags.Length) continue;
+
+            // On vérifie si ce choix est marqué comme correct sur le serveur
+            bool isCorrectChoice = dialogueData.isCorrectFlags[nextIdx];
+
+            dialogueUI.CreateChoiceButton(text, () => {
+                if (!isCorrectChoice) {
+                    // MAUVAISE RÉPONSE : On lance la boucle de retour
+                    StartCoroutine(WrongAnswerRoutine(nextIdx));
+                } else {
+                    // BONNE RÉPONSE : On continue normalement
+                    ChooseOption(nextIdx);
+                }
+            });
         }
+    }
+
+    IEnumerator WrongAnswerRoutine(int feedbackIndex)
+    {
+        // Affiche le message de feedback du PNJ (ex: "Ce n'est pas ça...")
+        dialogueIndex = feedbackIndex;
+        DisplayCurrentLine();
+
+        //  Attend que l'écriture soit finie
+        yield return new WaitUntil(() => !isTyping);
+        
+        // Attend un clic du joueur pour passer le message d'erreur
+        yield return new WaitUntil(() => Input.GetMouseButtonDown(0)); 
+
+        // BOUCLE : On revient à la question d'origine
+        dialogueIndex = lastQuestionIndex;
+        DisplayCurrentLine();
     }
 
     /// <summary>
@@ -345,6 +384,10 @@ public class NPC : MonoBehaviour, IInteractable
             hud.AddMoney(rewardAmount);
         }
     }
+
+   
+
+
 
     /// <summary>
     /// Termine le dialogue, cache l'UI et réactive le jeu.

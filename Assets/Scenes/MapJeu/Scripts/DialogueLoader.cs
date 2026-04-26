@@ -174,6 +174,9 @@ public class DialogueLoader : MonoBehaviour
         dialogue.typingSpeed = 0.05f;
         dialogue.autoProgressDelay = 1.5f;
         dialogue.recapText = response.recap;
+
+        dialogue.isCorrectFlags = response.dialogues.Select(d => d.isCorrect).ToArray();
+
         return dialogue;
     }
 
@@ -221,6 +224,7 @@ public class DialogueLoader : MonoBehaviour
     public string type; // "npc" ou "player"
     public string locuteur;
     public string scenarioName;
+    public bool isCorrect; // pour les nœuds "player", indique si c'est la bonne réponse
 }
 
 [System.Serializable] public class DialogueConnection
