@@ -394,7 +394,7 @@ async function deleteLine(id) {
     refreshNodeNumbers();
     updateLines();
 
-    showToast("Dialogue supprimé.", 'info', 2500);
+    showToast("Dialogue supprimé.", 'info', 100);
 }
 
 
@@ -569,9 +569,9 @@ function addConnection(fromId, toId) {
     if (!exists) {
         connections.push({ fromId, toId });
         updateLines();
-        showToast("Lien créé entre les deux dialogues.", 'success', 2000);
+        showToast("Lien créé entre les deux dialogues.", 'success', 100);
     } else {
-        showToast("Ce lien existe déjà.", 'warning', 2500);
+        showToast("Ce lien existe déjà.", 'warning', 100);
     }
 }
 
@@ -587,9 +587,9 @@ function removeConnection(fromId, toId) {
     connections = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
     if (connections.length < before) {
         updateLines();
-        showToast("Lien supprimé.", 'info', 2000);
+        showToast("Lien supprimé.", 'info', 100);
     } else {
-        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 3000);
+        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 100);
     }
 }
 
@@ -732,7 +732,7 @@ btnSaveAll.addEventListener('click', async () => {
         const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         
         loadingToast.remove();
-        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 3000);
+        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 100);
 
         // SOLUTION DOUBLONS : On recharge la page après 1.5s
         // Cela permet de voir les nouveaux nœuds créés et d'avoir les vrais IDs MongoDB
@@ -743,7 +743,7 @@ btnSaveAll.addEventListener('click', async () => {
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
         if (loadingToast) loadingToast.remove();
-        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 5000);
+        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 200);
     }
 });
 
@@ -784,5 +784,5 @@ btnCloseRecap.addEventListener('click', () => {
 btnSaveRecapLocal.addEventListener('click', () => {
     scenarioRecap = recapTextarea.value;
     modalRecap.classList.add('hidden');
-    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 3000);
+    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 100);
 });
