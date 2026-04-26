@@ -211,55 +211,43 @@ public class NPC : MonoBehaviour, IInteractable
         DisplayCurrentLine();
     }
 
+    private bool needsToLoop;
+
     /// <summary>
     /// Passe à la ligne suivante ou affiche les choix si nécessaire.
     /// </summary>
-    void NextLine()
-    {
-        // 1. Si le texte est en train de s'écrire, on l'affiche instantanément (Skip)
-        if (isTyping)
-        {
-            StopTypingCoroutine();
-            // On récupère le texte complet du morceau actuel via le contrôleur
-            // (Note: Assure-tu que la variable actuelle est bien affichée)
-            isTyping = false;
-            return; 
-        }
-
-        // 2. Nettoyer les anciens choix UI
+    void NextLine() {
+        if (isTyping) { /* skip logic */ return; }
         dialogueUI.ClearChoices();
 
-        // 3. PRIORITÉ : Est-ce qu'il reste des morceaux (chunks) de la phrase actuelle ?
-        if (dialogueUI.HasMoreChunks())
-        {
-            DisplayNextChunk(); // Affiche la suite du long texte
-            return; // On s'arrête ici pour ne pas passer à la suite du scénario
+        // LOGIQUE DE BOUCLE : Si on vient d'une mauvaise réponse
+        if (needsToLoop) {
+            needsToLoop = false;
+            dialogueIndex = lastQuestionIndex; // On revient à la question mémorisée
+            DisplayCurrentLine();
+            return;
         }
 
-        // 4. Si plus de morceaux, on regarde si la ligne actuelle marquait la FIN du dialogue
-        if (dialogueData.endDialogueLines.Length > dialogueIndex && dialogueData.endDialogueLines[dialogueIndex])
-        {
+        // FIN DU DIALOGUE
+        if (dialogueData.endDialogueLines[dialogueIndex]) {
             EndDialogue();
             return;
         }
 
-        // 5. On regarde si la ligne actuelle doit afficher des CHOIX
-        foreach (DialogueChoice dialogueChoice in dialogueData.choices)
-        {
-            if (dialogueChoice.dialogueIndex == dialogueIndex)
-            {
-                DisplayChoices(dialogueChoice);
+        // CHOIX
+        foreach (DialogueChoice choice in dialogueData.choices) {
+            if (choice.dialogueIndex == dialogueIndex) {
+                DisplayChoices(choice);
                 return;
             }
         }
 
-        // 6. Sinon, on passe à l'INDEX de dialogue suivant dans le scénario
-        if (++dialogueIndex < dialogueData.dialogueLines.Length)
-        {
+        // SUITE NORMALE (On suit la flèche au lieu de faire ++)
+        int nextIdx = dialogueData.nextLineTarget[dialogueIndex];
+        if (nextIdx != -1) {
+            dialogueIndex = nextIdx;
             DisplayCurrentLine();
-        }
-        else
-        {
+        } else {
             EndDialogue();
         }
     }
@@ -297,26 +285,21 @@ public class NPC : MonoBehaviour, IInteractable
     /// <summary>
     /// Applique le choix sélectionné et passe /// </summary>
     ///
-    void DisplayChoices(DialogueChoice choice)
-    {
-        lastQuestionIndex = dialogueIndex; 
+    void DisplayChoices(DialogueChoice choice) {
+        lastQuestionIndex = dialogueIndex; // On mémorise l'index de la question (ex: 5)
+        
+        for (int i = 0; i < choice.choices.Length; i++) {
+            int targetIdx = choice.nextDialogueIndexes[i]; // L'index du feedback (ex: 10)
+            bool isCorrect = choice.choicesCorrectness[i]; // LE FIX : On regarde la validité du bouton i
+            string choiceText = choice.choices[i];
 
-        for (int i = 0; i < choice.choices.Length; i++)
-        {
-            string text = choice.choices[i];
-            int nextIdx = choice.nextDialogueIndexes[i];
-            
-            // On récupère le drapeau isCorrect pour l'INDEX DU CHOIX (le nœud bleu)
-            bool isCorrectChoice = dialogueData.isCorrectFlags[nextIdx];
-
-            dialogueUI.CreateChoiceButton(text, () => {
-                if (!isCorrectChoice) {
-                    // MAUVAISE RÉPONSE : On lance le message d'erreur puis on revient à la question
-                    StartCoroutine(WrongAnswerRoutine(nextIdx));
-                } else {
-                    // BONNE RÉPONSE : On avance simplement vers la suite du scénario
-                    ChooseOption(nextIdx);
-                }
+            dialogueUI.CreateChoiceButton(choiceText, () => {
+                dialogueIndex = targetIdx; // On se téléporte au feedback ("Oui c'est bon")
+                
+                // Si le bouton cliqué n'était pas le bon, needsToLoop devient vrai
+                needsToLoop = !isCorrect; 
+                
+                ChooseOption(dialogueIndex);
             });
         }
     }

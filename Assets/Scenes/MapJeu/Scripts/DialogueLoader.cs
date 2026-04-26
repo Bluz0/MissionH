@@ -64,6 +64,7 @@ public class DialogueLoader : MonoBehaviour
         NPCDialogue dialogue = ScriptableObject.CreateInstance<NPCDialogue>();
         var nodeMap = response.dialogues.ToDictionary(d => d._id);
         var childrenMap = new Dictionary<string, List<string>>();
+
         foreach (var conn in response.connections)
         {
             if (!childrenMap.ContainsKey(conn.fromId)) childrenMap[conn.fromId] = new List<string>();
@@ -78,79 +79,96 @@ public class DialogueLoader : MonoBehaviour
         List<bool> autoProgress = new();
         List<bool> endLines = new();
         List<bool> correctnessList = new();
+        List<int> nextTargetList = new(); // Liste des cibles "Suivant"
         List<DialogueChoice> choices = new();
 
-        var queue = new Queue<(DialogueNode node, bool isPlayerChoice)>();
-        var indexMap = new Dictionary<string, int>(); 
+        var queue = new Queue<DialogueNode>();
+        var indexMap = new Dictionary<string, int>(); // id -> index final dans la liste
 
-        queue.Enqueue((root, false));
+        queue.Enqueue(root);
 
+        // On parcourt l'arbre pour mettre les messages dans l'ordre de lecture
         while (queue.Count > 0)
         {
-            var (node, _) = queue.Dequeue();
+            var node = queue.Dequeue();
             if (indexMap.ContainsKey(node._id)) continue;
 
             int currentIndex = lines.Count;
             indexMap[node._id] = currentIndex;
-            
+
             lines.Add(node.contenu);
             correctnessList.Add(node.isCorrect);
-            
-            // ... (Le reste de ta logique de children / choices reste identique) ...
+            nextTargetList.Add(-1); // Initialisé par défaut
+
             var children = childrenMap.GetValueOrDefault(node._id, new List<string>());
-            if (children.Count == 0) { autoProgress.Add(false); endLines.Add(true); }
-            else if (children.Count == 1) {
+
+            if (children.Count == 0)
+            {
+                autoProgress.Add(false);
+                endLines.Add(true);
+            }
+            else if (children.Count == 1)
+            {
                 autoProgress.Add(node.type == "player");
                 endLines.Add(false);
-                queue.Enqueue((nodeMap[children[0]], false));
-            } else {
-                autoProgress.Add(false); endLines.Add(false);
+                queue.Enqueue(nodeMap[children[0]]);
+            }
+            else
+            {
+                autoProgress.Add(false);
+                endLines.Add(false);
                 var choiceTexts = new List<string>();
                 var nextIndexes = new List<int>();
-                foreach (var childId in children) {
+
+                foreach (var childId in children)
+                {
                     choiceTexts.Add(nodeMap[childId].contenu);
                     var grandChildren = childrenMap.GetValueOrDefault(childId, new List<string>());
-                    foreach (var gcId in grandChildren) queue.Enqueue((nodeMap[gcId], false));
+                    foreach (var gcId in grandChildren) queue.Enqueue(nodeMap[gcId]);
                     nextIndexes.Add(-1);
                 }
-                choices.Add(new DialogueChoice { dialogueIndex = currentIndex, choices = choiceTexts.ToArray(), nextDialogueIndexes = nextIndexes.ToArray() });
+
+                choices.Add(new DialogueChoice
+                {
+                    dialogueIndex = currentIndex,
+                    choices = choiceTexts.ToArray(),
+                    nextDialogueIndexes = nextIndexes.ToArray()
+                });
             }
         }
 
-        
-        foreach (var choice in choices) {
-            var npcNodeId = indexMap.FirstOrDefault(x => x.Value == choice.dialogueIndex).Key;
-            var children = childrenMap.GetValueOrDefault(npcNodeId, new List<string>());
-            for (int i = 0; i < children.Count; i++) {
-                var childId = children[i];
-                var grandChildren = childrenMap.GetValueOrDefault(childId, new List<string>());
-                if (grandChildren.Count > 0 && indexMap.TryGetValue(grandChildren[0], out int idx))
-                    choice.nextDialogueIndexes[i] = idx;
-            }
-        }
-
-        dialogue.dialogueLines = lines.ToArray();
-        dialogue.autoProgressLines = autoProgress.ToArray();
-        dialogue.endDialogueLines = endLines.ToArray();
-        dialogue.choices = choices.ToArray();
-        dialogue.isCorrectFlags = correctnessList.ToArray(); 
-        dialogue.typingSpeed = 0.05f;
-        dialogue.recapText = response.recap;
-        return dialogue;
-    }
-
-        // Résolution des index de choix
-        foreach (var choice in choices)
+        foreach (var entry in indexMap)
         {
-            var npcNode = response.dialogues[choice.dialogueIndex];
-            var children = childrenMap.GetValueOrDefault(npcNode._id, new List<string>());
+            string nodeId = entry.Key;
+            int lineIdx = entry.Value;
+            var children = childrenMap.GetValueOrDefault(nodeId, new List<string>());
 
-            for (int i = 0; i < children.Count; i++)
+            // Si c'est une suite directe (flèche unique)
+            if (children.Count == 1 && indexMap.TryGetValue(children[0], out int targetIdx))
             {
-                var childId = children[i];
-                var grandChildren = childrenMap.GetValueOrDefault(childId, new List<string>());
-                if (grandChildren.Count > 0 && indexMap.TryGetValue(grandChildren[0], out int idx))
-                    choice.nextDialogueIndexes[i] = idx;
+                nextTargetList[lineIdx] = targetIdx;
+            }
+            
+            // Si c'est un nœud avec des choix (Question)
+            var choice = choices.Find(c => c.dialogueIndex == lineIdx);
+            if (choice != null)
+            {
+                choice.choicesCorrectness = new bool[children.Count]; // On prépare le tableau
+
+                for (int j = 0; j < children.Count; j++)
+                {
+                    string childId = children[j]; // Le nœud "Joueur" (le bouton bleu)
+                    
+                    // ON RÉCUPÈRE LA VALIDITÉ DU BOUTON ICI
+                    choice.choicesCorrectness[j] = nodeMap[childId].isCorrect;
+
+                    // On cherche la réponse du PNJ qui suit ce bouton
+                    var grandChildren = childrenMap.GetValueOrDefault(childId, new List<string>());
+                    if (grandChildren.Count > 0 && indexMap.TryGetValue(grandChildren[0], out int gcIdx))
+                    {
+                        choice.nextDialogueIndexes[j] = gcIdx;
+                    }
+                }
             }
         }
 
@@ -158,11 +176,10 @@ public class DialogueLoader : MonoBehaviour
         dialogue.autoProgressLines = autoProgress.ToArray();
         dialogue.endDialogueLines = endLines.ToArray();
         dialogue.choices = choices.ToArray();
+        dialogue.isCorrectFlags = correctnessList.ToArray();
+        dialogue.nextLineTarget = nextTargetList.ToArray();
         dialogue.typingSpeed = 0.05f;
-        dialogue.autoProgressDelay = 1.5f;
         dialogue.recapText = response.recap;
-
-        dialogue.isCorrectFlags = response.dialogues.Select(d => d.isCorrect).ToArray();
 
         return dialogue;
     }
