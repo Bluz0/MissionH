@@ -14,6 +14,10 @@ let firstNodeSelected = null;
 
 let scenarioRecap = "";
 
+const recapTextarea = document.getElementById('recap-text');
+const recapCounter = document.getElementById('recap-counter');
+const MAX_RECAP_LENGTH = 350;
+
 const modal = document.getElementById('modal-edit-dialogue');
 const listContainer = document.getElementById('dialogue-list-container');
 const btnAdd = document.getElementById('btn-add-dialogue');
@@ -49,7 +53,7 @@ const btnSaveRecapLocal = document.getElementById('save-recap-local');
  * @param {number} [duration=3500] - Durée d'affichage en millisecondes (0 pour persistant).
  * @returns {HTMLDivElement} Élément DOM du toast créé.
  */
-function showToast(message, type = 'info', duration = 100) {
+function showToast(message, type = 'info', duration = 2000) {
     const icons = { success: 'OK', error: 'X', info: 'ℹ', warning: '⚠︎' };
 
     const toast = document.createElement('div');
@@ -62,21 +66,24 @@ function showToast(message, type = 'info', duration = 100) {
 
     toastContainer.appendChild(toast);
 
-    // Le double rAF est nécessaire pour que le navigateur applique opacity:0 avant la transition
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => toast.classList.add('show'));
-    });
+    // Animation d'entrée
+    setTimeout(() => toast.classList.add('show'), 10);
 
     if (duration > 0) {
         setTimeout(() => {
             toast.classList.add('hide');
-            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+            
+            // SÉCURITÉ : On attend la fin de l'anim (500ms) puis on supprime le HTML
+            // même si l'événement transitionend ne répond pas.
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 500); 
+            
         }, duration);
     }
 
     return toast;
 }
-
 
 const confirmOverlay = document.createElement('div');
 confirmOverlay.id = 'confirm-overlay';
@@ -234,15 +241,26 @@ document.addEventListener('mouseup', () => {
  */
 function openEditor(id = null) {
     currentEditId = id;
+    const playerOptions = document.getElementById('player-options');
+
     if (id !== null) {
         const d = dialogues.find(item => item.id === id);
         editText.value = d.text;
         editType.value = d.type;
         if (editLocuteur) editLocuteur.value = d.locuteur || '';
+
+        // Gestion de la visibilité et de la valeur de la case "Bonne réponse"
+        if (d.type === 'player') {
+            playerOptions.classList.remove('hidden');
+            document.getElementById('node-is-correct').checked = d.isCorrect || false;
+        } else {
+            playerOptions.classList.add('hidden');
+        }
     } else {
         editText.value = "";
         editType.value = "npc";
         if (editLocuteur) editLocuteur.value = "";
+        playerOptions.classList.add('hidden');
     }
     updatePreview();
     modal.classList.remove('hidden');
@@ -264,35 +282,41 @@ function updatePreview() {
 }
 
 editText.addEventListener('input', updatePreview);
-editType.addEventListener('change', updatePreview);
+editType.addEventListener('change', () => {
+    const playerOptions = document.getElementById('player-options');
+    if (editType.value === 'player') {
+        playerOptions.classList.remove('hidden');
+    } else {
+        playerOptions.classList.add('hidden');
+    }
+    updatePreview();
+});
+
 if (editLocuteur) editLocuteur.addEventListener('input', updatePreview);
 
 btnValidate.addEventListener('click', () => {
-    if (editText.value.trim() === "") {
-        showToast("Le texte du dialogue ne peut pas être vide.", 'warning');
-        return;
-    }
+    if (editText.value.trim() === "") return;
 
     const locuteurVal = editLocuteur ? editLocuteur.value.trim() : '';
     const typeVal = editType.value;
-    const defaultLoc = typeVal === 'npc' ? 'NPC' : 'Joueur';
+    // On récupère l'état de la case à cocher
+    const isCorrectVal = document.getElementById('node-is-correct').checked;
 
     if (currentEditId !== null) {
         const d = dialogues.find(d => d.id === currentEditId);
         d.text = editText.value;
         d.type = typeVal;
-        d.locuteur = locuteurVal || defaultLoc;
-
-        const node = document.getElementById(`node-${currentEditId}`);
-        if (node) node.className = `node-circle node-${d.type}`;
+        d.locuteur = locuteurVal;
+        // On ne garde isCorrect que si c'est un choix joueur
+        d.isCorrect = (typeVal === 'player') ? isCorrectVal : false; 
     } else {
         dialogues.push({
             id: `tmp_${Date.now()}`,
             text: editText.value,
             type: typeVal,
-            locuteur: locuteurVal || defaultLoc,
-            x: undefined,
-            y: undefined
+            locuteur: locuteurVal,
+            isCorrect: (typeVal === 'player') ? isCorrectVal : false,
+            x: undefined, y: undefined
         });
     }
 
@@ -373,7 +397,7 @@ async function deleteLine(id) {
     refreshNodeNumbers();
     updateLines();
 
-    showToast("Dialogue supprimé.", 'info', 2500);
+    showToast("Dialogue supprimé.", 'info', 800);
 }
 
 
@@ -548,9 +572,9 @@ function addConnection(fromId, toId) {
     if (!exists) {
         connections.push({ fromId, toId });
         updateLines();
-        showToast("Lien créé entre les deux dialogues.", 'success', 2000);
+        showToast("Lien créé entre les deux dialogues.", 'success', 1000);
     } else {
-        showToast("Ce lien existe déjà.", 'warning', 2500);
+        showToast("Ce lien existe déjà.", 'warning', 1500);
     }
 }
 
@@ -566,9 +590,9 @@ function removeConnection(fromId, toId) {
     connections = connections.filter(c => !(c.fromId === fromId && c.toId === toId));
     if (connections.length < before) {
         updateLines();
-        showToast("Lien supprimé.", 'info', 2000);
+        showToast("Lien supprimé.", 'info', 800);
     } else {
-        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 3000);
+        showToast("Aucun lien n'existe entre ces deux dialogues.", 'warning', 1500);
     }
 }
 
@@ -623,6 +647,18 @@ function chunkText(text, limit = 120) {
     if (currentChunk.trim().length > 0) chunks.push(currentChunk.trim());
     return chunks;
 }
+
+// Au moment d'ouvrir les propriétés du nœud
+function openProperties(node) {
+    if (node.type === 'player') {
+        document.getElementById('player-options').classList.remove('hidden');
+        document.getElementById('node-is-correct').checked = node.isCorrect || false;
+    } else {
+        document.getElementById('player-options').classList.add('hidden');
+    }
+}
+
+
 
 btnSaveAll.addEventListener('click', async () => {
     let finalNodes = [];
@@ -693,13 +729,13 @@ btnSaveAll.addEventListener('click', async () => {
         recap: scenarioRecap
     };
 
-    const loadingToast = showToast("Découpage et sauvegarde en cours...", 'info', 0);
+    const loadingToast = showToast("Découpage et sauvegarde en cours...", 'info', 800);
     // 3. ENVOI AU SERVEUR (TRY/CATCH)
     try {
         const response = await axios.post(`${serveur}/api/scenarios/tree/save`, payload);
         
         loadingToast.remove();
-        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 3000);
+        showToast("Scénario découpé et sauvegardé avec succès !", 'success', 1000);
 
         // SOLUTION DOUBLONS : On recharge la page après 1.5s
         // Cela permet de voir les nouveaux nœuds créés et d'avoir les vrais IDs MongoDB
@@ -710,15 +746,37 @@ btnSaveAll.addEventListener('click', async () => {
     } catch (err) {
         console.error("Erreur sauvegarde :", err);
         if (loadingToast) loadingToast.remove();
-        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 5000);
+        showToast("Erreur lors de la sauvegarde du scénario.", 'error', 2000);
     }
 });
 
+// On fixe la limite physique dès le départ
+recapTextarea.setAttribute('maxlength', MAX_RECAP_LENGTH);
+
+// Fonction pour mettre à jour le compteur
+function updateRecapCounter() {
+    const currentLength = recapTextarea.value.length;
+    recapCounter.textContent = `${currentLength} / ${MAX_RECAP_LENGTH}`;
+    
+    // Change la couleur si on atteint la limite
+    if (currentLength >= MAX_RECAP_LENGTH) {
+        recapCounter.style.color = 'red';
+        recapCounter.style.fontWeight = 'bold';
+    } else {
+        recapCounter.style.color = '#666';
+        recapCounter.style.fontWeight = 'normal';
+    }
+}
+
 // Ouvrir la modale
 btnRecap.addEventListener('click', () => {
-    document.getElementById('recap-text').value = scenarioRecap;
+    recapTextarea.value = scenarioRecap;
+    updateRecapCounter(); // Met à jour le compteur à l'ouverture
     modalRecap.classList.remove('hidden');
 });
+
+// Écouter la saisie pour mettre à jour le compteur en temps réel
+recapTextarea.addEventListener('input', updateRecapCounter);
 
 // Fermer la modale (Annuler)
 btnCloseRecap.addEventListener('click', () => {
@@ -727,8 +785,7 @@ btnCloseRecap.addEventListener('click', () => {
 
 // Valider (Fermer et garder en mémoire)
 btnSaveRecapLocal.addEventListener('click', () => {
-    const textVal = document.getElementById('recap-text').value;
-    scenarioRecap = textVal;
+    scenarioRecap = recapTextarea.value;
     modalRecap.classList.add('hidden');
-    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 3000);
+    showToast("Récapitulatif mis en mémoire. N'oubliez pas de sauvegarder le scénario !", 'success', 1000);
 });

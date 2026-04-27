@@ -68,6 +68,14 @@ public class NPCDialogue : ScriptableObject
     /// Test récapitulatif en fin de dialogue.
     /// </summary>
     public string recapText;
+
+    /// <summary> Indique pour chaque choix si c'est la bonne réponse (pour les nœuds "player"). </summary>
+    public bool[] isCorrectFlags;
+
+    /// <summary>
+    /// Indique pour chaque choix si c'est la bonne réponse (pour les nœuds "player").
+    /// </summary>
+    public int[] nextLineTarget;
 }
 
 /// <summary>
@@ -80,17 +88,22 @@ public class NPCDialogue : ScriptableObject
 public class DialogueChoice
 {
     /// <summary>
-    /// Index de la ligne où ces choix doivent apparaître.
+    /// Index de la ligne où les choix apparaissent.
     /// </summary>
     public int dialogueIndex;
 
     /// <summary>
-    /// Texte affiché pour chaque choix.
+    /// Texte des choix affichés.
     /// </summary>
     public string[] choices;
-
+    
     /// <summary>
-    /// Index des lignes de dialogue à afficher selon le choix sélectionné.
+    /// Index des lignes vers lesquelles chaque choix mène.
     /// </summary>
     public int[] nextDialogueIndexes;
+
+    /// <summary>
+    /// Indique pour chaque choix si c'est la bonne réponse (pour les nœuds "player").
+    /// </summary>
+    public bool[] choicesCorrectness;
 }

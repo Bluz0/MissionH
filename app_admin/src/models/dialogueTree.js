@@ -11,7 +11,8 @@ const DialogueTreeSchema = new mongoose.Schema({
     y: { type: Number, default: 0 }
   },
   // Tableau d'ID des dialogues suivants
-  nextDialogues: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dialogue' }]
+  nextDialogues: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dialogue' }],
+  isCorrect: { type: Boolean, default: false }
 });
 
 const DialogueTree = mongoose.model('DialogueTree', DialogueTreeSchema);
