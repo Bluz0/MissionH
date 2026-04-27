@@ -28,6 +28,7 @@ public class NPC : MonoBehaviour, IInteractable
     private bool isLoaded = false;
     private bool needsToLoop;
     private int lastQuestionIndex;
+    private bool dialogueCompletedFully = false;
 
     private int currentSessionReward; 
     private const int MAX_REWARD = 20;
@@ -167,6 +168,7 @@ public class NPC : MonoBehaviour, IInteractable
         // Vérification de fin de dialogue (Index ou Flag)
         if (dialogueIndex >= dialogueData.dialogueLines.Length || dialogueData.endDialogueLines[dialogueIndex])
         {
+            dialogueCompletedFully = true;
             EndDialogue();
             return;
         }
@@ -287,24 +289,35 @@ public class NPC : MonoBehaviour, IInteractable
         needsToLoop = false;
 
         // --- DISTRIBUTION DE LA RÉCOMPENSE ---
-        HUDController hud = FindAnyObjectByType<HUDController>();
-        if (hud != null) 
+        if (dialogueCompletedFully)
         {
-            hud.AddMoney(currentSessionReward);
-            Debug.Log($"Fin du dialogue. Gain de {currentSessionReward} pièces.");
+            HUDController hud = FindAnyObjectByType<HUDController>();
+            if (hud != null) 
+            {
+                hud.AddMoney(currentSessionReward);
+                Debug.Log($"Succès ! Gain de {currentSessionReward} pièces.");
+            }
+
+            if (!string.IsNullOrEmpty(dialogueData.recapText))
+            {
+                dialogueUI.ShowRecap(dialogueData.recapText);
+            }
+        }
+        else
+        {
+            Debug.Log("Dialogue quitté prématurément : pas de récompense ni de récap.");
         }
     
         // On remet à zéro pour le prochain dialogue
-        currentSessionReward = 0; 
-        
+        dialogueCompletedFully = false; 
+        currentSessionReward = 0;
+        dialogueIndex = 0;
+        needsToLoop = false; 
+
         dialogueUI.ClearChoices();
         dialogueUI.SetDialogueText("");
         dialogueUI.ShowDialogueUI(false);
         PauseController.SetPause(false);
 
-        if (!string.IsNullOrEmpty(dialogueData.recapText))
-        {
-            dialogueUI.ShowRecap(dialogueData.recapText);
-        }
     }
 }
