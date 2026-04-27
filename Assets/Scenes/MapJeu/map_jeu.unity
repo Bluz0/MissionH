@@ -38047,7 +38047,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Quitter
+  m_text: Quitter le JEU
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e009720ee1d05ee49b1784ac4d879695, type: 2}
   m_sharedMaterial: {fileID: -4985011903183131441, guid: e009720ee1d05ee49b1784ac4d879695, type: 2}
@@ -38074,8 +38074,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 80
-  m_fontSizeBase: 80
+  m_fontSize: 70
+  m_fontSizeBase: 70
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -51671,6 +51671,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a23d958f36dfaa546aef52c79eff4b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  spawnPointName: SpawnPoint
 --- !u!4 &970153494 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2890191579039889399, guid: fb8c2c18b92e5304c99bf26169d1b868, type: 3}
@@ -132654,7 +132655,7 @@ Transform:
   m_GameObject: {fileID: 1247491187}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 68.6, y: -9.64, z: 0}
+  m_LocalPosition: {x: 52.18, y: -13.97, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -133389,7 +133390,7 @@ Transform:
   m_GameObject: {fileID: 1282816971}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 116.008514, y: -100.01846, z: -10}
+  m_LocalPosition: {x: 110.82649, y: -100.01995, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
