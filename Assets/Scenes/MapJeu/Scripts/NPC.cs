@@ -29,6 +29,10 @@ public class NPC : MonoBehaviour, IInteractable
     private bool needsToLoop;
     private int lastQuestionIndex;
 
+    private int currentSessionReward; 
+    private const int MAX_REWARD = 20;
+    private const int MIN_REWARD = 5;
+
     private Coroutine typeLineCoroutine;
     private Coroutine scenarioPollCoroutine;
 
@@ -135,6 +139,9 @@ public class NPC : MonoBehaviour, IInteractable
         dialogueIndex = 0; // Sécurité : on repart bien de zéro
         needsToLoop = false;
 
+        // Initialise la récompense au maximum au début du dialogue
+        currentSessionReward = MAX_REWARD;
+
         dialogueUI.SetNPCInfo(this.npcName, npcPortrait);
         dialogueUI.ShowDialogueUI(true);
         PauseController.SetPause(true);
@@ -239,6 +246,14 @@ public class NPC : MonoBehaviour, IInteractable
 
             dialogueUI.CreateChoiceButton(choiceText, () =>
             {
+                // --- LOGIQUE DE SCORE ---
+                if (!isCorrect)
+                {
+                    // On retire 1 point, sans descendre en dessous du minimum (5)
+                    currentSessionReward = Mathf.Max(MIN_REWARD, currentSessionReward - 1);
+                    Debug.Log($"Mauvaise réponse ! Récompense actuelle : {currentSessionReward}");
+                }
+                // ------------------------
                 dialogueIndex = targetIdx;
                 needsToLoop = !isCorrect;
                 ChooseOption(dialogueIndex);
@@ -271,14 +286,17 @@ public class NPC : MonoBehaviour, IInteractable
         dialogueIndex = 0;
         needsToLoop = false;
 
-        // Récompense (vérifier si on ne veut la donner qu'une fois)
-        if (rewardAmount > 0)
+        // --- DISTRIBUTION DE LA RÉCOMPENSE ---
+        HUDController hud = FindAnyObjectByType<HUDController>();
+        if (hud != null) 
         {
-            HUDController hud = FindAnyObjectByType<HUDController>();
-            if (hud != null) hud.AddMoney(rewardAmount);
-            rewardAmount = 0; // Évite de farmer le NPC en boucle
+            hud.AddMoney(currentSessionReward);
+            Debug.Log($"Fin du dialogue. Gain de {currentSessionReward} pièces.");
         }
-
+    
+        // On remet à zéro pour le prochain dialogue
+        currentSessionReward = 0; 
+        
         dialogueUI.ClearChoices();
         dialogueUI.SetDialogueText("");
         dialogueUI.ShowDialogueUI(false);
