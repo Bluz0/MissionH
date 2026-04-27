@@ -5,135 +5,32 @@ using System.Collections;
 
 /// <summary>
 /// Gère toute la logique d'interaction avec un PNJ :
-/// - lancement du dialogue
-/// - affichage progressif du texte (typewriter)
-/// - choix multiples
-/// - progression automatique
-/// - fin du dialogue.
-/// Implémente IInteractable pour être utilisé par le système d'interaction du joueur.
+/// - lancement du dialogue, affichage typewriter, choix, fin de dialogue.
 /// </summary>
 public class NPC : MonoBehaviour, IInteractable
 {
-
     [Header("Id PNJ")]
     public int npcId;
 
-    /// <summary>
-    /// Nom du scénario à charger depuis l'API ou la source de dialogues.
-    /// </summary>
     [Header("Scénario API")]
     public string scenarioName;
-
-    /// <summary>
-    /// Nom affiché du PNJ dans l'interface de dialogue.
-    /// </summary>
     public string npcName;
-
-    /// <summary>
-    /// Portrait du PNJ affiché pendant la conversation.
-    /// </summary>
     public Sprite npcPortrait;
-
-    /// <summary>
-    /// Montant de pièces accordé au joueur à la fin du dialogue.
-    /// </summary>
     public int rewardAmount = 0;
 
-    /// <summary>
-    /// Données du dialogue actuellement chargées pour ce PNJ.
-    /// </summary>
     private NPCDialogue dialogueData;
-
-    /// <summary>
-    /// Référence au contrôleur d'interface de dialogue.
-    /// </summary>
     private DialogueController dialogueUI;
-
-    /// <summary>
-    /// Composant chargé de récupérer et préparer les dialogues.
-    /// </summary>
     private DialogueLoader loader;
 
-    /// <summary>
-    /// Indique si une conversation avec ce PNJ est en cours.
-    /// </summary>
     private bool isDialogueActive;
-
-    /// <summary>
-    /// Indique si la ligne actuelle est en cours d'écriture progressive.
-    /// </summary>
     private bool isTyping;
-
-    /// <summary>
-    /// Index de la ligne de dialogue actuellement affichée.
-    /// </summary>
     private int dialogueIndex;
-
-    /// <summary>
-    /// Indique si les données de dialogue ont bien été préchargées.
-    /// </summary>
     private bool isLoaded = false;
+    private bool needsToLoop;
+    private int lastQuestionIndex;
 
     private Coroutine typeLineCoroutine;
     private Coroutine scenarioPollCoroutine;
-
-    private IEnumerator PollScenarioChange()
-    {
-        while (loader == null)
-        {
-            yield return null;
-        }
-
-        while (true)
-        {
-            yield return new WaitForSeconds(5f); // toutes les 5s
-            yield return loader.FetchAssignedScenario(npcId, npcName, (newScenarioName, serverNpcName) =>
-            {
-                if (!string.IsNullOrWhiteSpace(serverNpcName))
-                    npcName = serverNpcName;
-
-                if (!string.IsNullOrWhiteSpace(newScenarioName) && newScenarioName != scenarioName && !isDialogueActive)
-                {
-                    scenarioName = newScenarioName;
-                    // On recharge le dialogue
-                    StartCoroutine(loader.LoadDialogue(scenarioName, (data) => {
-                        data.npcName = npcName;
-                        data.npcPortrait = npcPortrait;
-                        dialogueData = data;
-                        isLoaded = true;
-                    }));
-                }
-            });
-        }
-    }
-
-    private void OnEnable()
-    {
-        if (scenarioPollCoroutine == null)
-        {
-            scenarioPollCoroutine = StartCoroutine(PollScenarioChange());
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (scenarioPollCoroutine != null)
-        {
-            StopCoroutine(scenarioPollCoroutine);
-            scenarioPollCoroutine = null;
-        }
-
-        StopTypingCoroutine();
-    }
-
-    private void StopTypingCoroutine()
-    {
-        if (typeLineCoroutine != null)
-        {
-            StopCoroutine(typeLineCoroutine);
-            typeLineCoroutine = null;
-        }
-    }
 
     private void Awake()
     {
@@ -147,16 +44,23 @@ public class NPC : MonoBehaviour, IInteractable
         loader = GetComponent<DialogueLoader>();
         if (loader == null) loader = gameObject.AddComponent<DialogueLoader>();
 
-        // Récupère d'abord le scénario assigné depuis l'API admin
-        StartCoroutine(loader.FetchAssignedScenario(npcId, npcName, (assignedScenario, serverNpcName) =>
+        // Initialisation initiale
+        StartCoroutine(InitializeNPC());
+
+        // Lance le polling pour les changements en temps réel
+        scenarioPollCoroutine = StartCoroutine(PollScenarioChange());
+    }
+
+    private IEnumerator InitializeNPC()
+    {
+        yield return loader.FetchAssignedScenario(npcId, npcName, (assignedScenario, serverNpcName) =>
         {
             if (!string.IsNullOrWhiteSpace(serverNpcName))
-                npcName = serverNpcName; 
+                npcName = serverNpcName;
 
             if (!string.IsNullOrWhiteSpace(assignedScenario))
                 scenarioName = assignedScenario;
 
-            // Charge le dialogue correspondant
             StartCoroutine(loader.LoadDialogue(scenarioName, (data) =>
             {
                 data.npcName = npcName;
@@ -164,180 +68,128 @@ public class NPC : MonoBehaviour, IInteractable
                 dialogueData = data;
                 isLoaded = true;
             }));
-        }));
-
-        // Lance le polling pour les changements en temps réel
-        scenarioPollCoroutine = StartCoroutine(PollScenarioChange());
-
+        });
     }
-    /// <summary>
-    /// Le joueur peut interagir seulement si aucun dialogue n'est en cours.
-    /// </summary>
+
+    private IEnumerator PollScenarioChange()
+    {
+        while (loader == null) yield return null;
+
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+            if (isDialogueActive) continue; // On ne change pas le script pendant qu'on parle
+
+            yield return loader.FetchAssignedScenario(npcId, npcName, (newScenarioName, serverNpcName) =>
+            {
+                if (!string.IsNullOrWhiteSpace(serverNpcName)) npcName = serverNpcName;
+
+                if (!string.IsNullOrWhiteSpace(newScenarioName) && newScenarioName != scenarioName)
+                {
+                    scenarioName = newScenarioName;
+                    isLoaded = false; // Bloque l'interaction le temps du reload
+                    StartCoroutine(loader.LoadDialogue(scenarioName, (data) =>
+                    {
+                        data.npcName = npcName;
+                        data.npcPortrait = npcPortrait;
+                        dialogueData = data;
+                        isLoaded = true;
+                    }));
+                }
+            });
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (scenarioPollCoroutine == null && loader != null)
+            scenarioPollCoroutine = StartCoroutine(PollScenarioChange());
+    }
+
+    private void OnDisable()
+    {
+        if (scenarioPollCoroutine != null)
+        {
+            StopCoroutine(scenarioPollCoroutine);
+            scenarioPollCoroutine = null;
+        }
+        StopTypingCoroutine();
+    }
 
     public bool CanInteract() => isLoaded && !isDialogueActive;
 
-
-    /// <summary>
-    /// Déclenche ou avance le dialogue selon l'état actuel.
-    /// </summary>
     public void Interact()
     {
         if (dialogueData == null || (PauseController.IsGamePaused && !isDialogueActive))
             return;
 
         if (isDialogueActive)
-        {
             NextLine();
-        }
         else
-        {
             StartDialogue();
-        }
     }
 
-    /// <summary>
-    /// Initialise le dialogue, affiche l'UI et bloque le jeu.
-    /// </summary>
     void StartDialogue()
     {
         isDialogueActive = true;
-        dialogueIndex = 0;
+        dialogueIndex = 0; // Sécurité : on repart bien de zéro
+        needsToLoop = false;
 
         dialogueUI.SetNPCInfo(this.npcName, npcPortrait);
-        
         dialogueUI.ShowDialogueUI(true);
         PauseController.SetPause(true);
 
         DisplayCurrentLine();
     }
 
-    private bool needsToLoop;
+    void NextLine()
+    {
+        if (isTyping) return;
 
-    /// <summary>
-    /// Passe à la ligne suivante ou affiche les choix si nécessaire.
-    /// </summary>
-    void NextLine() {
-        if (isTyping) { /* skip logic */ return; }
         dialogueUI.ClearChoices();
 
-        // LOGIQUE DE BOUCLE : Si on vient d'une mauvaise réponse
-        if (needsToLoop) {
+        // Si on vient d'une mauvaise réponse, on boucle vers la question
+        if (needsToLoop)
+        {
             needsToLoop = false;
-            dialogueIndex = lastQuestionIndex; // On revient à la question mémorisée
+            dialogueIndex = lastQuestionIndex;
             DisplayCurrentLine();
             return;
         }
 
-        // FIN DU DIALOGUE
-        if (dialogueData.endDialogueLines[dialogueIndex]) {
+        // Vérification de fin de dialogue (Index ou Flag)
+        if (dialogueIndex >= dialogueData.dialogueLines.Length || dialogueData.endDialogueLines[dialogueIndex])
+        {
             EndDialogue();
             return;
         }
 
-        // CHOIX
-        foreach (DialogueChoice choice in dialogueData.choices) {
-            if (choice.dialogueIndex == dialogueIndex) {
+        // Vérification des choix
+        foreach (DialogueChoice choice in dialogueData.choices)
+        {
+            if (choice.dialogueIndex == dialogueIndex)
+            {
                 DisplayChoices(choice);
                 return;
             }
         }
 
-        // SUITE NORMALE (On suit la flèche au lieu de faire ++)
+        // Progression via nextLineTarget ou simple incrément
         int nextIdx = dialogueData.nextLineTarget[dialogueIndex];
-        if (nextIdx != -1) {
+        if (nextIdx != -1)
+        {
             dialogueIndex = nextIdx;
             DisplayCurrentLine();
-        } else {
+        }
+        else
+        {
             EndDialogue();
         }
     }
 
-    /// <summary>
-    /// Effet "machine à écrire" pour afficher le texte progressivement.
-    /// </summary>
-    IEnumerator TypeLine(string textToType)
-    {
-        isTyping = true;
-        dialogueUI.SetDialogueText("");
-
-        foreach (char letter in textToType)
-        {
-            dialogueUI.dialogueText.text += letter;
-            yield return new WaitForSeconds(dialogueData.typingSpeed);
-        }
-
-        isTyping = false;
-        // --- LOGIQUE DE PROGRESSION AUTOMATIQUE ---
-        // On ne lance la progression automatique QUE s'il n'y a plus de morceaux de texte à lire
-        // pour éviter de "sauter" des morceaux si le PNJ est en mode autoProgress.
-        if (!dialogueUI.HasMoreChunks())
-        {
-            if (dialogueData.autoProgressLines.Length > dialogueIndex && dialogueData.autoProgressLines[dialogueIndex])
-            {
-                yield return new WaitForSeconds(dialogueData.autoProgressDelay);
-                NextLine();
-            }
-        }
-    }
-
-    private int lastQuestionIndex;
-
-    /// <summary>
-    /// Applique le choix sélectionné et passe /// </summary>
-    ///
-    void DisplayChoices(DialogueChoice choice) {
-        lastQuestionIndex = dialogueIndex; // On mémorise l'index de la question (ex: 5)
-        
-        for (int i = 0; i < choice.choices.Length; i++) {
-            int targetIdx = choice.nextDialogueIndexes[i]; // L'index du feedback (ex: 10)
-            bool isCorrect = choice.choicesCorrectness[i]; // LE FIX : On regarde la validité du bouton i
-            string choiceText = choice.choices[i];
-
-            dialogueUI.CreateChoiceButton(choiceText, () => {
-                dialogueIndex = targetIdx; // On se téléporte au feedback ("Oui c'est bon")
-                
-                // Si le bouton cliqué n'était pas le bon, needsToLoop devient vrai
-                needsToLoop = !isCorrect; 
-                
-                ChooseOption(dialogueIndex);
-            });
-        }
-    }
-
-    IEnumerator WrongAnswerRoutine(int feedbackIndex)
-    {
-        // Affiche le message de feedback du PNJ (ex: "Ce n'est pas ça...")
-        dialogueIndex = feedbackIndex;
-        DisplayCurrentLine();
-
-        //  Attend que l'écriture soit finie
-        yield return new WaitUntil(() => !isTyping);
-        
-        // Attend un clic du joueur pour passer le message d'erreur
-        yield return new WaitUntil(() => Input.GetMouseButtonDown(0)); 
-
-        // BOUCLE : On revient à la question d'origine
-        dialogueIndex = lastQuestionIndex;
-        DisplayCurrentLine();
-    }
-
-    /// <summary>
-    /// à la ligne correspondante.
-    /// </summary>
-    void ChooseOption(int nextIndex)
-    {
-        dialogueIndex = nextIndex;
-        dialogueUI.ClearChoices();
-        DisplayCurrentLine();
-    }
-
-    /// <summary>
-    /// Affiche la ligne actuelle en lançant la coroutine de typing.
-    /// </summary>
     void DisplayCurrentLine()
     {
         StopTypingCoroutine();
-        // On découpe la nouvelle ligne en morceaux
         dialogueUI.PrepareTextChunks(dialogueData.dialogueLines[dialogueIndex]);
         DisplayNextChunk();
     }
@@ -352,42 +204,89 @@ public class NPC : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Donne la récompense en pièces au joueur.
-    /// </summary>
-    void GiveReward()
+    IEnumerator TypeLine(string textToType)
     {
-        if (rewardAmount > 0)
+        isTyping = true;
+        dialogueUI.SetDialogueText("");
+
+        foreach (char letter in textToType)
         {
-            HUDController hud = FindAnyObjectByType<HUDController>();
-            hud.AddMoney(rewardAmount);
+            dialogueUI.dialogueText.text += letter;
+            yield return new WaitForSeconds(dialogueData.typingSpeed);
+        }
+
+        isTyping = false;
+
+        if (!dialogueUI.HasMoreChunks())
+        {
+            if (dialogueData.autoProgressLines.Length > dialogueIndex && dialogueData.autoProgressLines[dialogueIndex])
+            {
+                yield return new WaitForSeconds(dialogueData.autoProgressDelay);
+                NextLine();
+            }
         }
     }
 
-   
+    void DisplayChoices(DialogueChoice choice)
+    {
+        lastQuestionIndex = dialogueIndex;
 
+        for (int i = 0; i < choice.choices.Length; i++)
+        {
+            int targetIdx = choice.nextDialogueIndexes[i];
+            bool isCorrect = choice.choicesCorrectness[i];
+            string choiceText = choice.choices[i];
 
+            dialogueUI.CreateChoiceButton(choiceText, () =>
+            {
+                dialogueIndex = targetIdx;
+                needsToLoop = !isCorrect;
+                ChooseOption(dialogueIndex);
+            });
+        }
+    }
 
-    /// <summary>
-    /// Termine le dialogue, cache l'UI et réactive le jeu.
-    /// </summary>
+    void ChooseOption(int nextIndex)
+    {
+        dialogueIndex = nextIndex;
+        dialogueUI.ClearChoices();
+        DisplayCurrentLine();
+    }
+
+    private void StopTypingCoroutine()
+    {
+        if (typeLineCoroutine != null)
+        {
+            StopCoroutine(typeLineCoroutine);
+            typeLineCoroutine = null;
+        }
+    }
+
     public void EndDialogue()
     {
         StopTypingCoroutine();
-        isDialogueActive = false;
 
+        // --- RESET DES ÉTATS POUR REPARLER ---
+        isDialogueActive = false;
+        dialogueIndex = 0;
+        needsToLoop = false;
+
+        // Récompense (vérifier si on ne veut la donner qu'une fois)
         if (rewardAmount > 0)
         {
             HUDController hud = FindAnyObjectByType<HUDController>();
-            hud.AddMoney(rewardAmount);
+            if (hud != null) hud.AddMoney(rewardAmount);
+            rewardAmount = 0; // Évite de farmer le NPC en boucle
         }
 
+        dialogueUI.ClearChoices();
         dialogueUI.SetDialogueText("");
         dialogueUI.ShowDialogueUI(false);
         PauseController.SetPause(false);
 
-        if (!string.IsNullOrEmpty(dialogueData.recapText)){
-        dialogueUI.ShowRecap(dialogueData.recapText);
+        if (!string.IsNullOrEmpty(dialogueData.recapText))
+        {
+            dialogueUI.ShowRecap(dialogueData.recapText);
         }
     }
 }

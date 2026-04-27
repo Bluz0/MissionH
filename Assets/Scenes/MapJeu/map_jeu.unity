@@ -38141,7 +38141,7 @@ GameObject:
   - component: {fileID: 226347044}
   - component: {fileID: 226347043}
   - component: {fileID: 226347042}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Prof5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38223,7 +38223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Mr Dumond
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &226347044
@@ -39933,7 +39933,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 331130996}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Les_Pnj
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40049,7 +40049,7 @@ GameObject:
   - component: {fileID: 340104378}
   - component: {fileID: 340104377}
   - component: {fileID: 340104376}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Prof3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40131,7 +40131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 3
+  npcName: Mr Wayntal
   npcPortrait: {fileID: -5935188917897026707, guid: db9c44f39b3cfe64aaadd5ac5bbccfe2, type: 3}
   rewardAmount: 0
 --- !u!50 &340104378
@@ -48988,7 +48988,7 @@ GameObject:
   - component: {fileID: 767817845}
   - component: {fileID: 767817844}
   - component: {fileID: 767817843}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49070,7 +49070,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Julie
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &767817845
@@ -49219,7 +49219,7 @@ GameObject:
   - component: {fileID: 785140151}
   - component: {fileID: 785140150}
   - component: {fileID: 785140149}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Prof6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49301,7 +49301,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 6
+  npcName: Mrs Ferraris
   npcPortrait: {fileID: -6478336861009418988, guid: 9fd5155101d18414584b1c3c7e15e347, type: 3}
   rewardAmount: 0
 --- !u!50 &785140151
@@ -51085,7 +51085,7 @@ GameObject:
   - component: {fileID: 941638570}
   - component: {fileID: 941638569}
   - component: {fileID: 941638568}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Prof1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51121,7 +51121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 1
+  npcName: Mr Boussion
   npcPortrait: {fileID: 7314993261144778584, guid: 606be401aa8b51b4fad8908895036e38, type: 3}
   rewardAmount: 0
 --- !u!50 &941638564
@@ -52520,7 +52520,7 @@ GameObject:
   - component: {fileID: 1060298147}
   - component: {fileID: 1060298146}
   - component: {fileID: 1060298145}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52602,7 +52602,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Lena
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &1060298147
@@ -132167,7 +132167,7 @@ GameObject:
   - component: {fileID: 1192432289}
   - component: {fileID: 1192432288}
   - component: {fileID: 1192432287}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Prof4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132249,7 +132249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 4
+  npcName: Mr Hyvernat
   npcPortrait: {fileID: 8485679160395290860, guid: 18a3a1b49a081f046a273aa61a309b38, type: 3}
   rewardAmount: 0
 --- !u!50 &1192432289
@@ -132655,7 +132655,7 @@ Transform:
   m_GameObject: {fileID: 1247491187}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 52.18, y: -13.97, z: 0}
+  m_LocalPosition: {x: 57.3, y: -21.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -132706,7 +132706,7 @@ GameObject:
   - component: {fileID: 1252388738}
   - component: {fileID: 1252388737}
   - component: {fileID: 1252388736}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132788,7 +132788,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Ilias
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &1252388738
@@ -133390,7 +133390,7 @@ Transform:
   m_GameObject: {fileID: 1282816971}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 110.82649, y: -100.01995, z: -10}
+  m_LocalPosition: {x: 114.69893, y: -100.01884, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -135314,7 +135314,7 @@ GameObject:
   - component: {fileID: 1430544165}
   - component: {fileID: 1430544164}
   - component: {fileID: 1430544163}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135396,7 +135396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Medhi
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &1430544165
@@ -136207,7 +136207,7 @@ GameObject:
   - component: {fileID: 1476970080}
   - component: {fileID: 1476970079}
   - component: {fileID: 1476970078}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Prof2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136289,7 +136289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 2
+  npcName: Mr Cavallini
   npcPortrait: {fileID: 7813297715414455986, guid: 9537bdbfebaefe944aba462cea2534f5, type: 3}
   rewardAmount: 0
 --- !u!50 &1476970080
@@ -136737,7 +136737,7 @@ GameObject:
   - component: {fileID: 1510541251}
   - component: {fileID: 1510541250}
   - component: {fileID: 1510541249}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136819,7 +136819,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Coralie
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &1510541251
@@ -137430,7 +137430,7 @@ GameObject:
   - component: {fileID: 1576952659}
   - component: {fileID: 1576952658}
   - component: {fileID: 1576952657}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137512,7 +137512,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Theo
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &1576952659
@@ -139601,7 +139601,7 @@ GameObject:
   - component: {fileID: 1867254005}
   - component: {fileID: 1867254004}
   - component: {fileID: 1867254003}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139683,7 +139683,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Amine
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &1867254005
@@ -503613,7 +503613,7 @@ GameObject:
   - component: {fileID: 2031678182}
   - component: {fileID: 2031678181}
   - component: {fileID: 2031678180}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -503695,7 +503695,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Ayoub
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &2031678182
@@ -504963,7 +504963,7 @@ GameObject:
   - component: {fileID: 2112540252}
   - component: {fileID: 2112540251}
   - component: {fileID: 2112540250}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -505045,7 +505045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Andy
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &2112540252
@@ -505360,7 +505360,7 @@ GameObject:
   - component: {fileID: 2127798181}
   - component: {fileID: 2127798180}
   - component: {fileID: 2127798179}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eleve8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -505442,7 +505442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   npcId: 0
   scenarioName: 
-  npcName: Mr 5
+  npcName: Antonin
   npcPortrait: {fileID: -4109000487444534179, guid: d2675a21536080249a48814861ad67f6, type: 3}
   rewardAmount: 0
 --- !u!50 &2127798181
@@ -505656,7 +505656,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
       propertyPath: npcName
-      value: Ayoub
+      value: Test
       objectReference: {fileID: 0}
     - target: {fileID: 6717140821631727669, guid: e48cb732731a78a4592d8d408ffa2dc7, type: 3}
       propertyPath: nameText
