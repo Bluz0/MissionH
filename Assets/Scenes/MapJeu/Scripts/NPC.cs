@@ -199,7 +199,9 @@ public class NPC : MonoBehaviour, IInteractable
     void DisplayCurrentLine()
     {
         StopTypingCoroutine();
-        dialogueUI.PrepareTextChunks(dialogueData.dialogueLines[dialogueIndex]);
+        string rawText = dialogueData.dialogueLines[dialogueIndex];
+        string cleanText = loader.SimpleRemoveAccents(rawText);
+        dialogueUI.PrepareTextChunks(cleanText);
         DisplayNextChunk();
     }
 
@@ -244,7 +246,8 @@ public class NPC : MonoBehaviour, IInteractable
         {
             int targetIdx = choice.nextDialogueIndexes[i];
             bool isCorrect = choice.choicesCorrectness[i];
-            string choiceText = choice.choices[i];
+            string choiceText = loader.SimpleRemoveAccents(choice.choices[i]);
+            // string choiceText = choice.choices[i]; ancienne version
 
             dialogueUI.CreateChoiceButton(choiceText, () =>
             {
@@ -300,7 +303,8 @@ public class NPC : MonoBehaviour, IInteractable
 
             if (!string.IsNullOrEmpty(dialogueData.recapText))
             {
-                dialogueUI.ShowRecap(dialogueData.recapText);
+                string cleanRecap = loader.SimpleRemoveAccents(dialogueData.recapText);
+                dialogueUI.ShowRecap(cleanRecap);
             }
         }
         else

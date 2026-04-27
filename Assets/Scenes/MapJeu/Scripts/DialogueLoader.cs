@@ -211,6 +211,21 @@ public class DialogueLoader : MonoBehaviour
 
         return null;
     }
+
+    public string SimpleRemoveAccents(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+
+        string[] accents = { "é", "è", "ê", "ë", "à", "â", "î", "ï", "ô", "û", "ù", "ç" };
+        string[] sansAccents = { "e", "e", "e", "e", "a", "a", "i", "i", "o", "u", "u", "c" };
+
+        for (int i = 0; i < accents.Length; i++)
+        {
+            text = text.Replace(accents[i], sansAccents[i]);
+            text = text.Replace(accents[i].ToUpper(), sansAccents[i].ToUpper());
+        }
+        return text;
+    }
 }
 
 // Modèles JSON
