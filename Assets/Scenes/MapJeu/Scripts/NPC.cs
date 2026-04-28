@@ -30,7 +30,7 @@ public class NPC : MonoBehaviour, IInteractable
     private int lastQuestionIndex;
     private bool dialogueCompletedFully = false;
 
-    private int currentSessionReward; 
+    private int currentSessionReward;
     private const int MAX_REWARD = 20;
     private const int MIN_REWARD = 5;
 
@@ -43,6 +43,10 @@ public class NPC : MonoBehaviour, IInteractable
         npcId = name.GetHashCode() & 0x7FFFFFFF;
     }
 
+    public bool IsDialogueActive()
+    {
+        return isDialogueActive;
+    }
     public void Start()
     {
         dialogueUI = DialogueController.Instance;
@@ -295,7 +299,7 @@ public class NPC : MonoBehaviour, IInteractable
         if (dialogueCompletedFully)
         {
             HUDController hud = FindAnyObjectByType<HUDController>();
-            if (hud != null) 
+            if (hud != null)
             {
                 hud.AddMoney(currentSessionReward);
                 Debug.Log($"Succès ! Gain de {currentSessionReward} pièces.");
@@ -311,12 +315,12 @@ public class NPC : MonoBehaviour, IInteractable
         {
             Debug.Log("Dialogue quitté prématurément : pas de récompense ni de récap.");
         }
-    
+
         // On remet à zéro pour le prochain dialogue
-        dialogueCompletedFully = false; 
+        dialogueCompletedFully = false;
         currentSessionReward = 0;
         dialogueIndex = 0;
-        needsToLoop = false; 
+        needsToLoop = false;
 
         dialogueUI.ClearChoices();
         dialogueUI.SetDialogueText("");

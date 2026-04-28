@@ -38,7 +38,7 @@ public class MenuController : MonoBehaviour
     /// </summary>
     void Start()
     {
-        menuCanvas.SetActive(false);
+        if (menuCanvas != null) menuCanvas.SetActive(false);
     }
 
     /// <summary>
@@ -49,14 +49,25 @@ public class MenuController : MonoBehaviour
     /// </summary>
     public void ToggleMenu()
     {
+        if (!menuCanvas.activeSelf && DialogueController.Instance != null)
+        {
+            if (DialogueController.Instance.dialoguePanel.activeSelf)
+            {
+                Debug.Log("Ouverture du menu bloquée : Un dialogue est en cours.");
+                return;
+            }
+        }
+
         bool isOpen = !menuCanvas.activeSelf;
 
         menuCanvas.SetActive(isOpen);
         menuHUD.SetActive(!isOpen);
         joystick.SetActive(!isOpen);
         interactButton.SetActive(!isOpen);
+
         PauseController.SetPause(isOpen);
-        if (DialogueController.Instance.recapPanel.activeSelf)
+
+        if (DialogueController.Instance != null && DialogueController.Instance.recapPanel.activeSelf)
         {
             DialogueController.Instance.CloseRecap();
         }

@@ -4,9 +4,9 @@ using TMPro;
 public class GlobalSizeController : MonoBehaviour
 {
     [Header("Réglages des Multiplicateurs")]
-    public float scaleSmall = 0.7f;  // Taille réduite (70%)
-    public float scaleNormal = 1.0f; // Taille normale (100%)
-    public float scaleLarge = 1.4f;  // Taille augmentée (140%)
+    public float scaleSmall = 0.3f;
+    public float scaleNormal = 0.5f;
+    public float scaleLarge = 0.8f;
 
     private float currentScale = 1.0f;
     private const string SaveKey = "GlobalTextScale";
