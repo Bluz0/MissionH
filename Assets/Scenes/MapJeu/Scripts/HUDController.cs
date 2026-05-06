@@ -1,85 +1,84 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// Gère l'affichage du HUD du joueur :
-/// - heure du jeu
-/// - argent du joueur
-/// - mise à jour automatique de l'affichage
-/// </summary>
 public class HUDController : MonoBehaviour
 {
-    /// <summary>
-    /// Texte affichant l'heure dans le HUD.
-    /// </summary>
-    public TMP_Text timeText;
+    // Instance statique pour y accéder de partout (Singleton)
+    public static HUDController Instance;
 
-    /// <summary>
-    /// Texte affichant l'argent du joueur dans le HUD.
-    /// </summary>
+    [Header("Réglages Time")]
+    public bool timePasses = true;      // Le temps défile-t-il ?
+    public float timeSpeed = 0.01f;     // Vitesse du temps (0.01 = réaliste, plus haut = plus rapide)
+
+    [Header("Références HUD")]
+    public TMP_Text timeText;
     public TMP_Text moneyText;
 
-    /// <summary>
-    /// Heure actuelle du jeu (exprimée en heures décimales).
-    /// Exemple : 12.5 = 12h30.
-    /// </summary>
-    private float time = 12f;
+    [Header("Références MENU (Optionnel)")]
+    public TMP_Text menuTimeText;       // Glisse ici le texte qui est dans ton menu
+    public TMP_Text menuMoneyText;      // Glisse ici le texte d'argent dans ton menu
 
-    /// <summary>
-    /// Argent actuel du joueur.
-    /// </summary>
+    private float time = 8f;            // Départ à 08:00
     private int money = 0;
 
-    /// <summary>
-    /// Initialise l'affichage du HUD au lancement.
-    /// </summary>
+    void Awake()
+    {
+        // Initialisation du Singleton
+        if (Instance == null) Instance = this;
+    }
+
     void Start()
     {
         UpdateHUD();
     }
 
-    /// <summary>
-    /// Met à jour l'affichage de l'heure et de l'argent.
-    /// Convertit l'heure décimale en format HH:MM.
-    /// </summary>
-    void UpdateHUD()
+    void Update()
     {
-        // Conversion de l'heure décimale en heures + minutes
-        int hours = Mathf.FloorToInt(time);
-        int minutes = Mathf.FloorToInt((time - hours) * 60);
+        if (timePasses)
+        {
+            // Le temps avance. 24.0f permet de revenir à 00:00 après minuit
+            time += Time.deltaTime * timeSpeed;
+            if (time >= 24f) time = 0f;
 
-        // Mise à jour du texte de l'heure
-        timeText.text = $"{hours:00}:{minutes:00}";
-
-        // Mise à jour du texte de l'argent
-        moneyText.text = money.ToString();
+            UpdateHUD();
+        }
     }
 
-    /// <summary>
-    /// Ajoute de l'argent au joueur et met à jour le HUD.
-    /// </summary>
+    public void UpdateHUD()
+    {
+        int hours = Mathf.FloorToInt(time);
+        int minutes = Mathf.FloorToInt((time - hours) * 60);
+        string timeString = $"{hours:00}:{minutes:00}";
+
+        // Mise à jour HUD
+        if (timeText != null) timeText.text = timeString;
+        if (moneyText != null) moneyText.text = money.ToString();
+
+        if (menuTimeText != null) menuTimeText.text = timeString;
+        if (menuMoneyText != null) menuMoneyText.text = money.ToString();
+    }
+
+    // --- Gestion de l'Argent ---
     public void AddMoney(int amount)
     {
         money += amount;
         UpdateHUD();
     }
 
-    /// <summary>
-    /// Retire de l'argent au joueur si possible.
-    /// Retourne true si la transaction est possible.
-    /// </summary>
     public bool SpendMoney(int amount)
     {
-        if (money < amount)
-            return false;
-
+        if (money < amount) return false;
         money -= amount;
         UpdateHUD();
         return true;
     }
 
+    // --- Getters ---
+    public int GetMoney() => money;
+    public float GetTime() => time;
+
     /// <summary>
-    /// Définit directement le montant d'argent du joueur.
+    /// Définit directement le montant d'argent (utilisé par la sauvegarde).
     /// </summary>
     public void SetMoney(int value)
     {
@@ -88,27 +87,11 @@ public class HUDController : MonoBehaviour
     }
 
     /// <summary>
-    /// Retourne le montant actuel d'argent du joueur.
-    /// </summary>
-    public int GetMoney()
-    {
-        return money;
-    }
-
-    /// <summary>
-    /// Définit une nouvelle heure et met à jour l'affichage.
+    /// Définit directement l'heure (utilisé par la sauvegarde).
     /// </summary>
     public void SetTime(float newTime)
     {
         time = newTime;
         UpdateHUD();
-    }
-
-    /// <summary>
-    /// Retourne l'heure actuelle du jeu.
-    /// </summary>
-    public float GetTime()
-    {
-        return time;
     }
 }

@@ -10,6 +10,11 @@ public class MapController : MonoBehaviour
     public RectTransform markersParent;     // Parent qui contiendra les labels des bâtiments
     public GameObject labelPrefab;          // Prefab TMP_Text utilisé pour afficher les noms
 
+
+    [Header("Réglages Affichage")]
+    [Tooltip("Taille de la police pour les noms de bâtiments")]
+    public float fontSize = 24f;
+
     [Header("Références Monde")]
     public Transform player;                // Référence au joueur dans la scène
     public Vector2 worldMin;                // Coordonnées du coin bas-gauche de la map dans le monde
@@ -24,6 +29,11 @@ public class MapController : MonoBehaviour
     {
         UpdatePlayerPosition();
         GenerateMarkers();
+    }
+
+    void Update()
+    {
+        UpdatePlayerPosition();
     }
 
     /// <summary>
@@ -61,7 +71,12 @@ public class MapController : MonoBehaviour
         {
             GameObject label = Instantiate(labelPrefab, markersParent);
 
-            label.GetComponent<TMP_Text>().text = marker.buildingName;
+            TMP_Text textComponent = label.GetComponent<TMP_Text>();
+
+            textComponent.text = marker.buildingName;
+            textComponent.fontSize = fontSize;
+
+            textComponent.fontStyle = FontStyles.Bold;
 
             Vector2 pos = marker.transform.position;
 
