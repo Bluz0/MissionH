@@ -37,6 +37,8 @@ public class NPC : MonoBehaviour, IInteractable
     private Coroutine typeLineCoroutine;
     private Coroutine scenarioPollCoroutine;
 
+    private string currentChunkFullText;
+
     private void Awake()
     {
         // Hash stable sur le nom pour générer un ID int positif.
@@ -154,9 +156,21 @@ public class NPC : MonoBehaviour, IInteractable
         DisplayCurrentLine();
     }
 
+    void FinishLineInstantly()
+    {
+        StopTypingCoroutine();
+        isTyping = false;
+        dialogueUI.SetDialogueText(currentChunkFullText);
+        
+    }
+
     void NextLine()
     {
-        if (isTyping) return;
+        if (isTyping)
+        {
+            FinishLineInstantly();
+            return;
+        }
 
         dialogueUI.ClearChoices();
 
@@ -214,6 +228,7 @@ public class NPC : MonoBehaviour, IInteractable
         string chunk = dialogueUI.GetNextChunk();
         if (chunk != null)
         {
+            currentChunkFullText = chunk;
             StopTypingCoroutine();
             typeLineCoroutine = StartCoroutine(TypeLine(chunk));
         }
