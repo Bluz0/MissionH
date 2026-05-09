@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Téléchargement - Mission H</title>
     <link rel="stylesheet" href="../../style/style_main.css">
+    <style>
+        .step-number {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+            display: block;
+            margin-bottom: 1rem;
+            opacity: 0.2;
+        }
+        .step-card {
+            background: var(--gray-light);
+            padding: 2rem;
+            border: 2px solid var(--black);
+            height: 100%;
+        }
+        .warning-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 2px solid var(--swiss-red);
+            background-color: rgba(255, 0, 0, 0.05);
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <main class="container">
@@ -12,25 +36,66 @@
             <h2 class="page-title uppercase">Téléchargement</h2>
         </div>
 
+        <div style="margin-top: 5rem;">
+            <h3 class="uppercase espace-letter font-black" style="margin-bottom: 2rem; border-left: 8px solid var(--black); padding-left: 1rem;">
+                Comment installer l'application ?
+            </h3>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                
+                <div class="step-card">
+                    <span class="step-number">01</span>
+                    <h4 class="uppercase font-black" style="font-size: 14px; margin-bottom: 0.5rem;">Téléchargement</h4>
+                    <p style="font-size: 13px; color: var(--gray-text);">Récupérez le fichier via le bouton ci-dessous ou en scannant le QR code avec votre mobile.</p>
+                </div>
+
+                
+                <div class="step-card">
+                    <span class="step-number">02</span>
+                    <h4 class="uppercase font-black" style="font-size: 14px; margin-bottom: 0.5rem;">Autorisation</h4>
+                    <p style="font-size: 13px; color: var(--gray-text);">Si un message "Fichier potentiellement dangereux" apparaît, cliquez sur <strong>"Télécharger quand même"</strong>. C'est une alerte standard d'Android.</p>
+                </div>
+
+                
+                <div class="step-card">
+                    <span class="step-number">03</span>
+                    <h4 class="uppercase font-black" style="font-size: 14px; margin-bottom: 0.5rem;">Installation</h4>
+                    <p style="font-size: 13px; color: var(--gray-text);">Ouvrez le fichier .apk. Si le système bloque, allez dans <strong>Paramètres</strong> et cochez <strong>"Autoriser cette source"</strong>.</p>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <p class="uppercase font-black" style="color: var(--swiss-red);">Information importante</p>
+                <p>L'application n'est disponible que sur <strong>Android</strong>. Les utilisateurs d'iPhone ne peuvent pas installer de fichiers APK.</p>
+            </div>
+        </div>
+
+        <br><br>
+
         <div class="editor-split">
+            <!-- Colonne Bouton -->
             <div class="unity-preview" style="height: auto; text-align: center; padding: 3rem;">
                 <div class="card-number" style="font-size: 3rem; opacity: 1;">APK</div>
                 <h3 class="uppercase" style="margin: 1rem 0;">Mission H - Android</h3>
-                <p style="color: var(--gray-text); margin-bottom: 2rem;">Version de test actuelle</p>
+                <p style="color: var(--gray-text); margin-bottom: 2rem;">Version v1.0.1</p>
                 
                 <a href="../../builds/mission_h_v1.0.1.apk" download class="btn btn-black press-effect" style="font-size: 1.5rem; padding: 1.5rem 3rem;">
                     TÉLÉCHARGER L'APK
                 </a>
             </div>
 
+            <!-- Colonne QR Code -->
             <div class="unity-preview" style="text-align: center;">
                 <h3 class="uppercase" style="margin-bottom: 1rem;">Flash pour mobile</h3>
                 <div id="qrcode-container" style="background: white; padding: 20px; display: inline-block; border: 4px solid var(--black);">
+                    <!-- Le QR Code pointe vers l'URL directe du fichier sur ton serveur -->
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A%2F%2F82.165.32.184%2Fbuilds%2Fmission_h_v1.0.1.apk" alt="QR Code">
                 </div>
                 <p style="margin-top: 10px; font-size: 10px;" class="uppercase espace-letter">Scanner avec votre téléphone</p>
             </div>
         </div>
+
+        
     </main>
 </body>
 </html>
