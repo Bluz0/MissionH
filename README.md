@@ -18,7 +18,7 @@ Mission H is a mobile application project developed with Unity. It offers an int
 ## ⚙️ Depot Architecture
 
 *  `/Assets` : Unity C# scripts, scenes, sprites, templates, and prefabs.
-*  `   `/Packages` : Dependencies and packages for the Unity project.
+*  `/Packages` : Dependencies and packages for the Unity project.
 *  `/ProjectSettings` : Set up inputs, graphics, and the publisher.
 *  `/app_admin` : Administrative dashboard source code (API/web).
 
