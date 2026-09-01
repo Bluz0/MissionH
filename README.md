@@ -22,6 +22,7 @@ Mission H is a mobile application project developed with Unity. It offers an int
 *  `/ProjectSettings` : Set up inputs, graphics, and the publisher.
 *  `/app_admin` : Administrative dashboard source code (API/web).
 
+At its core, it is an educational game designed to teach players about different types of disabilities in a fun and engaging way.
 
 
 ## EN FRANCAIS 🇫🇷
@@ -49,3 +50,5 @@ Mission H est un projet d'application mobile développé avec Unity. Il propose 
 *   `/Packages` : Dépendances et packages du projet Unity.
 *   `/ProjectSettings` : Configuration des inputs, des graphismes et de l'éditeur.
 *   `/app_admin` : Code source du tableau de bord d'administration (API/Web).
+
+À l'origine, il s'agit d'un jeu éducatif conçu pour sensibiliser et faire apprendre, de manière ludique, les différents types de handicap.
