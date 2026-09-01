@@ -101,7 +101,21 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
+
+
 *.sln
 *.slnx
 *.csproj
 .vscode/
+
+# ==========================================
+# Unity IL2CPP & Burst Debug / Build Folders
+# ==========================================
+*_BackUpThisFolder_ButDontShipItWith*
+*_BurstDebugInformation_DoNotShip*
+
+# ==========================================
+# Web / Node.js (pour le dossier app_admin)
+# ==========================================
+node_modules/
+.env
